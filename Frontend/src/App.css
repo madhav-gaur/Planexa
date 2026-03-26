@@ -1,0 +1,139 @@
+:root {
+  --primary-blue: rgb(21, 93, 252);
+  --danger-red: #dc2626;
+  --primary-blue-hover: #125ee2;
+  --primary-blue-disabled: #87abfc;
+  --surface: #fff;
+  --border: 1px solid #e4e4e7;
+  --surface-hover-dark: rgb(245, 245, 245);
+  --surface-hover-light: #f9fafb;
+  --surface-hover-light2: #fafafa;
+  --surface-hover-light3: #f4f4f4;
+  --text-normal: black;
+  --text-normal2: rgb(50, 50, 50);
+  --text-normal3: #1e2939;
+
+  --text-light: #717171;
+  --text-light2: #9f9fa9;
+  --text-blue: #63b3cd;
+}
+
+.Toastify__progress-bar {
+  background: var(--primary-blue) !important;
+}
+
+.Toastify__toast-body {
+  color: var(--text-normal);
+  background-color: red;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+}
+
+button {
+  font-weight: 500;
+}
+
+p,
+span,
+li {
+  font-weight: 400;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button {
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #e5e7eb;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 7px;
+  background-color: #bbc3d1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #99a5bc;
+}
+
+/*? Utility Classes */
+
+/* Blue Button */
+.primary-button {
+  background-color: var(--primary-blue);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  &:hover {
+    background-color: var(--primary-blue-hover);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: var(--primary-blue-disabled);
+  }
+}
+
+.secondary-button {
+  background-color: var(--surface);
+  border: 2px solid var(--primary-blue);
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  &:hover {
+    background-color: var(--surface-hover-dark);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: var(--surface-hover-light3);
+  }
+}

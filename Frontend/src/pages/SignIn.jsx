@@ -1,0 +1,136 @@
+import React, { useState } from 'react'
+import './styles/Sign.css'
+import { IoEyeOutline } from "react-icons/io5";
+import { IoEyeOffOutline } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
+import Axios from '../utils/axios';
+import { apiList } from '../common/apiList';
+import ButtonLoading from '../components/ButtonLoading';
+import { useDispatch } from 'react-redux';
+import { setIsUserLoaded } from '../store/user.slice';
+import { toast } from 'react-toastify';
+// import { useSelector } from 'react-redux';
+const SignIn = () => {
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+  })
+  const dispatch = useDispatch()
+
+  const navigate = useNavigate()
+  // const dispatch = useDispatch()
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState("Sign in")
+
+  const validate = () => {
+    if (data.email == "" || data.password == "") {
+      return false
+    } else return true
+  }
+  const [isPswd, setIsPswd] = useState(false)
+  const handleInput = (e) => {
+    const { name, value } = e.target;
+    setData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+  const tempToken = localStorage.getItem("inviteToken");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const email = data.email.trim().toLowerCase();
+    setLoading("Signing you in");
+
+    try {
+      const response = await Axios({
+        ...apiList.signIn,
+        data: {
+          email,
+          password: data.password,
+        },
+      });
+      dispatch(setIsUserLoaded(false))
+      if (!response.data.success) {
+        setError(response.data.message);
+        return;
+      }
+      toast.success("Sign in Successfull")
+      if (tempToken) {
+        navigate(`/invite/${tempToken}`);
+        return;
+      }
+
+      setLoading("Sign in successful");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  // useEffect(() => {
+
+  //   if (user && tempToken) {
+  //     navigate(`/invite/${tempToken}`);
+  //     return
+  //   }
+  //   if (user) {
+  //     navigate("/")
+  //     return
+  //   }
+  // }, [user, tempToken, navigate])
+  return (
+    <section className='sign-wrapper'>
+      <div className='app-form-container'>
+        <div className='app-form-head'>
+          <h2>Sign in</h2>
+          <p>Enter Following Details to Sign in</p>
+        </div>
+        <form className='app-form' onSubmit={handleSubmit}>
+          <div className='app-form-item'>
+            <span>Email</span>
+            <div>
+              <input
+                type="email"
+                required
+                placeholder=" "
+                id='email'
+                name='email'
+                onChange={handleInput}
+                value={data.email}
+              />
+              <label htmlFor='email'>Enter Your Email</label>
+            </div>
+
+          </div>
+          <div className='app-form-item'>
+            <span>Password</span>
+            <div>
+              <input
+                type={!isPswd ? "password" : "text"}
+                placeholder=" "
+                required
+                id='password'
+                name='password'
+                onChange={handleInput}
+                value={data.password}
+              />
+              <label htmlFor='password'>Enter Password</label>
+              <i onClick={() => setIsPswd(!isPswd)}>{isPswd ? <IoEyeOffOutline /> : <IoEyeOutline />}</i>
+            </div>
+            {error != "" && <p>*{error}</p>}
+
+          </div>
+          <div>
+            <button disabled={!validate()} className='primary-button' style={{ width: '100%' }}>{loading == "Signing you in" && <ButtonLoading />}{loading}</button>
+          </div>
+        </form>
+        <div className='app-form-navigate'>
+          <p>Don't have an account? <u onClick={() => navigate('/sign-up')}>Sign up</u></p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default SignIn
