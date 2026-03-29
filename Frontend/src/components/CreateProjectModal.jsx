@@ -243,7 +243,6 @@ const CreateProjectModal = ({ close }) => {
                                 return <option key={item._id + idx} value={item._id}>{item.email}</option>
                             })}
                         </select>
-                        {/* <label htmlFor='name'>Enter Description</label> */}
                     </div>
                 </div>
                 <div className="team-member-pill-wrapper">

@@ -79,7 +79,7 @@
     div:last-child {
         font-size: 1.6rem;
         position: relative;
-        z-index: 10;
+        z-index: 5;
 
         svg {
             z-index: 10;

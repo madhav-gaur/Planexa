@@ -1,7 +1,6 @@
-/* eslint-disable no-unused-vars */
 import React from 'react'
 import { useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { FaArrowLeft } from "react-icons/fa6";
 import { useDispatch, useSelector } from 'react-redux';
 import CreateTaskModal from '../components/CreateTaskModal';
@@ -90,13 +89,11 @@ const ProjectDetail = () => {
                     <div className='task-list-head-item'>Type</div>
                     <div className='task-list-head-item'>Priority</div>
                     <div className='task-list-head-item'>Status</div>
-                    {/* <div className='task-list-head-item'>Assignee</div> */}
                     <div className='task-list-head-item'>Due Date</div>
                 </div>
                 <div className='task-list-group'>
                     {
                         tasks.map((item, idx) => {
-                            // console.log(item)
                             return <div
                                 key={item._id + idx}
                                 className='task-list-item'
@@ -120,7 +117,6 @@ const ProjectDetail = () => {
                                     {item.status == "TO_DO" && "To Do"}
                                     {item.status == "DONE" && "Done"}
                                 </div>
-                                {/* <div>{item.assignees}</div> */}
                                 <div>{formatDate(item.dueDate).split(",")[0]}</div>
                             </div>
                         })

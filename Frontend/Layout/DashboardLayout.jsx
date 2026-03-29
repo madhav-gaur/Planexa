@@ -4,13 +4,28 @@ import Sidebar from "../src/components/Sidebar";
 import './DashboardLayout.css'
 import { useSelector } from "react-redux";
 import Loading from "../src/components/Loading";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const DashboardLayout = () => {
     const { isWorkspaceLoading, } = useSelector(state => state.workspace)
     const [isSidebar, setIsSidebar] = useState(false);
+
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+        return localStorage.getItem("sidebar") === "true";
+    });
+    const [isSidebarHovering, setIsSidebarHovering] = useState(false);
+    useEffect(() => {
+        localStorage.setItem("sidebar", isSidebarCollapsed);
+    }, [isSidebarCollapsed]);
     return (
         <div className="dashboard-wrapper">
-            <Sidebar isSidebar={isSidebar} setIsSidebar={setIsSidebar} />
+            <Sidebar
+                isSidebar={isSidebar}
+                setIsSidebar={setIsSidebar}
+                isSidebarCollapsed={isSidebarCollapsed}
+                setIsSidebarCollapsed={setIsSidebarCollapsed}
+                isSidebarHovering={isSidebarHovering}
+                setIsSidebarHovering={setIsSidebarHovering}
+            />
 
             <div className="dashboard-main">
                 <Topbar setIsSidebar={setIsSidebar} isSidebar={isSidebar} />

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { LuLayoutDashboard } from "react-icons/lu";
 import { LuUsers } from "react-icons/lu";
@@ -7,22 +7,42 @@ import { IoClose, IoMenu, IoSettingsOutline } from "react-icons/io5";
 import { FiCheckSquare } from "react-icons/fi";
 import { FaRegFolderOpen } from "react-icons/fa";
 import "../components/Styles/Sidebar.css"
+import { TbLayoutSidebarLeftCollapseFilled, TbLayoutSidebarRightCollapseFilled } from "react-icons/tb";
 import { FaCheck } from "react-icons/fa";
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import { setCurrWorkspace } from '../store/workspace.slice';
+import { GoSidebarCollapse } from "react-icons/go";
 import { setIsProjectLoaded } from '../store/project.slice';
 import { toast } from 'react-toastify';
-const Sidebar = ({ isSidebar, setIsSidebar }) => {
-    const [isTaskList, setIsTaskList] = useState(false)
-    const { workspaces, currWorkspace } = useSelector(state => state.workspace)
-    const [isCreateModal, setIsCreateModal] = useState(false)
+const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarCollapsed, isSidebarHovering, setIsSidebarHovering, }) => {
+
     const dispatch = useDispatch()
-    const [isDropdown, setIsDropdown] = useState(false)
-    // console.log(workspaces)
     const navigate = useNavigate();
+
+    const { workspaces, currWorkspace } = useSelector(state => state.workspace)
+
+
+    const [isTaskList, setIsTaskList] = useState(false)
+    const [isCreateModal, setIsCreateModal] = useState(false)
+    const [isDropdown, setIsDropdown] = useState(false)
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1100);
     const workLogo = currWorkspace?.name?.split("")[0].toUpperCase()
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 1100);
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const isExpanded = isMobile
+        ? true
+        : (!isSidebarCollapsed || isSidebarHovering);
+
     const changeWorkspace = (item) => {
         setIsDropdown(false)
         dispatch(setCurrWorkspace(item))
@@ -31,29 +51,39 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
         navigate("/")
     }
     return (
-        <div className={`sidebar-wrapper ${isSidebar ? 'isSidebar' : ""}`}>
-            <div className='sidebar'>
+        <div className={`sidebar-wrapper ${isSidebar ? 'isSidebar' : ""}`}
+            onMouseEnter={() => setIsSidebarHovering(true)}
+            onMouseLeave={() => setIsSidebarHovering(false)}>
+            <div
+                className='sidebar'
+                style={{ width: isExpanded ? "250px" : "60px" }}
+            >
+
                 {isSidebar && <div style={{ margin: "21px 1rem 0" }} className='sidebar-toggle-sc' onClick={() => {
                     console.log(isSidebar)
                     setIsSidebar(!isSidebar)
                 }}>
                     <IoClose />
                 </div>}
-                <div className='workspace-nav-wrapper'>
+                <div className='workspace-nav-wrapper' >
 
-                    <div className='workspace-nav' onClick={() => setIsDropdown(!isDropdown)}>
+                    <div className='workspace-nav'
+                        style={{
+                            justifyContent: isExpanded ? "space-between" : "center",
+                        }}
+                        onClick={() => setIsDropdown(!isDropdown)}>
                         <div className='workspace-nav-name'>
                             {currWorkspace?.logo == "" ?
                                 <span>{workLogo}</span>
                                 : <img src={currWorkspace?.logo} alt="" />}
-                            <div>
+                            {isExpanded && <div>
                                 <p>{currWorkspace?.name?.slice(0, 14)}{currWorkspace?.name?.length > 14 ? "..." : ""}</p>
                                 <b>{workspaces.length} Workspace</b>
-                            </div>
+                            </div>}
                         </div>
-                        <div>
+                        {isExpanded && <div>
                             {!isDropdown ? <FaChevronDown /> : <IoClose />}
-                        </div>
+                        </div>}
                     </div>
                     {isDropdown && <div className='workspace-nav-dropdown-wrap'>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -99,21 +129,23 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                     </div>}
 
                 </div>
-                <div className='sidebar-nav-wrapper'>
-                    <nav>
+                <div className='sidebar-nav-wrapper'
+                >
+                    {isExpanded ? <nav>
                         <div className='active-bg' />
                         <NavLink
                             className={({ isActive }) =>
-                                isActive ? "nav-item active" : "nav-item"
+                                `${isActive ? 'nav-item active' : 'nav-item'
+                                }`
                             }
-
                             to="/">
                             <LuLayoutDashboard />
                             <p>Dashboard</p>
                         </NavLink>
                         <NavLink
                             className={({ isActive }) =>
-                                isActive ? "nav-item active" : "nav-item"
+                                `${isActive ? 'nav-item active' : 'nav-item'
+                                }`
                             }
                             to="/projects">
                             <FaRegFolderOpen />
@@ -121,7 +153,8 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                         </NavLink>
                         <NavLink
                             className={({ isActive }) =>
-                                isActive ? "nav-item active" : "nav-item"
+                                `${isActive ? 'nav-item active' : 'nav-item'
+                                }`
                             }
                             to="/team">
                             <LuUsers />
@@ -129,24 +162,65 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                         </NavLink>
                         <NavLink
                             className={({ isActive }) =>
-                                isActive ? "nav-item active" : "nav-item"
+                                `${isActive ? 'nav-item active' : 'nav-item'
+                                }`
                             }
                             to="/settings">
                             <IoSettingsOutline />
                             <p>Settings</p>
                         </NavLink>
-                    </nav>
+                    </nav> :
+                        <nav>
+                            <div className='active-bg' />
+                            <NavLink
+                                className={({ isActive }) =>
+                                    `${isActive ? 'nav-item active' : 'nav-item'
+                                    }`
+                                }
+                                to="/">
+                                <LuLayoutDashboard />
+                            </NavLink>
+                            <NavLink
+                                className={({ isActive }) =>
+                                    `${isActive ? 'nav-item active' : 'nav-item'
+                                    }`
+                                }
+                                to="/projects">
+                                <FaRegFolderOpen />
+                            </NavLink>
+                            <NavLink
+                                className={({ isActive }) =>
+                                    `${isActive ? 'nav-item active' : 'nav-item'
+                                    }`
+                                }
+                                to="/team">
+                                <LuUsers />
+                            </NavLink>
+                            <NavLink
+                                className={({ isActive }) =>
+                                    `${isActive ? 'nav-item active' : 'nav-item'
+                                    }`
+                                }
+                                to="/settings">
+                                <IoSettingsOutline />
+                            </NavLink>
+                        </nav>}
                     <div className='task-nav'>
                         <div className='task-nav-head' onClick={() => setIsTaskList(!isTaskList)}>
-                            <div>
+                            {isExpanded ? <><div>
                                 <FiCheckSquare />
                                 <p>My Tasks</p>
                                 <span>2</span>
                             </div>
-                            <div
-                                style={{ transform: isTaskList ? "rotate(90deg)" : "" }}>
-                                <FaChevronRight />
-                            </div>
+                                <div
+                                    style={{ transform: isTaskList ? "rotate(90deg)" : "" }}>
+                                    <FaChevronRight />
+                                </div> </> :
+                                <div>
+                                    <FiCheckSquare />
+
+                                </div>
+                            }
                         </div>
                         {isTaskList && <div className='task-nav-list'>
                             <span></span>
@@ -157,9 +231,18 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                         </div>}
                     </div>
                 </div>
+                <nav className='sidebar-collapse-toggle'
+                    onClick={() => {
+                        setIsSidebarCollapsed((prev) => !prev)
+                        setIsSidebarHovering(false)
+                    }}>
+                    <div className='nav-item'>
+                        {isSidebarCollapsed ? <TbLayoutSidebarRightCollapseFilled /> : <TbLayoutSidebarLeftCollapseFilled />}
+                    </div>
+                </nav>
             </div>
-
-            {isCreateModal &&
+            {
+                isCreateModal &&
                 <div className='create-modal-wrapper' onClick={() => setIsCreateModal(false)}>
                     <CreateWorkspaceModal close={() => {
                         setIsCreateModal(false)
@@ -167,7 +250,7 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                     }} />
                 </div>
             }
-        </div>
+        </div >
     )
 }
 

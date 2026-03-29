@@ -38,13 +38,4 @@
             backdrop-filter: blur(4px);
             z-index: 999;
         }
-
-        /* .workspace-nav-wrapper{
-        display: flex;
-        flex-direction: row;
-    }
-    .workspace-nav-wrapper.workspace-nav-name{
-        flex-direction: column;
-    } */
-
     }

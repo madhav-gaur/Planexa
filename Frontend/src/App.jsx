@@ -162,7 +162,6 @@ const App = () => {
         transition={Zoom} />
 
       <Routes>
-        {/*  <Route path="/" element={user?._id ?  <DashboardLayout /> :  <HomeLander />} /> */}
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route
@@ -203,7 +202,6 @@ const App = () => {
           <Route index element={<LoginProtect> <Settings /> </LoginProtect>} />
         </Route>
       </Routes >
-      {/*  </ToastContainer> */}
 
     </>
   );

@@ -1,6 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { setIsProjectLoaded } from '../store/project.slice'
@@ -26,12 +24,12 @@ const ProjectSettings = () => {
     const navigate = useNavigate()
 
     const params = useParams()
-    const { projects, isProjectLoaded } = useSelector(state => state.project)
+    const { projects } = useSelector(state => state.project)
     const user = useSelector(state => state.user.userDetails)
 
     useEffect(() => {
         dispatch(setIsProjectLoaded(false))
-    }, [])
+    }, [dispatch])
 
     const currProject = projects?.find(item => item._id == params.projectId)
     const transformDate = (date) => {
@@ -57,9 +55,6 @@ const ProjectSettings = () => {
     )?.role;
     console.log(currProject)
 
-    // let startDate = 
-    // let endDate = ;
-
     const [data, setData] = useState(null)
     useEffect(() => {
         if (!currProject?._id) return;
@@ -76,7 +71,7 @@ const ProjectSettings = () => {
                 members: currProject.members
             }
         )
-    }, [currProject])
+    }, [currProject, labels])
     const handleInput = (e) => {
         const { name, value } = e.target;
 
@@ -222,7 +217,6 @@ const ProjectSettings = () => {
                                         value={data.description}
                                         placeholder="Enter Description"
                                     />
-                                    {/* <label htmlFor='description'>Enter Description</label> */}
                                 </div>
                             </div>
                             <div style={{ display: "flex", justifyContent: "center", width: "100%", gap: "1rem" }}>
