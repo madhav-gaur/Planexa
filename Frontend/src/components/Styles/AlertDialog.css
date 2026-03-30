@@ -10,7 +10,7 @@
 }
 
 .alert-dialog-container {
-    background-color: white;
+    background-color: var(--surface);
     position: absolute;
     padding: 1.5rem;
     display: flex;

@@ -15,6 +15,34 @@
   --text-light: #717171;
   --text-light2: #9f9fa9;
   --text-blue: #63b3cd;
+  --primary-box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+
+}
+
+.dark {
+  /* --primary-blue: rgb(59, 130, 246); */
+  /* --danger-red: #ef4444; */
+  /* --primary-blue-hover: #3b82f6;
+  --primary-blue-disabled: #1e3a8a; */
+
+  --surface: #101013;
+  /* main background */
+  --border: 1px solid #334155;
+
+  --surface-hover-dark: #24242a;
+  --surface-hover-light: #23232b;
+  --surface-hover-light2: #1d1d25;
+  --surface-hover-light3: #282836;
+
+  --text-normal: #e5e7eb;
+  --text-normal2: #cbd5f5;
+  --text-normal3: #f1f5f9;
+
+  --text-light: #94a3b8;
+  --text-light2: #64748b;
+  --primary-box-shadow: rgba(207, 207, 211, 0.25) 0px 6px 12px -2px, rgba(215, 215, 215, 0.3) 0px 3px 7px -3px;
+
+  --text-blue: #38bdf8;
 }
 
 .Toastify__progress-bar {
@@ -66,6 +94,8 @@ input,
 textarea,
 select {
   font-family: inherit;
+  background-color: var(--surface);
+  color: var(--text-normal);
 }
 
 button {

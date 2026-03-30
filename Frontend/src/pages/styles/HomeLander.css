@@ -38,7 +38,7 @@
 .home-section-1 div:last-child button:last-child a,
 .home-section-2 div:first-child span {
   border: none;
-  background-color: white;
+  background-color: var(--surface);
   font-size: 1rem;
   cursor: pointer;
   padding: 10px 1rem;
@@ -162,7 +162,7 @@
 .home-section-3 {
   background-color: var(--primary-blue);
   margin: 2rem 0 !important;
-  color: white;
+  color: var(--surface);
   padding: 8rem 0;
   display: flex;
   align-items: center;
@@ -187,8 +187,8 @@
     gap: 2rem;
 
     button:first-child {
-      background-color: white;
-      color: black;
+      background-color: var(--surface);
+      color: var(--text-normal);
 
       &:hover {
         background-color: rgba(255, 255, 255, 0.833);
@@ -197,8 +197,8 @@
 
     button:last-child {
       background-color: transparent;
-      color: white;
-      border: 2px solid white;
+      color: var(--surface);
+      border: 2px solid var(--surface);
 
       &:hover {
         background-color: rgba(255, 255, 255);

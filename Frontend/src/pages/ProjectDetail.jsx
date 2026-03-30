@@ -201,7 +201,7 @@ const ProjectDetail = () => {
                         </div>
                         <div className='project-filter-clear-btn'>
                             {isFilter && <button onClick={handleClearFilter} style={{
-                                backgroundColor: "white",
+                                backgroundColor: "var(--surface)",
                                 border: "var(--border)",
                                 color: "var(--text-normal)"
                             }} className='primary-button'><IoClose /> Clear Filters</button>}

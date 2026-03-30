@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import { IoMenu, IoReorderThreeOutline, IoSettingsOutline } from "react-icons/io5";
 import { useSelector } from 'react-redux';
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { FaBars } from 'react-icons/fa6';
-const Topbar = ({ setIsSidebar, isSidebar }) => {
+import { LuMoon, LuSun } from "react-icons/lu";
+const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
     const navigate = useNavigate()
     const user = useSelector(state => state.user.userDetails)
     const userName = user?.name?.split("")[0].toUpperCase()
+
+
     return (
         <div className='topbar-wrapper'>
             <div className='topbar'>
@@ -26,8 +28,8 @@ const Topbar = ({ setIsSidebar, isSidebar }) => {
                     <div>
                         <IoIosNotificationsOutline />
                     </div>
-                    <div>
-                        <IoSettingsOutline />
+                    <div onClick={() => setDarkMode(prev => !prev)}>
+                        {darkMode ? <LuSun /> : <LuMoon />}
                     </div>
                     <div>
                         <p>

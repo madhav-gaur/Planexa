@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { setIsUserLoaded, setIsUserLoading, setUserDetails } from "./store/user.slice";
@@ -33,6 +33,8 @@ const App = () => {
   const { isUserLoaded, } = useSelector((state) => state.user);
   const { isWorkspaceLoaded } = useSelector((state) => state.workspace);
   const { isProjectLoaded } = useSelector((state) => state.project);
+
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -140,7 +142,6 @@ const App = () => {
 
 
   }, [currWorkspace?._id, dispatch, isProjectLoaded])
-
 
 
   return (

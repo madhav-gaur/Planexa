@@ -16,8 +16,25 @@ const DashboardLayout = () => {
     useEffect(() => {
         localStorage.setItem("sidebar", isSidebarCollapsed);
     }, [isSidebarCollapsed]);
+
+    const [darkMode, setDarkMode] = useState(() => {
+        const theme = localStorage.getItem("theme");
+        return theme ? theme === "dark" : false;
+    });
+
+    useEffect(() => {
+        if (darkMode) {
+            localStorage.setItem("theme", "dark");
+        } else {
+            localStorage.setItem("theme", "light");
+        }
+    }, [darkMode]);
+    console.log("theme:", localStorage.getItem("theme"));
+    console.log("darkMode:", darkMode);
+
+
     return (
-        <div className="dashboard-wrapper">
+        <div className={`dashboard-wrapper ${darkMode? "dark": ""}`}>
             <Sidebar
                 isSidebar={isSidebar}
                 setIsSidebar={setIsSidebar}
@@ -28,7 +45,7 @@ const DashboardLayout = () => {
             />
 
             <div className="dashboard-main">
-                <Topbar setIsSidebar={setIsSidebar} isSidebar={isSidebar} />
+                <Topbar setIsSidebar={setIsSidebar} isSidebar={isSidebar} darkMode={darkMode} setDarkMode={setDarkMode} />
 
                 <div className="dashboard-content-wrapper"
                     onClick={() => setIsSidebar(false)}

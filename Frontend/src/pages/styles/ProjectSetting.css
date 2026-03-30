@@ -130,7 +130,7 @@
         button {
             margin-top: 2rem;
             width: 100%;
-            background-color: white;
+            background-color: var(--surface);
             color: var(--danger-red);
             border: 2px solid var(--danger-red);
 

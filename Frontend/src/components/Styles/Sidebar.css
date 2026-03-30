@@ -47,15 +47,17 @@
         display: flex;
         gap: 1rem;
         justify-content: start;
+
         span {
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: black;
+            background-color: var(--text-normal);
             width: 2rem;
             height: 2rem;
-            color: white;
+            color: var(--surface);
             border-radius: 7px;
+            font-weight: 700;
         }
 
         div {
@@ -80,8 +82,9 @@
 
 .workspace-nav-dropdown-wrap {
     position: absolute;
+    box-shadow: var(--primary-box-shadow);
     background-color: var(--surface);
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 12px;
+    /* box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 12px; */
     z-index: 10;
     border-radius: 7px;
     left: 0;
@@ -111,6 +114,7 @@
         display: flex;
         justify-content: space-between;
         left: 0;
+
         svg {
             color: var(--primary-blue);
         }
@@ -151,8 +155,9 @@ nav .nav-item {
     align-items: center;
     color: var(--text-normal3);
     border-radius: 7px;
+
     svg {
-    flex-shrink: 0;
+        flex-shrink: 0;
         font-size: 1rem !important;
     }
 
@@ -281,7 +286,7 @@ nav:has(a.nav-item:nth-of-type(4).active)::before {
         align-items: center;
         cursor: pointer;
         gap: 8px;
-
+        
         img {
             width: 2.5rem;
         }
@@ -301,8 +306,9 @@ nav:has(a.nav-item:nth-of-type(4).active)::before {
         div {
             cursor: pointer;
             display: flex;
+            border: var(--border);
             align-items: center;
-            box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+            /* box-shadow: var(--primary-box-shadow); */
             justify-content: center;
             width: 2rem;
             height: 2rem;
@@ -348,7 +354,7 @@ nav:has(a.nav-item:nth-of-type(4).active)::before {
 
     svg {
         font-size: 1.3rem;
-        color: black;
+        color: var(--text-normal);
     }
 
     &:hover {
@@ -404,12 +410,14 @@ nav:has(a.nav-item:nth-of-type(4).active)::before {
         left: -100%;
         height: 100vh;
         width: 250px;
-        background: white;
+        background: var(--surface);
         z-index: 1000;
     }
-    .sidebar-collapse-toggle{
+
+    .sidebar-collapse-toggle {
         display: none;
     }
+
     .isSidebar {
         left: 0;
     }

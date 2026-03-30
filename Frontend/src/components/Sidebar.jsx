@@ -90,7 +90,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                             <p>Workspaces</p>
                             <IoClose
                                 onClick={() => setIsDropdown(false)}
-                                style={{ color: "black", fontSize: "1.2rem", cursor: "pointer" }} />
+                                style={{ color: "var(--text-normal)", fontSize: "1.2rem", cursor: "pointer" }} />
                         </div>
                         <div className='workspace-nav-dropdown-list'>
                             {

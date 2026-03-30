@@ -88,7 +88,6 @@
             width: 100%;
             padding: 10px;
             border: var(--border);
-            background-color: white;
             border-radius: 7px;
         }
 
@@ -106,14 +105,19 @@
             font-size: 14px;
         }
 
+        input::placeholder {
+            color: var(--text-normal);
+        }
+
         label {
             position: absolute;
             cursor: text;
+            background-color: var(--surface);
             font-size: 14px;
             transition: 0.2s ease;
             left: 10px;
             top: 50%;
-            color: var(--text-light);
+            color: var(--text-normal);
             transform: translateY(-50%);
         }
 
@@ -155,8 +159,8 @@
 .app-form-item input:not(:placeholder-shown)+label {
     top: 0;
     font-size: 12px;
-    background-color: white;
-    color: rgb(32, 32, 32);
+    background-color: var(--surface);
+    color: var(--text-normal);
     padding: 0 2px;
     font-weight: 500;
 
@@ -212,7 +216,7 @@
         cursor: pointer;
         right: -5px;
         background-color: black;
-        color: white;
+        color: var(--surface);
         width: 1rem;
         height: 1rem;
         font-size: 1rem;
