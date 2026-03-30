@@ -2,18 +2,14 @@ import React from 'react'
 import Axios from '../utils/axios'
 import { apiList } from '../common/apiList'
 import { useState } from 'react'
-// import { useNavigate } from 'react-router-dom'
 import { IoClose } from 'react-icons/io5'
 import ButtonLoading from './ButtonLoading'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { setIsProjectLoaded } from '../store/project.slice'
-// import { setIsWorkspaceLoaded } from '../store/workspace.slice'
 
 const CreateProjectModal = ({ close }) => {
     const { currWorkspace } = useSelector(state => state.workspace)
-    // const navigate = useNavigate()
-    // const dispatch = useDispatch()
     const [loading, setLoading] = useState(false)
     const [labels, setLabels] = useState("")
     const temp = labels?.split(",")
@@ -31,7 +27,6 @@ const CreateProjectModal = ({ close }) => {
         projectLead: "",
         members: []
     })
-    // console.log(data)
     const { workspaceMember } = useSelector(state => state.workspace)
     const handleInput = (e) => {
         const { name, value } = e.target;

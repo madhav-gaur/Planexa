@@ -1,13 +1,9 @@
 import React from 'react'
 import Axios from '../utils/axios'
-// import { apiList } from '../common/apiList'
 import { useState } from 'react'
-// import { useLocation, useNavigate } from 'react-router-dom'
 import { IoClose } from 'react-icons/io5'
 import ButtonLoading from './ButtonLoading'
 import { useSelector } from 'react-redux'
-// import { useDispatch } from 'react-redux'
-// import { setIsWorkspaceLoaded } from '../store/workspace.slice'
 import { apiList } from '../common/apiList'
 const InviteModal = ({ close }) => {
     const [link, setLink] = useState("")

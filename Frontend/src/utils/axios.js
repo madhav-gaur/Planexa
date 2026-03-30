@@ -1,6 +1,5 @@
 import axios from "axios";
 import { apiList } from "../common/apiList";
-// import { baseURL } from "../common/apiList";
 const Axios = axios.create({
   baseURL: "http://localhost:4000/api",
   withCredentials: true,
@@ -24,7 +23,6 @@ Axios.interceptors.response.use(
       } catch (err) {
         // logout
         console.log(err)
-        // window.location.href = "/sign-in";
       }
     }
 

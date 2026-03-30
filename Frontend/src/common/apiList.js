@@ -65,8 +65,4 @@ export const apiList = {
     url: "/task/get-tasks",
     method: "post",
   },
-  //   login: {
-  //     url: "/user/login",
-  //     method: "post",
-  //   },
 };

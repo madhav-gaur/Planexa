@@ -5,7 +5,15 @@
     border: var(--border);
     border-radius: 6px;
     width: 100%;
-    overflow: hidden;
+}
+
+.task-list-group {
+    min-width: 250px;
+    position: relative;
+
+    .empty-model {
+        top: 8rem !important;
+    }
 }
 
 .task-list-head,
@@ -30,7 +38,8 @@
     z-index: 10;
     font-weight: 500;
     color: var(--text-normal2);
-transition: background 0.2s ease;
+    transition: background 0.2s ease;
+
     &:hover {
         background-color: var(--surface-hover-light2);
     }
@@ -60,7 +69,7 @@ transition: background 0.2s ease;
 
     span.low-priority {
         background-color: rgb(255, 232, 232);
-        color: rgb(255, 0, 0);
+        color: var(--danger-red);
     }
 
 }
@@ -79,4 +88,90 @@ transition: background 0.2s ease;
     span {
         font-weight: 500;
     }
+}
+
+.project-basic-details-wrap {
+    display: flex;
+    width: 100%;
+    margin: 2rem 0;
+}
+
+.project-basic-details {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 1.5rem;
+}
+
+.project-detail-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1rem;
+    border: var(--border);
+    border-radius: 7px;
+    max-width: 16rem;
+    width: 100%;
+    min-width: 8rem;
+
+    p {
+        color: var(--text-normal3);
+        font-size: 14px;
+        margin-bottom: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    svg {
+        font-size: 1.2rem;
+    }
+
+
+    &:nth-child(2) {
+
+        h1,
+        svg {
+            color: rgb(11, 134, 0);
+        }
+    }
+
+    &:nth-child(3) {
+
+        h1,
+        svg {
+            color: var(--danger-red);
+        }
+    }
+
+    &:nth-child(4) {
+
+        h1,
+        svg {
+            color: var(--primary-blue);
+        }
+    }
+
+}
+
+@media (max-width:800px) {
+
+    .project-basic-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .project-detail-item {
+        max-width: none;
+        width: 100%;
+        padding: 1rem;
+    }
+}
+
+@media (max-width:500px) {
+    /* .project-searchbox {
+        width: max-content;
+    } */
 }

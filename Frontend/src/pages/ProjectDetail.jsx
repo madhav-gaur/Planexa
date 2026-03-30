@@ -5,12 +5,14 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { useDispatch, useSelector } from 'react-redux';
 import CreateTaskModal from '../components/CreateTaskModal';
 import { setIsTaskLoaded, setIsTaskLoading, setTasks } from "../store/task.slice";
+import { CiSearch } from "react-icons/ci";
 import { useEffect } from 'react';
 import { formatDate } from '../utils/formatDate';
 import { FaRegSquare } from "react-icons/fa6";
 import "./styles/ProjectDetail.css"
+import { AiOutlineThunderbolt } from "react-icons/ai";
 import { BsLightningCharge } from "react-icons/bs";
-import { IoBugOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoBugOutline, IoClose, IoSettingsOutline } from "react-icons/io5";
 import { apiList } from '../common/apiList';
 import { FiMessageSquare } from "react-icons/fi";
 import { FaBug, FaRegFolderOpen } from "react-icons/fa";
@@ -26,7 +28,36 @@ const ProjectDetail = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { tasks, isTaskLoaded } = useSelector((state) => state.task);
+    const [query, setQuery] = useState("")
+    const [status, setStatus] = useState("ALL");
+    const [priority, setPriority] = useState("ALL");
+    const [type, setType] = useState("ALL");
+    const filteredTasks = tasks?.filter((tasks) => {
+        const matchesSearch =
+            tasks.title?.toLowerCase().includes(query.toLowerCase());
 
+        const matchesStatus =
+            status === "ALL" || tasks.status === status;
+
+        const matchesPriority =
+            priority === "ALL" || tasks.priority === priority;
+
+        const matchesType =
+            type === "ALL" || tasks.type === priority;
+
+        return matchesSearch && matchesStatus && matchesPriority && matchesType;
+    });
+    const isFilter = query != "" || status != "ALL" || priority != "ALL" || type != "ALL"
+    const handleClearFilter = () => {
+        if (isFilter) {
+            setQuery("")
+            setStatus("ALL")
+            setPriority("ALL")
+            setType("ALL")
+        }
+    }
+    console.log(tasks)
+    console.log(filteredTasks)
     useEffect(() => {
         dispatch(setIsProjectLoaded(false))
         dispatch(setIsTaskLoaded(false))
@@ -66,8 +97,22 @@ const ProjectDetail = () => {
             }
         }
     }, [isTaskLoaded, dispatch, currProject?._id])
+    const [completedCount, setCompletedCount] = useState(0);
+    const [inProgressCount, setInProgressCount] = useState(0);
+    useEffect(() => {
 
-
+        let completed = 0;
+        let inProgress = 0;
+        const statusCount = () => {
+            tasks.forEach(task => {
+                if (task.status == "DONE") completed++;
+                if (task.status == "IN_PROGRESS") inProgress++;
+            });
+            setCompletedCount(completed);
+            setInProgressCount(inProgress);
+        }
+        statusCount();
+    }, [completedCount, inProgressCount, tasks])
     return (
         <>
             <div className='dashboard-head'>
@@ -83,6 +128,87 @@ const ProjectDetail = () => {
                     </div>
                 </div>
             </div>
+            {tasks[0] && <>
+                <div className='project-basic-details-wrap'>
+                    <div className='project-basic-details'>
+                        <div className='project-detail-item'>
+                            <div>
+                                <p>Total Tasks</p>
+                                <h1>{currProject?.tasks.length}</h1>
+                            </div>
+                            <div>
+                                <AiOutlineThunderbolt />
+                            </div>
+                        </div>
+                        <div className='project-detail-item'>
+                            <div>
+                                <p>Completed</p>
+                                <h1>{completedCount}</h1>
+                            </div>
+                            <div>
+                                <AiOutlineThunderbolt />
+                            </div>
+                        </div>
+                        <div className='project-detail-item'>
+                            <div>
+                                <p>In Progress</p>
+                                <h1>{inProgressCount}</h1>
+                            </div>
+                            <div>
+                                <AiOutlineThunderbolt />
+                            </div>
+                        </div>
+                        <div className='project-detail-item'>
+                            <div>
+                                <p>Total Tasks</p>
+                                <h1>{currProject?.tasks.length}</h1>
+                            </div>
+                            <div>
+                                <AiOutlineThunderbolt />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className='filter-search-container'>
+                    <div className='project-searchbox'>
+                        <CiSearch />
+                        <input type="text" placeholder='Search Tasks...' value={query} onChange={(e) => setQuery(e.target.value)} />
+                    </div>
+                    <div className='project-filter-wrapper'>
+                        <div className='project-filter'>
+                            <select name="status" id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                <option value="ALL">All Status</option>
+                                <option value="TO_DO">To Do</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                            </select>
+                        </div>
+                        <div className='project-filter'>
+                            <select name="priority" id="priority" value={priority} onChange={(e) => setPriority(e.target.value)}>
+                                <option value="ALL">All Priority</option>
+                                <option value="LOW">Low</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HIGH">High</option>
+                            </select>
+                        </div>
+                        <div className='project-filter'>
+                            <select name="type" id="type" value={type} onChange={(e) => setType(e.target.value)}>
+                                <option value="ALL">All type</option>
+                                <option value="BUG">Bug</option>
+                                <option value="FEATURE">Feature</option>
+                                <option value="IMPROVEMENT">Improvement</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+                        <div className='project-filter-clear-btn'>
+                            {isFilter && <button onClick={handleClearFilter} style={{
+                                backgroundColor: "white",
+                                border: "var(--border)",
+                                color: "var(--text-normal)"
+                            }} className='primary-button'><IoClose /> Clear Filters</button>}
+                        </div>
+                    </div>
+                </div>
+            </>}
             <div className='task-list-group-wrapper'>
                 <div className='task-list-head'>
                     <div className='task-list-head-item'>Title</div>
@@ -91,9 +217,18 @@ const ProjectDetail = () => {
                     <div className='task-list-head-item'>Status</div>
                     <div className='task-list-head-item'>Due Date</div>
                 </div>
+
                 <div className='task-list-group'>
+
                     {
-                        tasks.map((item, idx) => {
+                        tasks[0] && !filteredTasks[0] && isTaskLoaded && <div className='empty-model'>
+                            <span><FaRegFolderOpen /></span>
+                            <h3>No matching Tasks Found</h3>
+                            {/* <button className='primary-button' onClick={() => setIsCreateModal(true)}>+ Create Task</button> */}
+                        </div>
+                    }
+                    {
+                        filteredTasks.map((item, idx) => {
                             return <div
                                 key={item._id + idx}
                                 className='task-list-item'
@@ -120,6 +255,7 @@ const ProjectDetail = () => {
                                 <div>{formatDate(item.dueDate).split(",")[0]}</div>
                             </div>
                         })
+
                     }
 
                 </div>
@@ -133,6 +269,7 @@ const ProjectDetail = () => {
                     <button className='primary-button' onClick={() => setIsCreateModal(true)}>+ Create Task</button>
                 </div>
             }
+
             {
                 isCreateModal &&
                 <div className='create-modal-wrapper' onClick={() => setIsCreateModal(false)}>

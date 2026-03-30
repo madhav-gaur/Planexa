@@ -25,7 +25,6 @@ const LoginProtect = ({ children }) => {
                     border: "var(--border)",
                     width: "fit-content",
                     backgroundColor: "#fefefe",
-                    // boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
                     textAlign: "center"
                 }}>
                     <p style={{

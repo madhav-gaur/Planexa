@@ -25,7 +25,6 @@ export const createProject = async (req, res) => {
       !projectHeadId ||
       !startDate ||
       !endDate
-      //   members.length == 0
     ) {
       return res.status(401).json({
         success: false,

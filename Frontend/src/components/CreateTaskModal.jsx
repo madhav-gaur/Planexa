@@ -2,13 +2,12 @@ import React from 'react'
 import Axios from '../utils/axios'
 import { apiList } from '../common/apiList'
 import { useState } from 'react'
-// import { useNavigate } from 'react-router-dom'
 import { IoClose } from 'react-icons/io5'
 import ButtonLoading from './ButtonLoading'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { setIsProjectLoaded } from '../store/project.slice'
-// import { setIsWorkspaceLoaded } from '../store/workspace.slice'
+import { setIsTaskLoaded } from '../store/task.slice'
 
 const CreateTaskModal = ({ close, currProject }) => {
     const [loading, setLoading] = useState(false)
@@ -75,6 +74,7 @@ const CreateTaskModal = ({ close, currProject }) => {
                 close()
                 toast.success("Task Created !!")
                 dispatch(setIsProjectLoaded(false))
+                dispatch(setIsTaskLoaded(false))
             }
             console.log(response)
         } catch (error) {

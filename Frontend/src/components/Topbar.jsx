@@ -1,6 +1,5 @@
 import React from 'react'
 import logo from "../assets/Favicon.png"
-// import { IoIosNotificationsOutline } from "react-icons/io";
 import { useNavigate } from 'react-router-dom'
 import { IoMenu, IoReorderThreeOutline, IoSettingsOutline } from "react-icons/io5";
 import { useSelector } from 'react-redux';

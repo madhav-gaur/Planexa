@@ -87,19 +87,6 @@ const SignUp = () => {
     }
   };
 
-
-  // const user = useSelector((state) => state.user.userDetails);
-  // useEffect(() => {
-  //   if (user && tempToken) {
-  //     navigate(`/invite/${tempToken}`);
-  //     return
-  //   }
-  //   if (user) {
-  //     navigate("/")
-  //     return
-  //   }
-  // }, [user, tempToken, navigate])
-
   return (
     <section className='sign-wrapper'>
       <div className='app-form-container'>

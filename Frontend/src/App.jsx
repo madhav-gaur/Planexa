@@ -19,7 +19,6 @@ import { apiList } from "./common/apiList";
 import { setCurrWorkspace, setIsWorkspaceLoaded, setIsWorkspaceLoading, setWorkspaceMember, setWorkspaces } from "./store/workspace.slice";
 import InvitePage from "./pages/InvitePage";
 import LoginProtect from "./pages/LoginProtect";
-// import { useState } from "react";
 import { ToastContainer, Zoom } from "react-toastify";
 import { setIsProjectLoaded, setIsProjectLoading, setProjects } from "./store/project.slice";
 import ProjectDetail from "./pages/ProjectDetail";
@@ -144,8 +143,6 @@ const App = () => {
 
 
 
-
-  // if (isUserLoading) return  <Loading />
   return (
     <>
       <ToastContainer

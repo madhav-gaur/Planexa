@@ -9,7 +9,6 @@ import ButtonLoading from '../components/ButtonLoading';
 import { useDispatch } from 'react-redux';
 import { setIsUserLoaded } from '../store/user.slice';
 import { toast } from 'react-toastify';
-// import { useSelector } from 'react-redux';
 const SignIn = () => {
   const [data, setData] = useState({
     email: "",
@@ -18,7 +17,6 @@ const SignIn = () => {
   const dispatch = useDispatch()
 
   const navigate = useNavigate()
-  // const dispatch = useDispatch()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState("Sign in")
 
@@ -68,17 +66,6 @@ const SignIn = () => {
       console.error(error);
     }
   };
-  // useEffect(() => {
-
-  //   if (user && tempToken) {
-  //     navigate(`/invite/${tempToken}`);
-  //     return
-  //   }
-  //   if (user) {
-  //     navigate("/")
-  //     return
-  //   }
-  // }, [user, tempToken, navigate])
   return (
     <section className='sign-wrapper'>
       <div className='app-form-container'>
