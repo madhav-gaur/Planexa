@@ -2,7 +2,6 @@ import crypto from "crypto";
 import dotenv from "dotenv"
 dotenv.config()
 const SECRET = process.env.INVITE_SECRET;
-console.log("secret",SECRET)
 
 export const generateInviteLink = (workspaceId, role) => {
   const payload = `${workspaceId}:${role}`;

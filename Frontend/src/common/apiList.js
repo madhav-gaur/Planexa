@@ -52,7 +52,7 @@ export const apiList = {
   getProjects: {
     url: "/project/get-projects",
     method: "post",
-  },  
+  },
   deleteProject: {
     url: "/project/delete-project",
     method: "put",
@@ -61,8 +61,24 @@ export const apiList = {
     url: "/task/create-task",
     method: "post",
   },
+  updateTask: {
+    url: "/task/update-task",
+    method: "post",
+  },
   getTasks: {
     url: "/task/get-tasks",
+    method: "post",
+  },
+  addComment: {
+    url: "/task/add-comment",
+    method: "post",
+  },
+  addSubtask: {
+    url: "/task/add-subtask",
+    method: "post",
+  },
+  toggleSubtask: {
+    url: "/task/toggle-subtask",
     method: "post",
   },
 };

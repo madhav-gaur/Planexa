@@ -15,8 +15,9 @@
   --text-light: #717171;
   --text-light2: #9f9fa9;
   --text-blue: #63b3cd;
-  --primary-box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-
+  --primary-box-shadow:
+    rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+    rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
 }
 
 .dark {
@@ -34,13 +35,15 @@
   --surface-hover-light2: #1d1d25;
   --surface-hover-light3: #282836;
 
-  --text-normal: #e5e7eb;
+  --text-normal: #ffffff;
   --text-normal2: #cbd5f5;
   --text-normal3: #f1f5f9;
 
   --text-light: #94a3b8;
   --text-light2: #64748b;
-  --primary-box-shadow: rgba(207, 207, 211, 0.25) 0px 6px 12px -2px, rgba(215, 215, 215, 0.3) 0px 3px 7px -3px;
+  --primary-box-shadow:
+    rgba(207, 207, 211, 0.25) 0px 6px 12px -2px,
+    rgba(215, 215, 215, 0.3) 0px 3px 7px -3px;
 
   --text-blue: #38bdf8;
 }
@@ -65,7 +68,12 @@ html,
 body {
   width: 100%;
   height: 100%;
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 h1,
@@ -118,7 +126,19 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #99a5bc;
 }
+.dark {
+  ::-webkit-scrollbar-track {
+    background-color: #171a23;
+  }
 
+  ::-webkit-scrollbar-thumb {
+    background-color: #232731;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #181a1f;
+  }
+}
 /*? Utility Classes */
 
 /*? Blue Button */
@@ -143,6 +163,19 @@ button {
     cursor: not-allowed;
     background-color: var(--primary-blue-disabled);
   }
+}
+.danger-button {
+  margin-top: 2rem;
+  width: 100%;
+  background-color: var(--surface);
+  color: var(--danger-red);
+  border: 2px solid var(--danger-red);
+  &:hover {
+    background-color: rgba(255, 239, 239, 0.566);
+  }
+}
+.dark .danger-button:hover {
+  background-color: rgba(249, 58, 58, 0.1);
 }
 
 .secondary-button {

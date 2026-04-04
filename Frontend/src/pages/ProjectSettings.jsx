@@ -389,7 +389,7 @@ const ProjectSettings = () => {
                                     }
                                     setIsAlertBoxDel(currProject._id);
                                 }}
-                                    className='primary-button'>Delete Project</button>
+                                    className='primary-button danger-button'>Delete Project</button>
                             </div>
                         </div>
                     </div>

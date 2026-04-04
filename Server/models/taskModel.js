@@ -75,7 +75,11 @@ const taskSchema = new mongoose.Schema(
     subTasks: [
       {
         title: String,
-        isCompleted: Boolean
+        isCompleted: Boolean,
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
 
@@ -86,6 +90,6 @@ const taskSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 export const taskModel = mongoose.model("task", taskSchema);

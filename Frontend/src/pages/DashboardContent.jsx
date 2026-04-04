@@ -37,8 +37,8 @@ const DashboardContent = () => {
                 <div className='dashboard-stats-1-item'>
                     <div>
                         <p>Completed Projects</p>
-                        <h2>{currWorkspace?.projects.length}</h2>
-                        <span>{currWorkspace?.projects.length} Completed</span>
+                        <h2>{currWorkspace?.projects?.length}</h2>
+                        <span>{currWorkspace?.projects?.length} Completed</span>
                     </div>
                     <div>
                         <IoMdCheckboxOutline />
@@ -47,8 +47,8 @@ const DashboardContent = () => {
                 <div className='dashboard-stats-1-item'>
                     <div>
                         <p>To Do</p>
-                        <h2>{currWorkspace?.projects.length}</h2>
-                        <span>{currWorkspace?.projects.length} tasks to be done</span>
+                        <h2>{currWorkspace?.projects?.length}</h2>
+                        <span>{currWorkspace?.projects?.length} tasks to be done</span>
                     </div>
                     <div>
                         <MdChecklist />
@@ -57,8 +57,8 @@ const DashboardContent = () => {
                 <div className='dashboard-stats-1-item'>
                     <div>
                         <p>Overdue</p>
-                        <h2>{currWorkspace?.projects.length}</h2>
-                        <span>{currWorkspace?.projects.length} need attention</span>
+                        <h2>{currWorkspace?.projects?.length}</h2>
+                        <span>{currWorkspace?.projects?.length} need attention</span>
                     </div>
                     <div>
                         <BsExclamationTriangle />

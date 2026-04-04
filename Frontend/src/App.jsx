@@ -1,4 +1,4 @@
-import { useEffect} from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { setIsUserLoaded, setIsUserLoading, setUserDetails } from "./store/user.slice";
@@ -30,10 +30,10 @@ const App = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userDetails);
   const { currWorkspace } = useSelector(state => state.workspace)
-  const { isUserLoaded, } = useSelector((state) => state.user);
-  const { isWorkspaceLoaded } = useSelector((state) => state.workspace);
+  const { isUserLoaded,  } = useSelector((state) => state.user);
+  const { isWorkspaceLoaded,  } = useSelector((state) => state.workspace);
   const { isProjectLoaded } = useSelector((state) => state.project);
-
+// const [isAuthChecked, se]
 
 
   useEffect(() => {
@@ -143,6 +143,9 @@ const App = () => {
 
   }, [currWorkspace?._id, dispatch, isProjectLoaded])
 
+  
+
+  // if (isUserLoading || isWorkspaceLoading || !isAuthChecked) return <Loading />
 
   return (
     <>

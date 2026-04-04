@@ -87,8 +87,6 @@ const CreateTaskModal = ({ close, currProject }) => {
         <div className='app-form-container' onClick={(e) => e.stopPropagation()}>
             <div className='app-form-head'>
                 <h2>Create new Task</h2>
-                {/* <p>In workspace <a style={{ color: 'var(--primary-blue)' }}>{currWorkspace?.name}</a> </p>
-                <p>In Project <a style={{ color: 'var(--primary-blue)' }}>{currProject?.name}</a> </p> */}
                 <span onClick={close}><IoClose /></span>
             </div>
             <form className='app-form' onSubmit={handleSubmit} >

@@ -29,9 +29,6 @@ const DashboardLayout = () => {
             localStorage.setItem("theme", "light");
         }
     }, [darkMode]);
-    console.log("theme:", localStorage.getItem("theme"));
-    console.log("darkMode:", darkMode);
-
 
     return (
         <div className={`dashboard-wrapper ${darkMode? "dark": ""}`}>

@@ -40,7 +40,7 @@ export const createTask = async (req, res) => {
           tasks: newTask._id,
         },
       },
-      { new: true }
+      { new: true },
     );
     await projectModel.findByIdAndUpdate(
       projectId,
@@ -49,7 +49,7 @@ export const createTask = async (req, res) => {
           tasks: newTask._id,
         },
       },
-      { new: true }
+      { new: true },
     );
     await userModel.updateMany(
       { _id: { $in: assignees } },
@@ -57,7 +57,7 @@ export const createTask = async (req, res) => {
         $addToSet: {
           task: newTask._id,
         },
-      }
+      },
     );
     return res.status(200).json({
       success: true,
@@ -83,7 +83,7 @@ export const getTasks = async (req, res) => {
         message: "Provide projectId",
       });
     }
-    const tasks = await taskModel.find({projectId});
+    const tasks = await taskModel.find({ projectId });
 
     if (!tasks) {
       return res.status(404).json({
@@ -106,6 +106,159 @@ export const getTasks = async (req, res) => {
   }
 };
 
+export const updateTask = async (req, res) => {
+  try {
+    const {
+      taskId,
+      workspaceId,
+      projectId,
+      title,
+      type,
+      description,
+      status,
+      priority,
+      dueDate,
+      assignees,
+    } = req.body;
+
+    const updatedTask = await taskModel.findByIdAndUpdate(
+      taskId,
+      {
+        $set: {
+          projectId,
+          workspaceId,
+          title,
+          description,
+          type,
+          status,
+          priority,
+          dueDate,
+          assignees,
+        },
+      },
+      { new: true },
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Task Updated",
+      data: updatedTask,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const addSubtask = async (req, res) => {
+  try {
+    const { taskId, title } = req.body;
+
+    const updatedTask = await taskModel.findByIdAndUpdate(
+      taskId,
+      {
+        $push: {
+          subTasks: {
+            title,
+            isCompleted: false,
+          },
+        },
+      },
+      { new: true },
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Subtask added",
+      data: updatedTask,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const addComment = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { taskId, message } = req.body;
+
+    const updatedTask = await taskModel
+      .findByIdAndUpdate(
+        taskId,
+        {
+          $push: {
+            comments: {
+              userId,
+              message,
+            },
+          },
+        },
+        { new: true },
+      )
+      .populate("comments.userId", "name");
+
+    if (!updatedTask) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Comment added",
+      data: updatedTask,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+export const toggleSubtask = async (req, res) => {
+  try {
+    const { taskId, subtaskId } = req.body;
+
+    const task = await taskModel.findById(taskId);
+
+    const subtask = task.subTasks.id(subtaskId);
+
+    subtask.isCompleted = !subtask.isCompleted;
+
+    await task.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Subtask updated",
+      data: task,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 // export const template = async (req, res) => {
 //   try {
 //     return res.status(200).json({

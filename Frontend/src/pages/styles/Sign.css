@@ -1,226 +1,224 @@
 .sign-wrapper {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--surface-hover-light3);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-hover-light3);
 }
 
 .app-form-container {
-    z-index: 10000;
-    background-color: var(--surface);
-    padding: 2rem;
-    max-width: 450px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    border: var(--border);
-    border-radius: 13px;
-    position: relative;
+  z-index: 10000;
+  background-color: var(--surface);
+  padding: 2rem;
+  max-width: 450px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: var(--border);
+  border-radius: 13px;
+  position: relative;
 }
 
 .app-form-container .app-form-back {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-    width: min-content;
-    padding: 5px 10px;
-    border-radius: 7px;
-    font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  width: min-content;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 1rem;
 
-    &:hover {
-        background-color: var(--surface-hover-light2);
-    }
+  &:hover {
+    background-color: var(--surface-hover-light2);
+  }
 }
 
 .app-form-container .app-form-head {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 10px;
 
-    h2 {
-        font-size: 2rem;
-    }
+  h2 {
+    font-size: 2rem;
+  }
 
-    p {
-        font-size: 14px;
-        color: var(--text-light);
-    }
+  p {
+    font-size: 14px;
+    color: var(--text-light);
+  }
 }
 
 .app-form-head span {
-    position: absolute;
-    right: 14px;
-    cursor: pointer;
-    font-size: 1.5rem;
-    top: 14px;
+  position: absolute;
+  right: 14px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  top: 14px;
 }
 
 .app-form-container .app-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  gap: 10px;
 }
 
 .app-form-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+
+  span {
+    font-size: 14px;
+  }
+
+  div {
     display: flex;
-    flex-direction: column;
+    position: relative;
+  }
+  input,
+  select,
+  textarea {
     width: 100%;
-    gap: 10px;
+    padding: 10px;
+    border: var(--border);
+    border-radius: 7px;
+  }
 
-    span {
-        font-size: 14px;
+  input,
+  textarea {
+    font-size: 1rem;
+  }
+
+  textarea {
+    resize: vertical;
+    height: 100%;
+  }
+
+  input[type="date"] {
+    font-size: 14px;
+  }
+
+  input::placeholder {
+    color: var(--text-normal);
+  }
+
+  label {
+    position: absolute;
+    cursor: text;
+    background-color: var(--surface);
+    font-size: 14px;
+    transition: 0.2s ease;
+    left: 10px;
+    top: 50%;
+    color: var(--text-normal);
+    transform: translateY(-50%);
+  }
+
+  i {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-light);
+    padding: 2px 10px;
+    border-radius: 7px;
+
+    svg {
+      margin-top: 4px;
     }
 
-    div {
-        display: flex;
-        position: relative;
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: var(--border);
-            border-radius: 7px;
-        }
-
-        input,
-        textarea {
-            font-size: 1rem;
-        }
-
-        textarea {
-            resize: vertical;
-            height: 100%;
-        }
-
-        input[type=date] {
-            font-size: 14px;
-        }
-
-        input::placeholder {
-            color: var(--text-normal);
-        }
-
-        label {
-            position: absolute;
-            cursor: text;
-            background-color: var(--surface);
-            font-size: 14px;
-            transition: 0.2s ease;
-            left: 10px;
-            top: 50%;
-            color: var(--text-normal);
-            transform: translateY(-50%);
-        }
-
-        i {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--text-light);
-            padding: 2px 10px;
-            border-radius: 7px;
-
-            svg {
-                margin-top: 4px;
-            }
-
-            &:hover {
-                color: var(--text-normal);
-                background-color: var(--surface-hover-light3);
-            }
-        }
+    &:hover {
+      color: var(--text-normal);
+      background-color: var(--surface-hover-light3);
     }
+  }
 
-    p {
-        color: red;
-        font-size: 12px;
-        position: relative;
-    }
+  p {
+    color: red;
+    font-size: 12px;
+    position: relative;
+  }
 }
 
 .app-form-item input:focus,
 .app-form-item select:focus {
-    outline: auto;
-    outline-color: var(--primary-blue);
+  outline: auto;
+  outline-color: var(--primary-blue);
 }
 
-.app-form-item input:focus+label,
-.app-form-item input:not(:placeholder-shown)+label {
-    top: 0;
-    font-size: 12px;
-    background-color: var(--surface);
-    color: var(--text-normal);
-    padding: 0 2px;
-    font-weight: 500;
-
+.app-form-item input:focus + label,
+.app-form-item input:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 12px;
+  background-color: var(--surface);
+  color: var(--text-normal);
+  padding: 0 2px;
+  font-weight: 500;
 }
 
 .app-form-navigate {
-    p {
-        font-size: 12px;
-        color: var(--text-normal2);
-    }
+  p {
+    font-size: 12px;
+    color: var(--text-normal2);
+  }
 
-    u {
-        color: var(--primary-blue);
-        cursor: pointer;
-        text-decoration: none;
+  u {
+    color: var(--primary-blue);
+    cursor: pointer;
+    text-decoration: none;
 
-        &:hover {
-            text-decoration: underline;
-        }
+    &:hover {
+      text-decoration: underline;
     }
+  }
 }
 
 .app-form-item select {
-    width: 100%;
-    outline: 2px transparent;
-    border: var(--border);
+  width: 100%;
+  outline: 2px transparent;
+  border: var(--border);
 }
 
 .app-form-item input::placeholder {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .team-member-pill-wrapper {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    max-height: 5rem;
-    padding-top: 5px;
-    overflow-y: auto;
-    overflow-x: hidden;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  max-height: 5rem;
+  padding-top: 5px;
+  overflow-y: auto;
+  overflow-x: hidden;
 
-    .team-member-pill {
-        position: relative;
-        background-color: var(--surface);
-        font-size: 12px;
-        border: var(--border);
-        border-radius: 1rem;
-        padding: 2px 10px;
-    }
+  .team-member-pill {
+    position: relative;
+    background-color: var(--surface);
+    font-size: 12px;
+    border: var(--border);
+    border-radius: 1rem;
+    padding: 2px 10px;
+  }
 
-    span {
-        top: -5px;
-        cursor: pointer;
-        right: -5px;
-        background-color: black;
-        color: var(--surface);
-        width: 1rem;
-        height: 1rem;
-        font-size: 1rem;
-        border-radius: 50%;
-        position: absolute;
-    }
+  span {
+    top: -5px;
+    cursor: pointer;
+    right: -5px;
+    background-color: black;
+    color: var(--surface);
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+    border-radius: 50%;
+    position: absolute;
+  }
 }

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { FaArrowLeft } from "react-icons/fa6";
 import { useDispatch, useSelector } from 'react-redux';
 import CreateTaskModal from '../components/CreateTaskModal';
-import { setIsTaskLoaded, setIsTaskLoading, setTasks } from "../store/task.slice";
+import { setIsTaskLoaded, } from "../store/task.slice";
 import { CiSearch } from "react-icons/ci";
 import { useEffect } from 'react';
 import { formatDate } from '../utils/formatDate';
@@ -13,12 +13,12 @@ import "./styles/ProjectDetail.css"
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import { BsLightningCharge } from "react-icons/bs";
 import { IoBugOutline, IoClose, IoSettingsOutline } from "react-icons/io5";
-import { apiList } from '../common/apiList';
 import { FiMessageSquare } from "react-icons/fi";
 import { FaBug, FaRegFolderOpen } from "react-icons/fa";
 import Axios from '../utils/axios';
 import { LuGitCommitHorizontal } from "react-icons/lu";
 import { setIsProjectLoaded } from '../store/project.slice';
+import { getTasks } from '../utils/getTasks';
 const ProjectDetail = () => {
     const params = useParams()
     const [isCreateModal, setIsCreateModal] = useState(false)
@@ -63,40 +63,12 @@ const ProjectDetail = () => {
         dispatch(setIsTaskLoaded(false))
     }, [dispatch])
     useEffect(() => {
-        if (currProject?._id) {
-
-            const getTasks = async () => {
-                try {
-                    dispatch(setIsTaskLoading(true))
-                    const response = await Axios({
-                        ...apiList.getTasks,
-                        data: {
-                            projectId: currProject?._id
-                        }
-                    })
-                    if (response) {
-                        dispatch(setIsTaskLoading(false))
-                    }
-                    if (response.data.success) {
-                        let data = response.data.data
-                        dispatch(setTasks(data))
-                        dispatch(setIsTaskLoaded(true))
-                        if (isTaskLoaded) {
-                            dispatch(setIsTaskLoading(false))
-                        }
-                    }
-                } catch (error) {
-                    console.error(error)
-                } finally {
-                    dispatch(setIsTaskLoaded(true))
-                    dispatch(setIsTaskLoading(false))
-                }
-            }
+        if (currProject?._id || !isTaskLoaded) {
             if (!isTaskLoaded) {
-                getTasks()
+                getTasks({currProject, dispatch})
             }
         }
-    }, [isTaskLoaded, dispatch, currProject?._id])
+    }, [isTaskLoaded, dispatch, currProject])
     const [completedCount, setCompletedCount] = useState(0);
     const [inProgressCount, setInProgressCount] = useState(0);
     useEffect(() => {
