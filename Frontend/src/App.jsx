@@ -16,7 +16,7 @@ import Team from "./pages/Team";
 import Settings from "./pages/Settings";
 import Axios from "./utils/axios";
 import { apiList } from "./common/apiList";
-import { setCurrWorkspace, setIsWorkspaceLoaded, setIsWorkspaceLoading, setWorkspaceMember, setWorkspaces } from "./store/workspace.slice";
+import { setCurrWorkspace, setIsWorkspaceLoaded, setIsWorkspaceLoading, setWorkspaces } from "./store/workspace.slice";
 import InvitePage from "./pages/InvitePage";
 import LoginProtect from "./pages/LoginProtect";
 import { ToastContainer, Zoom } from "react-toastify";
@@ -24,16 +24,19 @@ import { setIsProjectLoaded, setIsProjectLoading, setProjects } from "./store/pr
 import ProjectDetail from "./pages/ProjectDetail";
 import TaskDetail from "./pages/TaskDetail";
 import ProjectSettings from "./pages/ProjectSettings";
+import { setIsTaskLoading, setTasks } from "./store/task.slice";
+import { getWorkspaceMembers } from "./utils/getWorkspaceMember";
 
 
 const App = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userDetails);
   const { currWorkspace } = useSelector(state => state.workspace)
-  const { isUserLoaded,  } = useSelector((state) => state.user);
-  const { isWorkspaceLoaded,  } = useSelector((state) => state.workspace);
+  const { isUserLoaded, } = useSelector((state) => state.user);
+  const { isWorkspaceLoaded, isWorkspaceMemberLoaded } = useSelector((state) => state.workspace);
   const { isProjectLoaded } = useSelector((state) => state.project);
-// const [isAuthChecked, se]
+  const { isTaskLoaded } = useSelector((state) => state.task);
+  // const [isAuthChecked, se]
 
 
   useEffect(() => {
@@ -96,23 +99,12 @@ const App = () => {
 
 
   useEffect(() => {
-    const getWorkspaceMembers = async () => {
-      try {
-        const response = await Axios({
-          ...apiList.getWorkspaceMembers,
-          data: {
-            workspaceId: currWorkspace?._id
-          }
-        })
-        if (response.data.success) {
-          dispatch(setWorkspaceMember(response.data.data))
-        }
-      } catch (error) {
-        console.error(error)
-      }
+
+    if (!isWorkspaceMemberLoaded) {
+      getWorkspaceMembers({ dispatch, currWorkspace })
     }
-    getWorkspaceMembers()
-  }, [currWorkspace?._id, dispatch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currWorkspace?._id, dispatch, isWorkspaceMemberLoaded])
 
   useEffect(() => {
     if (!currWorkspace._id) return
@@ -143,9 +135,41 @@ const App = () => {
 
   }, [currWorkspace?._id, dispatch, isProjectLoaded])
 
-  
+  useEffect(() => {
+    if (!currWorkspace._id) return
+    const getAllWorkspaceTasks = async () => {
+      try {
+        dispatch(setIsTaskLoading(true))
+        const response = await Axios({
+          ...apiList.getAllWorkspaceTasks,
+          data: {
+            workspaceId: currWorkspace?._id
+          }
+        })
+        console.log(response)
+        if (response.data.success) {
+          dispatch(setTasks(response.data.data))
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        dispatch(setIsProjectLoading(false))
+        dispatch(setIsProjectLoaded(true))
+      }
+    }
+    if (!isTaskLoaded) {
+      getAllWorkspaceTasks()
+    }
 
-  // if (isUserLoading || isWorkspaceLoading || !isAuthChecked) return <Loading />
+
+  }, [currWorkspace?._id, dispatch, isTaskLoaded])
+
+  console.log(localStorage.getItem('theme'))
+  const AuthProtect = ({ children }) => {
+    const user = useSelector((state) => state.user.userDetails);
+    if (!user || !user._id) return <Navigate to="/sign-in" />;
+    return children;
+  };
 
   return (
     <>
@@ -159,19 +183,17 @@ const App = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark"
+        theme={localStorage.getItem('theme') == 'light' ? 'dark' : 'light'}
         transition={Zoom} />
 
       <Routes>
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
-        <Route
-          path="/create-workspace"
-          element={
-            <LoginProtect>
-              <CreateWorkspace />
-            </LoginProtect>
-          } />
+        <Route path="/create-workspace" element={
+          <AuthProtect>
+            <CreateWorkspace />
+          </AuthProtect>
+        } />
 
         <Route path="/invite/:inviteToken" element={<InvitePage />} />
 

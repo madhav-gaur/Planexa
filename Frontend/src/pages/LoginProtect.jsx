@@ -1,16 +1,19 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 const LoginProtect = ({ children }) => {
     const user = useSelector((state) => state.user.userDetails);
+
+    if (user?.workspaces?.length === 0) return <Navigate to="/create-workspace" />;
+
 
     if (!user || !user._id) {
         return (
             <div style={{
                 width: "100vw",
                 height: "100vh",
-                backgroundColor:"var(--surface)"
+                backgroundColor: "var(--surface)"
             }}>
                 <div style={{
                     display: "flex",

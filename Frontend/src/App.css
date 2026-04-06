@@ -5,7 +5,7 @@
   --primary-blue-disabled: #87abfc;
   --surface: #fff;
   --border: 1px solid #e4e4e7;
-  --surface-hover-dark: rgb(245, 245, 245);
+  --surface-hover-dark: rgb(240, 240, 240);
   --surface-hover-light: #f9fafb;
   --surface-hover-light2: #fafafa;
   --surface-hover-light3: #f4f4f4;
@@ -30,7 +30,7 @@
   /* main background */
   --border: 1px solid #334155;
 
-  --surface-hover-dark: #24242a;
+  --surface-hover-dark: #2e2e39;
   --surface-hover-light: #23232b;
   --surface-hover-light2: #1d1d25;
   --surface-hover-light3: #282836;

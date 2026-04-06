@@ -73,6 +73,38 @@ export const createTask = async (req, res) => {
   }
 };
 
+export const getAllWorkspaceTasks = async (req, res) => {
+  try {
+    const { workspaceId } = req.body;
+
+    if (!workspaceId) {
+      return res.status(400).json({
+        success: false,
+        message: "Provide projectId",
+      });
+    }
+    const tasks = await taskModel.find({ workspaceId });
+
+    if (!tasks) {
+      return res.status(404).json({
+        success: false,
+        message: "Tasks not Found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Tasks Fetched",
+      data: tasks,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
 export const getTasks = async (req, res) => {
   try {
     const { projectId } = req.body;

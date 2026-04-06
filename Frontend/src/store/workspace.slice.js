@@ -5,6 +5,7 @@ const initialVal = {
   currWorkspace: {},
   isWorkspaceLoading: false,
   isWorkspaceLoaded: false,
+  isWorkspaceMemberLoaded: false,
 };
 
 const workspaceSlice = createSlice({
@@ -26,6 +27,9 @@ const workspaceSlice = createSlice({
     setIsWorkspaceLoaded: (state, action) => {
       state.isWorkspaceLoaded = action.payload;
     },
+    setIsWorkspaceMemberLoaded: (state, action) => {
+      state.isWorkspaceMemberLoaded = action.payload;
+    },
   },
 });
 
@@ -35,6 +39,7 @@ export const {
   setIsWorkspaceLoading,
   setIsWorkspaceLoaded,
   setCurrWorkspace,
+  setIsWorkspaceMemberLoaded
 } = workspaceSlice.actions;
 
 export default workspaceSlice.reducer;

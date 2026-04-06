@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import CreateProjectModal from '../components/CreateProjectModal'
@@ -11,6 +12,7 @@ import { FaRegFolderOpen } from "react-icons/fa";
 import Loading from '../components/Loading'
 import { CiSearch } from "react-icons/ci";
 import { setIsProjectLoaded } from '../store/project.slice'
+import { setIsTaskLoaded } from '../store/task.slice'
 const Projects = () => {
     const [isCreateModal, setIsCreateModal] = useState(false)
     const { projects, isProjectLoading } = useSelector(state => state.project)
@@ -18,10 +20,13 @@ const Projects = () => {
     const dispatch = useDispatch()
     useEffect(() => {
         dispatch(setIsProjectLoaded(false))
+        dispatch(setIsTaskLoaded(false))
     }, [dispatch])
     const [query, setQuery] = useState("")
     const [status, setStatus] = useState("ALL");
     const [priority, setPriority] = useState("ALL");
+    const [view, setView] = useState('GRID')
+    const { tasks } = useSelector((state) => state.task);
     const filteredProjects = projects?.filter((project) => {
         const matchesSearch =
             project.name?.toLowerCase().includes(query.toLowerCase());
@@ -42,6 +47,13 @@ const Projects = () => {
             setPriority("ALL")
         }
     }
+    const getProjectProgress = (tasks = []) => {
+        if (!tasks.length) return 0;
+
+        const completed = tasks.filter(t => t.status === "DONE").length;
+
+        return Math.floor((completed / tasks.length) * 100);
+    };
     return (
         <>
             <div className='dashboard-head'>
@@ -58,39 +70,56 @@ const Projects = () => {
                     <CiSearch />
                     <input type="text" placeholder='Search Projects...' value={query} onChange={(e) => setQuery(e.target.value)} />
                 </div>
-                    <div className='project-filter-wrapper'>
+                <div className='project-filter-wrapper'>
 
-                <div className='project-filter'>
-                    <select name="status" id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
-                        <option value="ALL">All Status</option>
-                        <option value="ACTIVE">Active</option>
-                        <option value="PLANNING">Planning</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="ON_HOLD">On Hold</option>
-                        <option value="CANCELLED">Cancelled</option>
-                    </select>
-                </div>
-                <div className='project-filter'>
-                    <select name="priority" id="priority" value={priority} onChange={(e) => setPriority(e.target.value)}>
-                        <option value="ALL">All Priority</option>
-                        <option value="LOW">Low</option>
-                        <option value="MEDIUM">Medium</option>
-                        <option value="HIGH">High</option>
-                    </select>
-                </div>
-                <div className='project-filter-clear-btn'>
-                    {isFilter && <button onClick={handleClearFilter} style={{
-                        backgroundColor: "var(--surface)",
-                        border: "var(--border)",
-                        color: "var(--text-normal)"
-                    }} className='primary-button'><IoClose /> Clear Filters</button>}
-                </div>
+                    <div className='project-filter'>
+                        <select name="status" id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                            <option value="ALL">All Status</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="PLANNING">Planning</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="ON_HOLD">On Hold</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                    <div className='project-filter'>
+                        <select name="priority" id="priority" value={priority} onChange={(e) => setPriority(e.target.value)}>
+                            <option value="ALL">All Priority</option>
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="HIGH">High</option>
+                        </select>
+                    </div>
+                    <div className='project-filter-clear-btn'>
+                        {isFilter && <button onClick={handleClearFilter} style={{
+                            backgroundColor: "var(--surface)",
+                            border: "var(--border)",
+                            color: "var(--text-normal)"
+                        }} className='primary-button'><IoClose /> Clear Filters</button>}
+                    </div>
                 </div>
             </div>
-            <div className='project-container-wrapper'>
-                <div className='project-container'>
+            <div className='view-toggle-btn-group view-toggle-btn-group-project'>
+                <button
+                    onClick={() => setView('LIST')}
+                    style={view === 'LIST' ? { backgroundColor: 'var(--surface)', boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px' } : {}}>
+                    List
+                </button>
+
+                <button
+                    onClick={() => setView('GRID')}
+                    style={view === 'GRID'
+                        ? { backgroundColor: 'var(--surface)', boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px' } : {}}>
+                    Grid
+                </button>
+            </div >
+            <div className={`project-container-wrapper ${view == 'LIST' && 'list'}`}>
+                <div className={`project-container `}>
                     {
                         filteredProjects.map((item, idx) => {
+                            const projectTasks = tasks.filter(t => t.projectId === item._id);
+
+                            const progress = getProjectProgress(projectTasks);
                             return <div key={item._id + idx} className='project-card' onClick={() => navigate(`/projects/${item._id}`)}>
                                 <div className='project-card-head'>
                                     <div>
@@ -111,11 +140,11 @@ const Projects = () => {
                                 <div className='project-card-progress-details'>
                                     <div>
                                         <p>Progress</p>
-                                        <p>{item.progress}%</p>
+                                        <p>{progress}%</p>
                                     </div>
                                     <div>
                                         <p></p>
-                                        <span style={{ width: `${item.progress}%` }}></span>
+                                        <span style={{ width: `${progress}%` }}></span>
                                     </div>
                                 </div>
                                 <div className='project-card-date'>

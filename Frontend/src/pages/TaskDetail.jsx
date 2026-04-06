@@ -312,15 +312,18 @@ const TaskDetail = () => {
                                 );
                             })}
                         </div>
-                        <div>
-                            <button
-                                className='primary-button'
-                                style={{ width: '100%' }}>
-                                {loading ? <>Saving... <ButtonLoading />
-                                </> : "Update Task"}</button>
-                        </div>
-                        <div className='task-delete-btn'>
-                            <button type='button' className='primary-button danger-button'>Delete Task</button>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'end' }}>
+                            
+                            <div className='task-delete-btn'>
+                                <button type='button' className='primary-button danger-button'>Delete Task</button>
+                            </div>
+                            <div style={{ display: 'flex' }}>
+                                <button
+                                    className='primary-button'
+                                >
+                                    {loading ? <>Saving... <ButtonLoading />
+                                    </> : "Update Task"}</button>
+                            </div>
                         </div>
                     </form>
                 </div>

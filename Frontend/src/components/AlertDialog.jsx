@@ -1,7 +1,7 @@
 import React from 'react'
 import "../components/Styles/AlertDialog.css"
 import { IoClose } from 'react-icons/io5'
-const AlertDialog = ({ title, subtitle, close, action, actionBtnColor }) => {
+const AlertDialog = ({ title, subtitle, close, action, actionBtnColor, children }) => {
     return (
         <div className='alert-dialog-wrapper' onClick={close}>
             <div className='alert-dialog-container' onClick={(e) => e.stopPropagation()}>
@@ -14,9 +14,13 @@ const AlertDialog = ({ title, subtitle, close, action, actionBtnColor }) => {
                     </h2>
                 </div>
                 <div>
-                    <p>
+                    <p style={{ whiteSpace: 'pre-line' }}>
                         {subtitle}
                     </p>
+                </div>
+
+                <div style={{width:'100%'}}>
+                    {children}
                 </div>
                 <div className='alert-box-btn-group'>
                     <button className='secondary-button' onClick={close}>Cancel</button>

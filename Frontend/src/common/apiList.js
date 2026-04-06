@@ -37,6 +37,14 @@ export const apiList = {
     url: "/workspace/join-workspace",
     method: "post",
   },
+  removeWorkspaceMember: {
+    url: "/workspace/remove-workspace-member",
+    method: "post",
+  },
+  updateMemberRole: {
+    url: "/workspace/update-member-role",
+    method: "post",
+  },
   createProject: {
     url: "/project/create-project",
     method: "post",
@@ -67,6 +75,10 @@ export const apiList = {
   },
   getTasks: {
     url: "/task/get-tasks",
+    method: "post",
+  },
+  getAllWorkspaceTasks: {
+    url: "/task/get-all-workspace-tasks",
     method: "post",
   },
   addComment: {

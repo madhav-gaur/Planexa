@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { auth } from "../middleware/auth.js";
-import { addComment, addSubtask, createTask, getTasks, toggleSubtask, updateTask } from "../controller/task.controller.js";
+import { addComment, addSubtask, createTask, getAllWorkspaceTasks, getTasks, toggleSubtask, updateTask } from "../controller/task.controller.js";
 export const taskRouter = Router();
 
 taskRouter.post("/create-task", auth, createTask);
+taskRouter.post("/get-all-workspace-tasks", auth, getAllWorkspaceTasks);
 taskRouter.post("/get-tasks", auth, getTasks);
 taskRouter.post("/update-task", auth, updateTask);
 taskRouter.post("/add-comment", auth, addComment);

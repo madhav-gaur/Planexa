@@ -50,9 +50,13 @@ const ProjectSettings = () => {
         if (!currProject) return;
         setLabels(transformLabel(currProject.labels || []));
     }, [currProject]);
+    
+    
     const currentUserRole = user?.workspaces?.find(
         w => w.workspaceId.toString() === currWorkspace._id.toString()
-    )?.role;
+    )?.role; 
+    
+    
     console.log(currProject)
 
     const [data, setData] = useState(null)
@@ -317,12 +321,10 @@ const ProjectSettings = () => {
                                     );
                                 })}
                             </div>
-                            <div>
-                                <button
-                                    className='primary-button'
-                                    style={{ width: '100%' }}>
+                            <div style={{ display: 'flex', justifyContent: 'end' }}>
+                                <button className='primary-button'>
                                     {loading ? <>Updating... <ButtonLoading />
-                                    </> : "Save"}</button>
+                                    </> : "Update"}</button>
                             </div>
                         </form>
                     </div>

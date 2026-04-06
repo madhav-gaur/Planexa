@@ -1,3 +1,6 @@
+import mongoose from "mongoose";
+import { projectModel } from "../models/projectModel.js";
+import { taskModel } from "../models/taskModel.js";
 import { userModel } from "../models/userModel.js";
 import { workspaceModel } from "../models/workspaceModel.js";
 import { generateInviteLink } from "../utils/generateInviteLink.js";
@@ -27,7 +30,7 @@ export const createWorkspace = async (req, res) => {
           },
         },
       },
-      { new: true }
+      { new: true },
     );
     return res.status(200).json({
       success: true,
@@ -118,7 +121,7 @@ export const joinWorkspace = async (req, res) => {
     const workspace = await workspaceModel.findById(workspaceId);
 
     const alreadyMember = workspace.members.some(
-      (memb) => memb.toString() == userId
+      (memb) => memb.toString() == userId,
     );
     if (alreadyMember) {
       return res.status(200).json({
@@ -142,7 +145,7 @@ export const joinWorkspace = async (req, res) => {
             isActive: true,
           },
         },
-      }
+      },
     );
 
     return res.status(200).json({
@@ -158,6 +161,89 @@ export const joinWorkspace = async (req, res) => {
   }
 };
 
+export const removeWorkspaceMember = async (req, res) => {
+  try {
+    const { memberId, workspaceId } = req.body;
+    if (!memberId || !workspaceId)
+      return res.status(404).json({
+        success: false,
+        message: "Provide Workspce Id and Member Id",
+      });
+
+    const workspace = await workspaceModel.findById(workspaceId);
+
+    if (memberId == workspace.adminId.toString()) {
+      return res.status(401).json({
+        success: false,
+        message: "Can't remove Admin",
+      });
+    }
+    await projectModel.findByIdAndUpdate(
+      workspaceId,
+      {
+        $pull: { members: new mongoose.Types.ObjectId(memberId) },
+      },
+      { new: true },
+    );
+
+    await userModel.findByIdAndUpdate(memberId, {
+      $pull: {
+        workspaces: { workspaceId: new mongoose.Types.ObjectId(workspaceId) },
+      },
+    });
+    await projectModel.updateMany(
+      { workspaceId: new mongoose.Types.ObjectId(workspaceId) },
+      { $pull: { members: new mongoose.Types.ObjectId(memberId) } },
+    );
+
+    await taskModel.updateMany(
+      { workspaceId: new mongoose.Types.ObjectId(workspaceId) },
+      { $pull: { assignees: new mongoose.Types.ObjectId(memberId) } },
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Member Removed from Workspace",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const updateMemberRole = async (req, res) => {
+  try {
+    const { memberId, workspaceId, newRole } = req.body;
+    if (!memberId || !workspaceId || !newRole)
+      return res.status(404).json({
+        success: false,
+        message: "Provide workspceId, memberId and newRole",
+      });
+
+    await userModel.findOneAndUpdate(
+      {
+        _id: memberId,
+        "workspaces.workspaceId": new mongoose.Types.ObjectId(workspaceId),
+      },
+      { $set: { "workspaces.$.role": newRole } },
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Role Updated",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+//
 // export const template = async (req, res) => {
 //   try {
 //     return res.status(200).json({
