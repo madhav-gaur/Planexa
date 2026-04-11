@@ -5,11 +5,11 @@ import { userModel } from "../models/userModel.js";
 import { workspaceModel } from "../models/workspaceModel.js";
 import { generateInviteLink } from "../utils/generateInviteLink.js";
 import { verifyInviteHash } from "../utils/verifyInviteLink.js";
+import { logActivity } from "../utils/logActivity.js";
 
 export const createWorkspace = async (req, res) => {
   try {
     const userId = req.userId;
-    console.log(req.body);
     const { name, description, logo } = req.body;
     const newWorkspace = await workspaceModel.create({
       adminId: userId,
@@ -32,6 +32,16 @@ export const createWorkspace = async (req, res) => {
       },
       { new: true },
     );
+
+    await logActivity({
+      actorId: req.userId,
+      action: "WORKSPACE_CREATED",
+      entityType: "WORKSPACE",
+      entityId: newWorkspace._id,
+      workspaceId: newWorkspace._id,
+      metadata: { name },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Workspace created",
@@ -69,9 +79,7 @@ export const getWorkspaces = async (req, res) => {
 // ? Get members in a workspace
 export const getWorkspaceMembers = async (req, res) => {
   try {
-    // console.log(req.body);
     const { workspaceId } = req.body;
-    // console.log("id", workspaceId);
     const members = await userModel.find({
       "workspaces.workspaceId": workspaceId,
     });
@@ -148,6 +156,15 @@ export const joinWorkspace = async (req, res) => {
       },
     );
 
+    await logActivity({
+      actorId: req.userId,
+      action: "WORKSPACE_MEMBER_JOINED",
+      entityType: "WORKSPACE",
+      entityId: workspaceId,
+      workspaceId,
+      metadata: { role: role || "MEMBER" },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Joined Workspace",
@@ -200,6 +217,14 @@ export const removeWorkspaceMember = async (req, res) => {
       { workspaceId: new mongoose.Types.ObjectId(workspaceId) },
       { $pull: { assignees: new mongoose.Types.ObjectId(memberId) } },
     );
+    await logActivity({
+      actorId: req.userId,
+      action: "WORKSPACE_MEMBER_REMOVED",
+      entityType: "WORKSPACE",
+      entityId: workspaceId,
+      workspaceId,
+      metadata: { targetUserId: memberId },
+    });
 
     return res.status(200).json({
       success: true,
@@ -230,6 +255,15 @@ export const updateMemberRole = async (req, res) => {
       },
       { $set: { "workspaces.$.role": newRole } },
     );
+
+    await logActivity({
+      actorId: req.userId,
+      action: "UPDATED_ROLE",
+      entityType: "WORKSPACE",
+      entityId: workspaceId,
+      workspaceId,
+      metadata: { targetUserId: memberId, newRole },
+    });
 
     return res.status(200).json({
       success: true,

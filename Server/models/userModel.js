@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    avatar: {
+      type: String,
+      required:false,
+    },
     workspaces: [
       {
         workspaceId: {
@@ -24,7 +28,7 @@ const userSchema = new mongoose.Schema(
 
         role: {
           type: String,
-          enum: ["ADMIN","CONTRIBUTOR", "VIEWER"],
+          enum: ["ADMIN", "CONTRIBUTOR", "VIEWER"],
           default: "VIEWER",
         },
 
@@ -64,6 +68,6 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 export const userModel = mongoose.model("user", userSchema);

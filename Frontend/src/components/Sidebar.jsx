@@ -85,48 +85,54 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                             {!isDropdown ? <FaChevronDown /> : <IoClose />}
                         </div>}
                     </div>
-                    {isDropdown && <div className='workspace-nav-dropdown-wrap'>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <p>Workspaces</p>
-                            <IoClose
-                                onClick={() => setIsDropdown(false)}
-                                style={{ color: "var(--text-normal)", fontSize: "1.2rem", cursor: "pointer" }} />
-                        </div>
-                        <div className='workspace-nav-dropdown-list'>
-                            {
-                                workspaces.map((item, idx) => {
-                                    return <div className='workspace-nav-dropdown' key={item._id + idx}>
-                                        <div className='workspace-nav' onClick={() => changeWorkspace(item)}>
-                                            <div className='workspace-nav-name'>
-                                                {item?.logo == "" ?
-                                                    <span>{item?.name?.split("")[0].toUpperCase()}</span>
-                                                    : <img src={item?.logo} alt="" />}
-                                                <div>
-                                                    <p style={{ fontSize: "14px" }}>{item?.name?.slice(0, 16)}{item?.name?.length > 16 ? "..." : ""}</p>
-                                                    <b>{item?.members.length} members</b>
+                    {isDropdown &&
+                        <div
+                            style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+                            onClick={() => setIsDropdown(false)}
+                        >
+                            <div className='workspace-nav-dropdown-wrap'>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <p>Workspaces</p>
+                                    <IoClose
+                                        onClick={() => setIsDropdown(false)}
+                                        style={{ color: "var(--text-normal)", fontSize: "1.2rem", cursor: "pointer" }} />
+                                </div>
+                                <div className='workspace-nav-dropdown-list'>
+                                    {
+                                        workspaces.map((item, idx) => {
+                                            return <div className='workspace-nav-dropdown' key={item._id + idx}>
+                                                <div className='workspace-nav' onClick={() => changeWorkspace(item)}>
+                                                    <div className='workspace-nav-name'>
+                                                        {item?.logo == "" ?
+                                                            <span>{item?.name?.split("")[0].toUpperCase()}</span>
+                                                            : <img src={item?.logo} alt="" />}
+                                                        <div>
+                                                            <p style={{ fontSize: "14px" }}>{item?.name?.slice(0, 16)}{item?.name?.length > 16 ? "..." : ""}</p>
+                                                            <b>{item?.members.length} members</b>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        {currWorkspace._id == item._id ? <FaCheck /> : ""}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                {currWorkspace._id == item._id ? <FaCheck /> : ""}
-                                            </div>
-                                        </div>
 
-                                    </div>
-                                })
-                            }
-                        </div>
+                                            </div>
+                                        })
+                                    }
+                                </div>
 
-                        <div>
-                            <button
-                                style={{ width: "100%" }}
-                                onClick={() => {
-                                    setIsDropdown(false)
-                                    setIsCreateModal(true)
-                                }}
-                                className='primary-button'>+ Create Workspace
-                            </button>
-                        </div>
-                    </div>}
+                                <div>
+                                    <button
+                                        style={{ width: "100%" }}
+                                        onClick={() => {
+                                            setIsDropdown(false)
+                                            setIsCreateModal(true)
+                                        }}
+                                        className='primary-button'>+ Create Workspace
+                                    </button>
+                                </div>
+                            </div>
+                        </div>}
 
                 </div>
                 <div className='sidebar-nav-wrapper'

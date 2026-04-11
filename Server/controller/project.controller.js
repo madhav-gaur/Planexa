@@ -1,8 +1,8 @@
-import { crossOriginResourcePolicy } from "helmet";
 import { projectModel } from "../models/projectModel.js";
 import { taskModel } from "../models/taskModel.js";
 import { userModel } from "../models/userModel.js";
 import { workspaceModel } from "../models/workspaceModel.js";
+import { logActivity } from "../utils/logActivity.js";
 import mongoose from "mongoose";
 export const createProject = async (req, res) => {
   try {
@@ -18,14 +18,7 @@ export const createProject = async (req, res) => {
       members,
       labels,
     } = req.body;
-    console.log(req.body);
-    if (
-      !workspaceId ||
-      !name ||
-      !projectHeadId ||
-      !startDate ||
-      !endDate
-    ) {
+    if (!workspaceId || !name || !projectHeadId || !startDate || !endDate) {
       return res.status(401).json({
         success: false,
         message: "Provide all required Feilds",
@@ -61,6 +54,15 @@ export const createProject = async (req, res) => {
       },
       { new: true },
     );
+
+    await logActivity({
+      actorId: req.userId,
+      action: "PROJECT_CREATED",
+      entityType: "PROJECT",
+      entityId: newProject._id,
+      workspaceId,
+      metadata: { projectHeadId, name },
+    });
 
     return res.status(200).json({
       success: true,
@@ -116,6 +118,7 @@ export const updateProject = async (req, res) => {
     const { projectId } = req.params;
 
     const {
+      workspaceId,
       name,
       description,
       status,
@@ -158,6 +161,15 @@ export const updateProject = async (req, res) => {
       });
     }
 
+    await logActivity({
+      actorId: req.userId,
+      action: "PROJECT_UPDATED",
+      entityType: "PROJECT",
+      entityId: updatedProject._id,
+      workspaceId,
+      metadata: { projectId, name },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Project updated successfully",
@@ -176,6 +188,14 @@ export const removeMember = async (req, res) => {
   try {
     const { projectId, memberId } = req.body;
 
+    const project = await projectModel.findById(projectId);
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found",
+      });
+    }
+
     const updatedProject = await projectModel.findByIdAndUpdate(
       projectId,
       {
@@ -186,6 +206,16 @@ export const removeMember = async (req, res) => {
     await userModel.findByIdAndUpdate(memberId, {
       $pull: { project: new mongoose.Types.ObjectId(projectId) },
     });
+
+    await logActivity({
+      actorId: req.userId,
+      action: "PROJECT_MEMBER_REMOVED",
+      entityType: "PROJECT",
+      entityId: projectId,
+      workspaceId: project.workspaceId,
+      metadata: { targetUserId: memberId },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Member deleted Successfully",
@@ -204,6 +234,14 @@ export const deleteProject = async (req, res) => {
   try {
     const { projectId } = req.body;
 
+    const project = await projectModel.findById(projectId);
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found",
+      });
+    }
+
     await projectModel.findByIdAndDelete(projectId);
 
     await userModel.updateMany(
@@ -217,6 +255,15 @@ export const deleteProject = async (req, res) => {
       { projects: projectId },
       { $pull: { projects: projectId } },
     );
+
+    await logActivity({
+      actorId: req.userId,
+      action: "PROJECT_DELETED",
+      entityType: "PROJECT",
+      entityId: projectId,
+      workspaceId: project.workspaceId,
+      metadata: {},
+    });
 
     return res.status(200).json({
       success: true,

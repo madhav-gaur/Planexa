@@ -13,6 +13,14 @@ export const apiList = {
     url: "/user/get-user",
     method: "get",
   },
+  updateAvatar: {
+    url: "/user/upload-avatar",
+    method: "post",
+  },
+  updateProfile: {
+    url: "/user/update-profile",
+    method: "post",
+  },
   refreshToken: {
     url: "/auth/refresh-token",
     method: "post",

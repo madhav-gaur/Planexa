@@ -26,6 +26,7 @@ import TaskDetail from "./pages/TaskDetail";
 import ProjectSettings from "./pages/ProjectSettings";
 import { setIsTaskLoading, setTasks } from "./store/task.slice";
 import { getWorkspaceMembers } from "./utils/getWorkspaceMember";
+import Account from "./pages/Account";
 
 
 const App = () => {
@@ -224,6 +225,10 @@ const App = () => {
         <Route path="/settings" element={<DashboardLayout />}>
           <Route index element={<LoginProtect> <Settings /> </LoginProtect>} />
         </Route>
+        <Route path="/account" element={<DashboardLayout />}>
+          <Route index element={<LoginProtect> <Account /> </LoginProtect>} />
+        </Route>
+
       </Routes >
 
     </>

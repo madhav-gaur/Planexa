@@ -2,6 +2,7 @@ import { projectModel } from "../models/projectModel.js";
 import { taskModel } from "../models/taskModel.js";
 import { userModel } from "../models/userModel.js";
 import { workspaceModel } from "../models/workspaceModel.js";
+import { logActivity } from "../utils/logActivity.js";
 export const createTask = async (req, res) => {
   try {
     const {
@@ -59,6 +60,16 @@ export const createTask = async (req, res) => {
         },
       },
     );
+
+    await logActivity({
+      actorId: req.userId,
+      action: "TASK_CREATED",
+      entityType: "TASK",
+      entityId: newTask._id,
+      workspaceId,
+      metadata: { projectId, assignees },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Task Created",
@@ -178,6 +189,15 @@ export const updateTask = async (req, res) => {
       });
     }
 
+    await logActivity({
+      actorId: req.userId,
+      action: "TASK_UPDATED",
+      entityType: "TASK",
+      entityId: updatedTask._id,
+      workspaceId,
+      metadata: { projectId, title },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Task Updated",
@@ -215,6 +235,15 @@ export const addSubtask = async (req, res) => {
         message: "Task not found",
       });
     }
+
+    await logActivity({
+      actorId: req.userId,
+      action: "SUBTASK_ADDED",
+      entityType: "TASK",
+      entityId: updatedTask._id,
+      workspaceId: updatedTask.workspaceId,
+      metadata: { subtaskTitle: title },
+    });
 
     return res.status(200).json({
       success: true,
@@ -257,6 +286,15 @@ export const addComment = async (req, res) => {
       });
     }
 
+    await logActivity({
+      actorId: req.userId,
+      action: "TASK_COMMENT_ADDED",
+      entityType: "TASK",
+      entityId: updatedTask._id,
+      workspaceId: updatedTask.workspaceId,
+      metadata: { comment: message },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Comment added",
@@ -281,6 +319,15 @@ export const toggleSubtask = async (req, res) => {
     subtask.isCompleted = !subtask.isCompleted;
 
     await task.save();
+
+    await logActivity({
+      actorId: req.userId,
+      action: "SUBTASK_TOGGLED",
+      entityType: "TASK",
+      entityId: task._id,
+      workspaceId: task.workspaceId,
+      metadata: { subtaskId, isCompleted: subtask.isCompleted },
+    });
 
     return res.status(200).json({
       success: true,
