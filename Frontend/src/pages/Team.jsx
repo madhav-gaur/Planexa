@@ -217,7 +217,7 @@ const Team = () => {
                                 </div>
                             })
                         }
-                        {!filteredMembers[0] && <div style={{ display: "flex", justifyContent: "center", color: "var(--text-light)" }}>No Memebers Found </div>}
+                        {!filteredMembers[0] && <div style={{ display: "flex", justifyContent: "center", color: "var(--text-light)" }}>No members found</div>}
                     </div>
                 </div>
 

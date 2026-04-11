@@ -31,6 +31,12 @@ const workspaceSchema = new mongoose.Schema(
         ref: "project",
       },
     ],
+    tasks: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "task",
+      },
+    ],
     settings: {
       allowGuestAccess: {
         type: Boolean,

@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { setIsUserLoaded, setIsUserLoading, setUserDetails } from "./store/user.slice";
 
-import Home from "./pages/Home";
 import HomeLander from "./pages/HomeLander";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -24,7 +23,7 @@ import { setIsProjectLoaded, setIsProjectLoading, setProjects } from "./store/pr
 import ProjectDetail from "./pages/ProjectDetail";
 import TaskDetail from "./pages/TaskDetail";
 import ProjectSettings from "./pages/ProjectSettings";
-import { setIsTaskLoading, setTasks } from "./store/task.slice";
+import { setIsTaskLoading, setIsTaskLoaded, setTasks } from "./store/task.slice";
 import { getWorkspaceMembers } from "./utils/getWorkspaceMember";
 import Account from "./pages/Account";
 
@@ -100,9 +99,9 @@ const App = () => {
 
 
   useEffect(() => {
-
+    if (!currWorkspace?._id) return;
     if (!isWorkspaceMemberLoaded) {
-      getWorkspaceMembers({ dispatch, currWorkspace })
+      getWorkspaceMembers({ dispatch, currWorkspace });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currWorkspace?._id, dispatch, isWorkspaceMemberLoaded])
@@ -154,8 +153,8 @@ const App = () => {
       } catch (error) {
         console.error(error)
       } finally {
-        dispatch(setIsProjectLoading(false))
-        dispatch(setIsProjectLoaded(true))
+        dispatch(setIsTaskLoading(false))
+        dispatch(setIsTaskLoaded(true))
       }
     }
     if (!isTaskLoaded) {
@@ -165,7 +164,6 @@ const App = () => {
 
   }, [currWorkspace?._id, dispatch, isTaskLoaded])
 
-  console.log(localStorage.getItem('theme'))
   const AuthProtect = ({ children }) => {
     const user = useSelector((state) => state.user.userDetails);
     if (!user || !user._id) return <Navigate to="/sign-in" />;

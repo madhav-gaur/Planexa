@@ -1,3 +1,6 @@
+import jwt from "jsonwebtoken";
+import { generateAccessToken } from "../utils/generateToken.js";
+
 export const refreshToken = async (req, res) => {
   try {
     const refreshToken =
@@ -8,18 +11,18 @@ export const refreshToken = async (req, res) => {
         message: "Invalid token",
       });
     }
-    const verifyToken = await jwt.verify(
+    const verifyToken = jwt.verify(
       refreshToken,
-      process.env.JWT_SECRET_REFRESH_TOKEN
+      process.env.JWT_SECRET_REFRESH_TOKEN,
     );
-    if (!verifyToken) {
+    if (!verifyToken?.id) {
       return res.status(401).json({
         success: false,
         message: "Token expired",
       });
     }
-    const userId = verifyToken?.id;
-    const newAccessToken = await generatedAccessToken(userId);
+    const userId = verifyToken.id;
+    const newAccessToken = await generateAccessToken(userId);
 
     const cookieOption = {
       httpOnly: true,

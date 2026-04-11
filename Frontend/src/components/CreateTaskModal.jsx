@@ -21,7 +21,7 @@ const CreateTaskModal = ({ close, currProject }) => {
         dueDate: undefined,
         assignees: []
     })
-    console.log(data)
+    // console.log(data)
     const { workspaceMember, currWorkspace } = useSelector(state => state.workspace)
     const handleInput = (e) => {
         const { name, value } = e.target;
@@ -32,7 +32,7 @@ const CreateTaskModal = ({ close, currProject }) => {
         }));
     };
     const removeMember = (email) => {
-        const lead = workspaceMember.find(m => m._id === data.projectLead);
+        const lead = workspaceMember.find(m => m._id === (currProject?.projectHeadId ?? currProject?.projectLead));
         if (lead?.email === email) return;
 
         setData(prev => ({

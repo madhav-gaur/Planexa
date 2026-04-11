@@ -50,7 +50,7 @@ const InviteModal = ({ close }) => {
                     <div>
                         <select name="role" id="role" onChange={(e) => setRole(e.target.value)}>
                             {temp.role === "ADMIN" && <option value="ADMIN">Admin</option>}
-                            <option value="MEMBER">Member</option>
+                            <option value="CONTRIBUTOR">Contributor</option>
                             <option value="VIEWER">Viewer</option>
                         </select>
                     </div>

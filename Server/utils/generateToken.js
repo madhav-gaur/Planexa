@@ -10,7 +10,7 @@ export const generateAccessToken = async (userId) => {
       id: userId,
     },
     process.env.JWT_SECRET_ACCESS_TOKEN,
-    { expiresIn: "2d" },
+    { expiresIn: "2m" },
   );
   return token;
 };
@@ -27,6 +27,6 @@ export const generateRefreshToken = async (userId) => {
     process.env.JWT_SECRET_REFRESH_TOKEN,
     { expiresIn: "14d" },
   );
-  await userModel.updateOne({ _id: userId }, { refresh_token: token });
+  await userModel.updateOne({ _id: userId }, { refreshToken: token });
   return token;
 };

@@ -51,7 +51,7 @@ const CreateProjectModal = ({ close }) => {
         }));
     };
     const removeMember = (email) => {
-        const lead = workspaceMember.find(m => m._id === data.projectLead);
+            const lead = workspaceMember.find(m => m._id === data.projectLead);
         if (lead?.email === email) return;
 
         setData(prev => ({

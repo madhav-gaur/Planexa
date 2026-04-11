@@ -126,6 +126,7 @@ export const updateProject = async (req, res) => {
       startDate,
       endDate,
       labels,
+      projectHeadId,
       projectLead,
       members,
     } = req.body;
@@ -135,19 +136,26 @@ export const updateProject = async (req, res) => {
         message: "Project ID is required",
       });
     }
+    const headId =
+      projectHeadId !== undefined ? projectHeadId : projectLead;
+
+    const updatePayload = {
+      name,
+      description,
+      status,
+      priority,
+      startDate,
+      endDate,
+      labels,
+      members,
+    };
+    if (headId !== undefined) {
+      updatePayload.projectHeadId = headId;
+    }
+
     const updatedProject = await projectModel.findByIdAndUpdate(
       projectId,
-      {
-        name,
-        description,
-        status,
-        priority,
-        startDate,
-        endDate,
-        labels,
-        projectLead,
-        members,
-      },
+      updatePayload,
       {
         new: true,
         runValidators: true,

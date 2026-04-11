@@ -56,8 +56,6 @@ const ProjectDetail = () => {
             setType("ALL")
         }
     }
-    console.log(tasks)
-    console.log(filteredTasks)
     useEffect(() => {
         dispatch(setIsProjectLoaded(false))
         dispatch(setIsTaskLoaded(false))

@@ -12,7 +12,7 @@ import { FaCheck } from "react-icons/fa";
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
-import { setCurrWorkspace } from '../store/workspace.slice';
+import { setCurrWorkspace, setIsWorkspaceMemberLoaded } from '../store/workspace.slice';
 import { GoSidebarCollapse } from "react-icons/go";
 import { setIsProjectLoaded } from '../store/project.slice';
 import { toast } from 'react-toastify';
@@ -47,6 +47,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
         setIsDropdown(false)
         dispatch(setCurrWorkspace(item))
         dispatch(setIsProjectLoaded(false))
+        dispatch(setIsWorkspaceMemberLoaded(false))
         toast(`Workspace changed to ${item.name.slice(0, 12)}...`)
         navigate("/")
     }
@@ -60,7 +61,6 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
             >
 
                 {isSidebar && <div style={{ margin: "21px 1rem 0" }} className='sidebar-toggle-sc' onClick={() => {
-                    console.log(isSidebar)
                     setIsSidebar(!isSidebar)
                 }}>
                     <IoClose />

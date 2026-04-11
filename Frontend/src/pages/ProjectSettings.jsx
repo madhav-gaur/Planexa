@@ -71,7 +71,7 @@ const ProjectSettings = () => {
                 startDate: transformDate(currProject?.startDate) || "",
                 endDate: transformDate(currProject?.endDate) || "",
                 labels: labels,
-                projectLead: currProject.projectLead,
+                projectLead: currProject.projectHeadId ?? currProject.projectLead,
                 members: currProject.members
             }
         )

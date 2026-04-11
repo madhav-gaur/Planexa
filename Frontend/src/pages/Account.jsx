@@ -232,7 +232,6 @@ const Account = () => {
                             <div className='account-workspace-list'>
                                 {user?.workspaces?.map((ws) => {
                                     let temp = workspaces.find(item => item._id == ws.workspaceId)
-                                    // console.log(temp)
                                     return <div key={ws._id} className='account-workspace-item'>
                                         <div className='account-workspace-info'>
                                             <div className='account-workspace-icon'>

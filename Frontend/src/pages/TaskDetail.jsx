@@ -15,13 +15,24 @@ import ButtonLoading from '../components/ButtonLoading'
 import { useEffect } from 'react'
 import { getTasks } from '../utils/getTasks'
 import { useRef } from "react";
+import Loading from '../components/Loading'
+
+const emptyForm = () => ({
+    title: '',
+    description: '',
+    type: 'TASK',
+    status: 'TO_DO',
+    priority: 'MEDIUM',
+    dueDate: '',
+    assignees: [],
+})
 
 const TaskDetail = () => {
     const navigate = useNavigate()
-    const { tasks, isTaskLoaded } = useSelector(state => state.task)
+    const { tasks, isTaskLoaded, isTaskLoading } = useSelector(state => state.task)
     const params = useParams()
     const currTask = tasks?.find(item => item._id == params.taskId)
-    const { projects } = useSelector(state => state.project)
+    const { projects, isProjectLoaded } = useSelector(state => state.project)
     const currProject = projects?.find(item => item._id == params.projectId)
     const { workspaceMember, currWorkspace } = useSelector(state => state.workspace)
     const [loading, setLoading] = useState(false)
@@ -38,18 +49,20 @@ const TaskDetail = () => {
         const finalDate = temp[0] + '-' + temp[1] + '-' + temp[2].split('T')[0];
         return finalDate;
     }
+    const [data, setData] = useState(emptyForm)
+
     useEffect(() => {
-        dispatch(setIsTaskLoaded(false))
-    }, [dispatch])
-    const [data, setData] = useState({
-        title: currTask.title,
-        description: currTask.description,
-        type: currTask.type,
-        status: currTask.status,
-        priority: currTask.priority,
-        dueDate: transformDate(currTask.dueDate) || '',
-        assignees: currTask.assignees
-    })
+        if (!currTask) return
+        setData({
+            title: currTask.title ?? '',
+            description: currTask.description ?? '',
+            type: currTask.type ?? 'TASK',
+            status: currTask.status ?? 'TO_DO',
+            priority: currTask.priority ?? 'MEDIUM',
+            dueDate: transformDate(currTask.dueDate) || '',
+            assignees: currTask.assignees ?? [],
+        })
+    }, [currTask])
     const handleInput = (e) => {
         const { name, value } = e.target;
 
@@ -58,13 +71,13 @@ const TaskDetail = () => {
             [name]: value,
         }));
     };
-    const removeMember = (email) => {
-        const lead = workspaceMember.find(m => m._id === data.projectLead);
-        if (lead?.email === email) return;
+    const removeMember = (memberId) => {
+        const lead = workspaceMember.find(m => m._id === (currProject?.projectHeadId ?? currProject?.projectLead));
+        if (lead?._id === memberId) return;
 
         setData(prev => ({
             ...prev,
-            assignees: prev.assignees.filter(m => m !== email),
+            assignees: prev.assignees.filter(m => m !== memberId),
         }));
     };
 
@@ -185,18 +198,44 @@ const TaskDetail = () => {
             getTasks({ currProject, dispatch });
         }
     }, [currProject, dispatch, isTaskLoaded]);
+
+    if (!isProjectLoaded) {
+        return <Loading />
+    }
+    if (!currProject) {
+        return (
+            <div className='project-setting-wrapper'>
+                <p style={{ padding: '2rem', color: 'var(--text-light)' }}>Project not found.</p>
+                <button type="button" className="primary-button" style={{ marginLeft: '2rem' }} onClick={() => navigate('/projects')}>Back to projects</button>
+            </div>
+        )
+    }
+
+    const waitingForTask = !currTask && (!isTaskLoaded || isTaskLoading)
+    if (waitingForTask) {
+        return <Loading />
+    }
+    if (!currTask) {
+        return (
+            <div className='project-setting-wrapper'>
+                <p style={{ padding: '2rem', color: 'var(--text-light)' }}>Task not found.</p>
+                <button type="button" className="primary-button" style={{ marginLeft: '2rem' }} onClick={() => navigate(`/projects/${params.projectId}`)}>Back to project</button>
+            </div>
+        )
+    }
+
     return (
         <div className='project-setting-wrapper'>
             <div className='project-setting-container'>
                 <div className='app-form-container' onClick={(e) => e.stopPropagation()}>
                     <div className='app-form-setting-head' style={{ position: "relative" }}>
-                        <div onClick={() => navigate(`/projects/${currProject._id}`)}>
+                        <div onClick={() => navigate(`/projects/${currProject?._id}`)}>
                             <IoArrowBack />
                             <span>Back</span>
                         </div>
                         <div>
                             <h2>
-                                {currTask.title}
+                                {currTask?.title}
                             </h2>
                         </div>
                     </div>
@@ -336,10 +375,10 @@ const TaskDetail = () => {
                                 Comments
                             </h2>
                         </div>
-                        <Comments comments={currTask.comments} />
+                        <Comments comments={currTask?.comments} />
                         <div>
                             {
-                                currTask.subTasks.length == 0 && <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem 1rem 0', color: 'var(--text-light)' }}>
+                                (currTask?.subTasks?.length ?? 0) === 0 && <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem 1rem 0', color: 'var(--text-light)' }}>
                                     No Comments Yet
                                 </div>
                             }
@@ -376,11 +415,11 @@ const TaskDetail = () => {
                             <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Add</button>
                         </form>
                         {
-                            currTask.subTasks.length == 0 && <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem', color: 'var(--text-light)' }}>
+                            (currTask?.subTasks?.length ?? 0) === 0 && <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem', color: 'var(--text-light)' }}>
                                 No Subtasks Yet
                             </div>
                         }
-                        {currTask.subTasks.map((task, idx) => {
+                        {(currTask?.subTasks ?? []).map((task, idx) => {
                             console.log(task)
                             return <div className='subtask-item' key={task._id + idx}>
                                 <div>{task?.title}</div>

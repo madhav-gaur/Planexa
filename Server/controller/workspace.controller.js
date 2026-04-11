@@ -7,6 +7,15 @@ import { generateInviteLink } from "../utils/generateInviteLink.js";
 import { verifyInviteHash } from "../utils/verifyInviteLink.js";
 import { logActivity } from "../utils/logActivity.js";
 
+const WORKSPACE_ROLES = ["ADMIN", "CONTRIBUTOR", "VIEWER"];
+
+/** Maps invite UI "MEMBER" and legacy values onto user.workspaces.role enum. */
+const normalizeInviteRole = (role) => {
+  if (!role || role === "MEMBER") return "CONTRIBUTOR";
+  if (WORKSPACE_ROLES.includes(role)) return role;
+  return "VIEWER";
+};
+
 export const createWorkspace = async (req, res) => {
   try {
     const userId = req.userId;
@@ -118,7 +127,8 @@ export const joinWorkspace = async (req, res) => {
   try {
     const userId = req.userId;
     const { token } = req.body;
-    const { workspaceId, role } = verifyInviteHash(token);
+    const { workspaceId, role: rawRole } = verifyInviteHash(token);
+    const role = normalizeInviteRole(rawRole);
 
     if (!workspaceId) {
       return res.status(400).json({
@@ -148,7 +158,7 @@ export const joinWorkspace = async (req, res) => {
         $push: {
           workspaces: {
             workspaceId,
-            role: role || "MEMBER",
+            role,
             joinedAt: new Date(),
             isActive: true,
           },
@@ -162,7 +172,7 @@ export const joinWorkspace = async (req, res) => {
       entityType: "WORKSPACE",
       entityId: workspaceId,
       workspaceId,
-      metadata: { role: role || "MEMBER" },
+      metadata: { role },
     });
 
     return res.status(200).json({
@@ -248,12 +258,20 @@ export const updateMemberRole = async (req, res) => {
         message: "Provide workspceId, memberId and newRole",
       });
 
+    const roleToSet = normalizeInviteRole(newRole);
+    if (!WORKSPACE_ROLES.includes(roleToSet)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role",
+      });
+    }
+
     await userModel.findOneAndUpdate(
       {
         _id: memberId,
         "workspaces.workspaceId": new mongoose.Types.ObjectId(workspaceId),
       },
-      { $set: { "workspaces.$.role": newRole } },
+      { $set: { "workspaces.$.role": roleToSet } },
     );
 
     await logActivity({
@@ -262,7 +280,7 @@ export const updateMemberRole = async (req, res) => {
       entityType: "WORKSPACE",
       entityId: workspaceId,
       workspaceId,
-      metadata: { targetUserId: memberId, newRole },
+      metadata: { targetUserId: memberId, newRole: roleToSet },
     });
 
     return res.status(200).json({

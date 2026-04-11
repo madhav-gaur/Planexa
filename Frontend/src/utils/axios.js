@@ -1,7 +1,14 @@
 import axios from "axios";
 import { apiList } from "../common/apiList";
+
+const resolvedBaseURL =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, "") ||
+  "http://localhost:4000/api";
+
 const Axios = axios.create({
-  baseURL: "http://localhost:4000/api",
+  baseURL: resolvedBaseURL.endsWith("/api")
+    ? resolvedBaseURL
+    : `${resolvedBaseURL}/api`,
   withCredentials: true,
 });
 Axios.interceptors.request.use((config) => {
@@ -18,7 +25,10 @@ Axios.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await Axios(apiList.refreshToken, { withCredentials: true });
+        await Axios({
+          ...apiList.refreshToken,
+          withCredentials: true,
+        });
         return Axios(originalRequest);
       } catch (err) {
         // logout

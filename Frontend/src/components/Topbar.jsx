@@ -17,7 +17,6 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
             <div className='topbar'>
                 <div className='topbar-left'>
                     <div className='sidebar-toggle-sc' onClick={() => {
-                        console.log(isSidebar)
                         setIsSidebar(!isSidebar)
                     }}>
                         <IoMenu />
