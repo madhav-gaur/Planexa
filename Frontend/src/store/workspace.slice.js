@@ -30,6 +30,17 @@ const workspaceSlice = createSlice({
     setIsWorkspaceMemberLoaded: (state, action) => {
       state.isWorkspaceMemberLoaded = action.payload;
     },
+    mergeWorkspace: (state, action) => {
+      const w = action.payload;
+      if (!w?._id) return;
+      const id = w._id.toString();
+      state.workspaces = state.workspaces.map((item) =>
+        item._id?.toString() === id ? { ...item, ...w } : item,
+      );
+      if (state.currWorkspace?._id?.toString() === id) {
+        state.currWorkspace = { ...state.currWorkspace, ...w };
+      }
+    },
   },
 });
 
@@ -39,7 +50,8 @@ export const {
   setIsWorkspaceLoading,
   setIsWorkspaceLoaded,
   setCurrWorkspace,
-  setIsWorkspaceMemberLoaded
+  setIsWorkspaceMemberLoaded,
+  mergeWorkspace,
 } = workspaceSlice.actions;
 
 export default workspaceSlice.reducer;

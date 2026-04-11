@@ -53,6 +53,18 @@ export const apiList = {
     url: "/workspace/update-member-role",
     method: "post",
   },
+  updateWorkspace: {
+    url: "/workspace",
+    method: "put",
+  },
+  updateWorkspaceSettings: {
+    url: "/workspace",
+    method: "patch",
+  },
+  updateWorkspaceLogo: {
+    url: "/workspace",
+    method: "post",
+  },
   createProject: {
     url: "/project/create-project",
     method: "post",
