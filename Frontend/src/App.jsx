@@ -13,6 +13,7 @@ import DashboardLayout from "../Layout/DashboardLayout";
 import Projects from "./pages/Projects";
 import Team from "./pages/Team";
 import Settings from "./pages/Settings";
+import Notifications from "./pages/Notifications";
 import Axios from "./utils/axios";
 import { apiList } from "./common/apiList";
 import { setCurrWorkspace, setIsWorkspaceLoaded, setIsWorkspaceLoading, setWorkspaces } from "./store/workspace.slice";
@@ -164,6 +165,9 @@ const App = () => {
 
   }, [currWorkspace?._id, dispatch, isTaskLoaded])
 
+
+
+
   const AuthProtect = ({ children }) => {
     const user = useSelector((state) => state.user.userDetails);
     if (!user || !user._id) return <Navigate to="/sign-in" />;
@@ -222,6 +226,9 @@ const App = () => {
 
         <Route path="/settings" element={<DashboardLayout />}>
           <Route index element={<LoginProtect> <Settings /> </LoginProtect>} />
+        </Route>
+        <Route path="/notifications" element={<DashboardLayout />}>
+          <Route index element={<LoginProtect> <Notifications /> </LoginProtect>} />
         </Route>
         <Route path="/account" element={<DashboardLayout />}>
           <Route index element={<LoginProtect> <Account /> </LoginProtect>} />

@@ -75,8 +75,8 @@ export const userSignIn = async (req, res) => {
 
     const cookieOption = {
       httpOnly: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
     };
     res.cookie("accessToken", accessToken, cookieOption);

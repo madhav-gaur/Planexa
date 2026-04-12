@@ -10,7 +10,7 @@ export const generateAccessToken = async (userId) => {
       id: userId,
     },
     process.env.JWT_SECRET_ACCESS_TOKEN,
-    { expiresIn: "2m" },
+    { expiresIn: "2d" },
   );
   return token;
 };

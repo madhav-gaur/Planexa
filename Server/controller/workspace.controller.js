@@ -6,6 +6,7 @@ import { workspaceModel } from "../models/workspaceModel.js";
 import { generateInviteLink } from "../utils/generateInviteLink.js";
 import { verifyInviteHash } from "../utils/verifyInviteLink.js";
 import { logActivity } from "../utils/logActivity.js";
+import { createNotification } from "../utils/createNotification.js";
 
 const WORKSPACE_ROLES = ["ADMIN", "CONTRIBUTOR", "VIEWER"];
 
@@ -175,6 +176,20 @@ export const joinWorkspace = async (req, res) => {
       metadata: { role },
     });
 
+    const workspaceData = await workspaceModel.findById(workspaceId);
+    const newMember = await userModel.findById(userId);
+    if (workspaceData && workspaceData.adminId.toString() !== userId) {
+      await createNotification({
+        userId: workspaceData.adminId,
+        title: "New Member Joined",
+        message: `${newMember.name} has joined the workspace as ${role}`,
+        type: "WORKSPACE",
+        entityId: workspaceId,
+        workspaceId,
+        createdBy: userId,
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "Joined Workspace",
@@ -236,6 +251,20 @@ export const removeWorkspaceMember = async (req, res) => {
       metadata: { targetUserId: memberId },
     });
 
+    // Notify removed member
+    const removedMember = await userModel.findById(memberId);
+    if (removedMember && workspace) {
+      await createNotification({
+        userId: memberId,
+        title: "Removed from Workspace",
+        message: `You have been removed from workspace "${workspace.name}"`,
+        type: "WORKSPACE",
+        entityId: workspaceId,
+        workspaceId,
+        createdBy: req.userId,
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "Member Removed from Workspace",
@@ -273,6 +302,21 @@ export const updateMemberRole = async (req, res) => {
       },
       { $set: { "workspaces.$.role": roleToSet } },
     );
+
+    // Notify member about role change
+    const memberUser = await userModel.findById(memberId);
+    const workspaceInfo = await workspaceModel.findById(workspaceId);
+    if (memberUser && workspaceInfo) {
+      await createNotification({
+        userId: memberId,
+        title: "Role Updated",
+        message: `Your role in workspace "${workspaceInfo.name}" has been changed to ${roleToSet}`,
+        type: "WORKSPACE",
+        entityId: workspaceId,
+        workspaceId,
+        createdBy: req.userId,
+      });
+    }
 
     await logActivity({
       actorId: req.userId,

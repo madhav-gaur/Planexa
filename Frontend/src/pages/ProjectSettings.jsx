@@ -50,13 +50,13 @@ const ProjectSettings = () => {
         if (!currProject) return;
         setLabels(transformLabel(currProject.labels || []));
     }, [currProject]);
-    
-    
+
+
     const currentUserRole = user?.workspaces?.find(
         w => w.workspaceId.toString() === currWorkspace._id.toString()
-    )?.role; 
-    
-    
+    )?.role;
+
+
     console.log(currProject)
 
     const [data, setData] = useState(null)
@@ -385,7 +385,7 @@ const ProjectSettings = () => {
                             </div>
                             <div>
                                 <button onClick={() => {
-                                    if (currentUserRole == "MEMBER" || currentUserRole == "VIEWER") {
+                                    if (currentUserRole == "MEMBER" || currentUserRole == "CONTRIBUTOR" || currentUserRole == "VIEWER") {
                                         toast.info("Permission Denied")
                                         return;
                                     }

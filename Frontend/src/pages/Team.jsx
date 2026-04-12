@@ -85,12 +85,12 @@ const Team = () => {
             })
             console.log(response)
             if (response.data.success) {
-                close()
                 toast.success("Role Updated")
                 getWorkspaceMembers({ dispatch, currWorkspace })
                 dispatch(setIsWorkspaceMemberLoaded(false))
-                setIsUpdateRole('');
+                setIsUpdateRole('')
                 setMemberMenu(null)
+                setSelectedRole('')
             }
             console.log(response)
         } catch (error) {
@@ -160,10 +160,10 @@ const Team = () => {
                                     <div className='member-item-right'>
                                         <span className={`${role == 'ADMIN' && 'admin-member-tag'} member-tag`}>
                                             {role == 'ADMIN' && 'Admin'}
-                                            {role == 'MEMBER' && 'Member'}
+                                            {(role == 'MEMBER' || role == 'CONTRIBUTOR') && 'Contributor'}
                                             {role == 'VIEWER' && 'Viewer'}
                                         </span>
-                                        <div style={{ position: 'relative' }} className={view=='GRID' ? 'member-item-menu-wrapper' : ''}>
+                                        <div style={{ position: 'relative' }} className={view == 'GRID' ? 'member-item-menu-wrapper' : ''}>
 
                                             {currentUserRole == 'ADMIN' && role != 'ADMIN' && <button className='secondary-button'
                                                 onClick={() => {
@@ -173,7 +173,8 @@ const Team = () => {
                                                 {memberMenu == item._id ? <IoClose /> : <BsThreeDotsVertical />}
                                             </button>}
                                             {
-                                                memberMenu == item._id && <div className='member-menu-container'>
+                                                memberMenu == item._id &&
+                                                <div className='member-menu-container'>
                                                     <div onClick={() => setIsDeleteMember(item)}>Remove Member</div>
                                                     <div onClick={() => setIsUpdateRole(`${item._id}~${item.name}~${role}`)}>Update Role</div>
                                                 </div>
@@ -211,7 +212,7 @@ const Team = () => {
                                         >  <select value={selectedRole} className='secondary-button' style={{ width: '100%' }} onChange={(e) => setSelectedRole(e.target.value)}>
                                                 <option defaultValue value="">Select Role</option>
                                                 {isUpdateRole.split('~')[2] != 'ADMIN' && <option value="ADMIN">Admin</option>}
-                                                {isUpdateRole.split('~')[2] != 'MEMBER' && <option value="MEMBER">Member</option>}
+                                                {isUpdateRole.split('~')[2] != 'MEMBER' && isUpdateRole.split('~')[2] != 'CONTRIBUTOR' && <option value="CONTRIBUTOR">Member</option>}
                                                 {isUpdateRole.split('~')[2] != 'VIEWER' && <option value="VIEWER">Viewer</option>}
                                             </select></AlertDialog>}
                                 </div>

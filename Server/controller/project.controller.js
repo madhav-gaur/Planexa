@@ -3,6 +3,7 @@ import { taskModel } from "../models/taskModel.js";
 import { userModel } from "../models/userModel.js";
 import { workspaceModel } from "../models/workspaceModel.js";
 import { logActivity } from "../utils/logActivity.js";
+import { createNotification } from "../utils/createNotification.js";
 import mongoose from "mongoose";
 export const createProject = async (req, res) => {
   try {
@@ -64,6 +65,22 @@ export const createProject = async (req, res) => {
       metadata: { projectHeadId, name },
     });
 
+    const workspace = await workspaceModel
+      .findById(workspaceId)
+      .populate("members.userId");
+    for (const member of workspace.members) {
+      if (member.userId._id.toString() !== req.userId) {
+        await createNotification({
+          userId: member.userId._id,
+          title: "New Project Created",
+          message: `A new project "${name}" has been created in workspace "${workspace.name}"`,
+          type: "PROJECT",
+          entityId: newProject._id,
+          workspaceId,
+          createdBy: req.userId,
+        });
+      }
+    }
     return res.status(200).json({
       success: true,
       message: "Project Created",
@@ -136,8 +153,7 @@ export const updateProject = async (req, res) => {
         message: "Project ID is required",
       });
     }
-    const headId =
-      projectHeadId !== undefined ? projectHeadId : projectLead;
+    const headId = projectHeadId !== undefined ? projectHeadId : projectLead;
 
     const updatePayload = {
       name,
@@ -177,6 +193,21 @@ export const updateProject = async (req, res) => {
       workspaceId,
       metadata: { projectId, name },
     });
+    if (updatedProject.members && updatedProject.members.length > 0) {
+      for (const member of updatedProject.members) {
+        if (member.toString() !== req.userId) {
+          await createNotification({
+            userId: member,
+            title: "Project Updated",
+            message: `Project "${name}" has been updated`,
+            type: "PROJECT",
+            entityId: updatedProject._id,
+            workspaceId,
+            createdBy: req.userId,
+          });
+        }
+      }
+    }
 
     return res.status(200).json({
       success: true,

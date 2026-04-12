@@ -113,4 +113,13 @@ export const apiList = {
     url: "/task/toggle-subtask",
     method: "post",
   },
+
+  getNotifications: {
+    method: "GET",
+    url: "/notification/get",
+  },
+  markNotificationRead: {
+    method: "PATCH",
+    url: "/notification/:notificationId/read",
+  },
 };

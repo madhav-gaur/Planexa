@@ -3,6 +3,7 @@ import { taskModel } from "../models/taskModel.js";
 import { userModel } from "../models/userModel.js";
 import { workspaceModel } from "../models/workspaceModel.js";
 import { logActivity } from "../utils/logActivity.js";
+import { createNotification } from "../utils/createNotification.js";
 export const createTask = async (req, res) => {
   try {
     const {
@@ -69,6 +70,19 @@ export const createTask = async (req, res) => {
       workspaceId,
       metadata: { projectId, assignees },
     });
+
+    // Notify assignees
+    for (const assigneeId of assignees) {
+      await createNotification({
+        userId: assigneeId,
+        title: "New Task Assigned",
+        message: `You have been assigned a new task: ${title}`,
+        type: "TASK",
+        entityId: newTask._id,
+        workspaceId,
+        createdBy: req.userId,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -198,6 +212,22 @@ export const updateTask = async (req, res) => {
       metadata: { projectId, title },
     });
 
+    if (assignees && assignees.length > 0) {
+      for (const assigneeId of assignees) {
+        if (assigneeId.toString() !== req.userId) {
+          await createNotification({
+            userId: assigneeId,
+            title: "Task Updated",
+            message: `Task "${title}" has been updated`,
+            type: "TASK",
+            entityId: updatedTask._id,
+            workspaceId,
+            createdBy: req.userId,
+          });
+        }
+      }
+    }
+
     return res.status(200).json({
       success: true,
       message: "Task Updated",
@@ -244,6 +274,23 @@ export const addSubtask = async (req, res) => {
       workspaceId: updatedTask.workspaceId,
       metadata: { subtaskTitle: title },
     });
+
+    // Notify all assignees about subtask
+    if (updatedTask.assignees && updatedTask.assignees.length > 0) {
+      for (const assigneeId of updatedTask.assignees) {
+        if (assigneeId.toString() !== req.userId) {
+          await createNotification({
+            userId: assigneeId,
+            title: "Subtask Added",
+            message: `A new subtask "${title}" has been added to task "${updatedTask.title}"`,
+            type: "TASK",
+            entityId: updatedTask._id,
+            workspaceId: updatedTask.workspaceId,
+            createdBy: req.userId,
+          });
+        }
+      }
+    }
 
     return res.status(200).json({
       success: true,
@@ -294,6 +341,23 @@ export const addComment = async (req, res) => {
       workspaceId: updatedTask.workspaceId,
       metadata: { comment: message },
     });
+
+    // Notify all assignees about comment
+    if (updatedTask.assignees && updatedTask.assignees.length > 0) {
+      for (const assigneeId of updatedTask.assignees) {
+        if (assigneeId.toString() !== req.userId) {
+          await createNotification({
+            userId: assigneeId,
+            title: "New Comment on Task",
+            message: `A new comment has been added to task "${updatedTask.title}"`,
+            type: "TASK",
+            entityId: updatedTask._id,
+            workspaceId: updatedTask.workspaceId,
+            createdBy: req.userId,
+          });
+        }
+      }
+    }
 
     return res.status(200).json({
       success: true,

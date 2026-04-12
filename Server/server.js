@@ -11,6 +11,7 @@ import { refreshTokenRouter } from "./routes/refreshToken.route.js";
 import { workspaceRouter } from "./routes/workspace.route.js";
 import { projectRouter } from "./routes/project.route.js";
 import { taskRouter } from "./routes/task.route.js";
+import notificationRouter from "./routes/notification.route.js";
 
 const app = express();
 app.use(express.json());
@@ -27,7 +28,7 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 
 app.use(cookieParser());
@@ -35,7 +36,7 @@ app.use(morgan("combined"));
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
-  })
+  }),
 );
 app.get("/", (req, res) => {
   res.send("SERVER RUNNING");
@@ -45,7 +46,7 @@ app.use("/api/auth", refreshTokenRouter);
 app.use("/api/workspace", workspaceRouter);
 app.use("/api/project", projectRouter);
 app.use("/api/task", taskRouter);
-
+app.use("/api/notification", notificationRouter);
 const PORT = process.env.PORT || 4000;
 
 connectDB()
