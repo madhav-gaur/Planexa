@@ -58,6 +58,17 @@ export const getWorkspaceSummary = async (req, res) => {
     const overdueTasks = tasks.filter(
       (task) => task.dueDate && task.status !== "DONE" && new Date(task.dueDate) < now,
     ).length;
+    const dueTodayTasks = tasks.filter((task) => {
+      if (!task.dueDate || task.status === "DONE") return false;
+      const due = new Date(task.dueDate);
+      return due.toDateString() === now.toDateString();
+    }).length;
+    const dueThisWeekTasks = tasks.filter((task) => {
+      if (!task.dueDate || task.status === "DONE") return false;
+      const due = new Date(task.dueDate);
+      const diff = due.getTime() - now.getTime();
+      return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000;
+    }).length;
 
     const completedThisWeek = tasks.filter((task) => {
       if (!task.completedAt) return false;
@@ -79,6 +90,7 @@ export const getWorkspaceSummary = async (req, res) => {
           projects: projects.length,
           completedProjects: projectStatus.COMPLETED,
           tasks: tasks.length,
+          activeTasks: taskStatus.TO_DO + taskStatus.IN_PROGRESS,
           overdueTasks,
         },
         projectStatus,
@@ -87,6 +99,8 @@ export const getWorkspaceSummary = async (req, res) => {
         insights: {
           averageProgress,
           completedThisWeek,
+          dueTodayTasks,
+          dueThisWeekTasks,
         },
       },
     });

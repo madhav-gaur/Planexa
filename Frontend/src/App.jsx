@@ -29,6 +29,7 @@ import { setIsTaskLoading, setIsTaskLoaded, setTasks } from "./store/task.slice"
 import { getWorkspaceMembers } from "./utils/getWorkspaceMember";
 import Account from "./pages/Account";
 
+const CURR_WORKSPACE_STORAGE_KEY = "currWorkspaceId";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -81,7 +82,10 @@ const App = () => {
         if (response.data.success) {
           let data = response.data.data
           dispatch(setWorkspaces(data))
-          dispatch(setCurrWorkspace(data[0]))
+          const savedWorkspaceId = localStorage.getItem(CURR_WORKSPACE_STORAGE_KEY)
+          const selectedWorkspace =
+            data.find((item) => item._id === savedWorkspaceId) || data[0] || {}
+          dispatch(setCurrWorkspace(selectedWorkspace))
           dispatch(setIsWorkspaceLoaded(true))
           if (isWorkspaceLoaded) {
             dispatch(setIsWorkspaceLoading(false))
@@ -98,6 +102,12 @@ const App = () => {
       getWorkspaces()
     }
   }, [isWorkspaceLoaded, dispatch])
+
+  useEffect(() => {
+    if (currWorkspace?._id) {
+      localStorage.setItem(CURR_WORKSPACE_STORAGE_KEY, currWorkspace._id)
+    }
+  }, [currWorkspace?._id])
 
 
   useEffect(() => {

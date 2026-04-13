@@ -45,6 +45,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
         : (!isSidebarCollapsed || isSidebarHovering);
 
     const changeWorkspace = (item) => {
+        localStorage.setItem("currWorkspaceId", item._id)
         setIsDropdown(false)
         dispatch(setCurrWorkspace(item))
         dispatch(setIsProjectLoaded(false))
@@ -212,22 +213,22 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                 to="/team">
                                 <LuUsers />
                             </NavLink>
-                        <NavLink
-                            className={({ isActive }) =>
-                                `${isActive ? 'nav-item active' : 'nav-item'
-                                }`
-                            }
-                            to="/activity">
-                            <IoPulseOutline />
-                        </NavLink>
-                        <NavLink
-                            className={({ isActive }) =>
-                                `${isActive ? 'nav-item active' : 'nav-item'
-                                }`
-                            }
-                            to="/settings">
-                            <IoSettingsOutline />
-                        </NavLink>
+                            <NavLink
+                                className={({ isActive }) =>
+                                    `${isActive ? 'nav-item active' : 'nav-item'
+                                    }`
+                                }
+                                to="/activity">
+                                <IoPulseOutline />
+                            </NavLink>
+                            <NavLink
+                                className={({ isActive }) =>
+                                    `${isActive ? 'nav-item active' : 'nav-item'
+                                    }`
+                                }
+                                to="/settings">
+                                <IoSettingsOutline />
+                            </NavLink>
                         </nav>}
                     <div className='task-nav'>
                         <div className='task-nav-head' onClick={() => setIsTaskList(!isTaskList)}>

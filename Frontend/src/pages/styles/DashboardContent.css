@@ -52,6 +52,12 @@
     grid-column-gap: 2rem;
 }
 
+.dashboard-stats-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
 .dashboard-stats-1-item {
     border: var(--border);
     display: flex;
@@ -142,12 +148,198 @@
     }
 }
 
+.dashboard-panel {
+    border: var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dashboard-panel-wide {
+    grid-column: span 2;
+}
+
+.dashboard-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+
+    h3 {
+        font-size: 1.05rem;
+        margin-bottom: 6px;
+    }
+
+    p {
+        color: var(--text-light);
+        font-size: 13px;
+    }
+}
+
+.dashboard-metric-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dashboard-metric-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem 1rem;
+    align-items: center;
+}
+
+.dashboard-metric-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    p {
+        font-size: 14px;
+    }
+}
+
+.dashboard-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.dashboard-dot.blue {
+    background: var(--primary-blue);
+}
+
+.dashboard-dot.green {
+    background: #00bc7d;
+}
+
+.dashboard-dot.orange {
+    background: #fe9a00;
+}
+
+.dashboard-metric-values {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    strong {
+        font-size: 14px;
+    }
+
+    span {
+        color: var(--text-light);
+        font-size: 12px;
+    }
+}
+
+.dashboard-metric-bar {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface-hover-light);
+    overflow: hidden;
+
+    span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--primary-blue), #74a9ff);
+    }
+}
+
+.dashboard-deadline-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.dashboard-deadline-item {
+    border: var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    background: var(--surface-hover-light);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    span {
+        font-size: 13px;
+        color: var(--text-light);
+    }
+
+    strong {
+        font-size: 1.5rem;
+    }
+}
+
+.dashboard-deadline-item.warning strong {
+    color: #fe9a00;
+}
+
+.dashboard-deadline-item.success strong {
+    color: #00bc7d;
+}
+
+.dashboard-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.dashboard-activity-item {
+    border: var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+
+    strong {
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 14px;
+    }
+
+    p {
+        color: var(--text-light);
+        font-size: 13px;
+    }
+
+    span {
+        color: var(--text-light);
+        font-size: 12px;
+        white-space: nowrap;
+    }
+}
+
+.dashboard-empty-state {
+    border: var(--border);
+    border-radius: 10px;
+    padding: 1.1rem;
+    color: var(--text-light);
+    text-align: center;
+}
+
 @media (max-width:1100px) {
     .dashboard-stats-1 {
         grid-template-columns: repeat(2, 1fr);
         grid-column-gap: 1rem;
         grid-row-gap: 1rem;
 
+    }
+
+    .dashboard-stats-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-panel-wide {
+        grid-column: span 1;
     }
 }
 
@@ -167,5 +359,14 @@
     }
     .dashboard-head-right .primary-button, .dashboard-head .primary-button{
         flex: 1;
+    }
+    .dashboard-stats-1 {
+        grid-template-columns: 1fr;
+    }
+    .dashboard-deadline-grid {
+        grid-template-columns: 1fr;
+    }
+    .dashboard-activity-item {
+        flex-direction: column;
     }
 }
