@@ -5,6 +5,8 @@ import { generateRefreshToken } from "../utils/generateToken.js";
 import { workspaceModel } from "../models/workspaceModel.js";
 import { projectModel } from "../models/projectModel.js";
 import { taskModel } from "../models/taskModel.js";
+import crypto from "node:crypto";
+import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
 
 const cookieOption = {
   httpOnly: true,
@@ -252,6 +254,115 @@ export const updatePassword = async (req, res) => {
   }
 };
 
+export const forgotPassword = async (req, res) => {
+  try {
+    const email = req.body.email?.trim().toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(200).json({
+        success: false,
+        message: "Account not found.",
+      });
+    }
+
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+    const resetLink = `http://${process.env.FRONTEND_URL}/reset-password/${rawToken}`;
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpiresAt = expiresAt;
+    await user.save();
+
+    await sendPasswordResetEmail({
+      email: user.email,
+      name: user.name,
+      resetLink,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Reset link sent to ${email}`,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, password, confirmPassword } = req.body;
+
+    if (!token || !password || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Token, password, and confirm password are required",
+      });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Password and confirm password do not match",
+      });
+    }
+    // if (password.length < 6) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Password must be at least 6 characters long",
+    //   });
+    // }
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    const user = await userModel.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpiresAt: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Reset link is invalid or has expired",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    user.resetPasswordToken = "";
+    user.resetPasswordExpiresAt = null;
+    user.refreshToken = "";
+    await user.save();
+
+    res.clearCookie("accessToken", cookieOption);
+    res.clearCookie("refreshToken", cookieOption);
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successful. Please sign in.",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
 export const leaveWorkspace = async (req, res) => {
   try {
     const userId = req.userId;
@@ -274,7 +385,8 @@ export const leaveWorkspace = async (req, res) => {
     if (workspace.adminId?.toString() === userId.toString()) {
       return res.status(400).json({
         success: false,
-        message: "Workspace admins cannot leave. Transfer ownership or delete the workspace first.",
+        message:
+          "Workspace admins cannot leave. Transfer ownership or delete the workspace first.",
       });
     }
 
@@ -285,14 +397,8 @@ export const leaveWorkspace = async (req, res) => {
       userModel.findByIdAndUpdate(userId, {
         $pull: { workspaces: { workspaceId } },
       }),
-      projectModel.updateMany(
-        { workspaceId },
-        { $pull: { members: userId } },
-      ),
-      taskModel.updateMany(
-        { workspaceId },
-        { $pull: { assignees: userId } },
-      ),
+      projectModel.updateMany({ workspaceId }, { $pull: { members: userId } }),
+      taskModel.updateMany({ workspaceId }, { $pull: { assignees: userId } }),
     ]);
 
     const updatedUser = await userModel
@@ -317,7 +423,9 @@ export const deleteAccount = async (req, res) => {
   try {
     const userId = req.userId;
 
-    const ownedWorkspaces = await workspaceModel.countDocuments({ adminId: userId });
+    const ownedWorkspaces = await workspaceModel.countDocuments({
+      adminId: userId,
+    });
     if (ownedWorkspaces > 0) {
       return res.status(400).json({
         success: false,

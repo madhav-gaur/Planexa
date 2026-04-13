@@ -164,6 +164,20 @@
   font-weight: 500;
 }
 
+.sign-text-button {
+  background: transparent;
+  border: none;
+  color: var(--primary-blue);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  width: fit-content;
+}
+
+.sign-text-button:hover {
+  text-decoration: underline;
+}
+
 .app-form-navigate {
   p {
     font-size: 12px;

@@ -6,6 +6,7 @@ import { setIsUserLoaded, setIsUserLoading, setUserDetails } from "./store/user.
 import HomeLander from "./pages/HomeLander";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import ResetPassword from "./pages/ResetPassword";
 import CreateWorkspace from "./pages/CreateWorkspace";
 import Loading from "./components/Loading";
 import DashboardContent from "./pages/DashboardContent";
@@ -203,6 +204,7 @@ const App = () => {
       <Routes>
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/create-workspace" element={
           <AuthProtect>
             <CreateWorkspace />

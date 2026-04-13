@@ -9,6 +9,14 @@ export const apiList = {
     url: "/user/sign-in",
     method: "post",
   },
+  forgotPassword: {
+    url: "/user/forgot-password",
+    method: "post",
+  },
+  resetPassword: {
+    url: "/user/reset-password",
+    method: "post",
+  },
   getUser: {
     url: "/user/get-user",
     method: "get",

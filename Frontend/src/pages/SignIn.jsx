@@ -19,6 +19,7 @@ const SignIn = () => {
   const navigate = useNavigate()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState("Sign in")
+  const [sendingReset, setSendingReset] = useState(false)
 
   const validate = () => {
     if (data.email == "" || data.password == "") {
@@ -72,6 +73,30 @@ const SignIn = () => {
       setLoading('Sign in')
     }
   };
+
+  const handleForgotPassword = async () => {
+    const email = data.email.trim().toLowerCase();
+    if (!email) {
+      toast.error('Enter your email first')
+      return
+    }
+
+    try {
+      setSendingReset(true)
+      const response = await Axios({
+        ...apiList.forgotPassword,
+        data: { email },
+      })
+      if (response.data.success) {
+        toast.success(response.data.message)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(error.response?.data?.message || 'Failed to send reset link')
+    } finally {
+      setSendingReset(false)
+    }
+  }
   return (
     <section className='sign-wrapper'>
       <div className='app-form-container'>
@@ -112,6 +137,14 @@ const SignIn = () => {
               <i onClick={() => setIsPswd(!isPswd)}>{isPswd ? <IoEyeOffOutline /> : <IoEyeOutline />}</i>
             </div>
             {error != "" && <p>*{error}</p>}
+            <button
+              type='button'
+              className='sign-text-button'
+              onClick={handleForgotPassword}
+              disabled={sendingReset}
+            >
+              {sendingReset ? 'Sending reset link...' : 'Forgot password?'}
+            </button>
 
           </div>
           <div>

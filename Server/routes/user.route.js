@@ -1,8 +1,10 @@
 import { Router } from "express";
 import {
   deleteAccount,
+  forgotPassword,
   getUser,
   leaveWorkspace,
+  resetPassword,
   updatePassword,
   updateAvatar,
   updateProfile,
@@ -16,6 +18,8 @@ export const userRouter = Router();
 
 userRouter.post("/sign-up", upload.none(), userSignUp);
 userRouter.post("/sign-in", upload.none(), userSignIn);
+userRouter.post("/forgot-password", upload.none(), forgotPassword);
+userRouter.post("/reset-password", upload.none(), resetPassword);
 userRouter.get("/get-user", auth, getUser);
 
 userRouter.post(
