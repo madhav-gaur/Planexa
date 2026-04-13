@@ -68,6 +68,8 @@ const SignIn = () => {
       navigate("/");
     } catch (error) {
       console.error(error);
+    }finally{
+      setLoading('Sign in')
     }
   };
   return (

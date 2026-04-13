@@ -21,6 +21,18 @@ export const apiList = {
     url: "/user/update-profile",
     method: "post",
   },
+  updatePassword: {
+    url: "/user/update-password",
+    method: "post",
+  },
+  leaveWorkspace: {
+    url: "/user/leave-workspace",
+    method: "post",
+  },
+  deleteAccount: {
+    url: "/user/delete-account",
+    method: "delete",
+  },
   refreshToken: {
     url: "/auth/refresh-token",
     method: "post",

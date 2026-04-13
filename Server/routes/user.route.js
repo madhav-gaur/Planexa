@@ -1,6 +1,9 @@
 import { Router } from "express";
 import {
+  deleteAccount,
   getUser,
+  leaveWorkspace,
+  updatePassword,
   updateAvatar,
   updateProfile,
   userSignIn,
@@ -22,3 +25,6 @@ userRouter.post(
   updateAvatar,
 );
 userRouter.post("/update-profile", auth, updateProfile);
+userRouter.post("/update-password", auth, updatePassword);
+userRouter.post("/leave-workspace", auth, leaveWorkspace);
+userRouter.delete("/delete-account", auth, deleteAccount);

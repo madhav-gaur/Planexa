@@ -2,6 +2,16 @@ import { userModel } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import { generateAccessToken } from "../utils/generateToken.js";
 import { generateRefreshToken } from "../utils/generateToken.js";
+import { workspaceModel } from "../models/workspaceModel.js";
+import { projectModel } from "../models/projectModel.js";
+import { taskModel } from "../models/taskModel.js";
+
+const cookieOption = {
+  httpOnly: true,
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+};
 // ? Create User
 export const userSignUp = async (req, res) => {
   try {
@@ -73,12 +83,6 @@ export const userSignIn = async (req, res) => {
     const accessToken = await generateAccessToken(user._id);
     const refreshToken = await generateRefreshToken(user._id);
 
-    const cookieOption = {
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    };
     res.cookie("accessToken", accessToken, cookieOption);
     res.cookie("refreshToken", refreshToken, cookieOption);
 
@@ -148,12 +152,206 @@ export const updateProfile = async (req, res) => {
     const { name, email } = req.body;
 
     const userId = req.userId;
+    if (!name || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "Name and email are required",
+      });
+    }
 
-    await userModel.findByIdAndUpdate(userId, { name, email });
+    const existingUser = await userModel.findOne({
+      email,
+      _id: { $ne: userId },
+    });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is already in use",
+      });
+    }
+
+    const updatedUser = await userModel
+      .findByIdAndUpdate(userId, { name, email }, { new: true })
+      .select("-password -refreshToken");
 
     return res.status(200).json({
       success: true,
       message: "User Details Updated",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.userId;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Provide current, new, and confirm password",
+      });
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "New password and confirm password do not match",
+      });
+    }
+    // if (newPassword.length < 6) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "New password must be at least 6 characters long",
+    //   });
+    // }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password is incorrect",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await userModel.findByIdAndUpdate(userId, {
+      password: hashedPassword,
+      refreshToken: "",
+    });
+
+    res.clearCookie("accessToken", cookieOption);
+    res.clearCookie("refreshToken", cookieOption);
+
+    return res.status(200).json({
+      success: true,
+      message: "Password updated.",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const leaveWorkspace = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { workspaceId } = req.body;
+
+    if (!workspaceId) {
+      return res.status(400).json({
+        success: false,
+        message: "workspaceId is required",
+      });
+    }
+
+    const workspace = await workspaceModel.findById(workspaceId);
+    if (!workspace) {
+      return res.status(404).json({
+        success: false,
+        message: "Workspace not found",
+      });
+    }
+    if (workspace.adminId?.toString() === userId.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: "Workspace admins cannot leave. Transfer ownership or delete the workspace first.",
+      });
+    }
+
+    await Promise.all([
+      workspaceModel.findByIdAndUpdate(workspaceId, {
+        $pull: { members: userId },
+      }),
+      userModel.findByIdAndUpdate(userId, {
+        $pull: { workspaces: { workspaceId } },
+      }),
+      projectModel.updateMany(
+        { workspaceId },
+        { $pull: { members: userId } },
+      ),
+      taskModel.updateMany(
+        { workspaceId },
+        { $pull: { assignees: userId } },
+      ),
+    ]);
+
+    const updatedUser = await userModel
+      .findById(userId)
+      .select("-password -refreshToken");
+
+    return res.status(200).json({
+      success: true,
+      message: "Left workspace successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const ownedWorkspaces = await workspaceModel.countDocuments({ adminId: userId });
+    if (ownedWorkspaces > 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "You still own one or more workspaces. Delete them or transfer ownership before deleting your account.",
+      });
+    }
+
+    await Promise.all([
+      workspaceModel.updateMany(
+        { members: userId },
+        { $pull: { members: userId } },
+      ),
+      projectModel.updateMany(
+        { members: userId },
+        { $pull: { members: userId } },
+      ),
+      projectModel.updateMany(
+        { projectHeadId: userId },
+        { $unset: { projectHeadId: 1 } },
+      ),
+      taskModel.updateMany(
+        { assignees: userId },
+        { $pull: { assignees: userId } },
+      ),
+      userModel.findByIdAndDelete(userId),
+    ]);
+
+    res.clearCookie("accessToken", cookieOption);
+    res.clearCookie("refreshToken", cookieOption);
+
+    return res.status(200).json({
+      success: true,
+      message: "Account deleted successfully",
     });
   } catch (error) {
     console.error(error);

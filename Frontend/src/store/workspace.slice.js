@@ -41,6 +41,15 @@ const workspaceSlice = createSlice({
         state.currWorkspace = { ...state.currWorkspace, ...w };
       }
     },
+    removeWorkspace: (state, action) => {
+      const workspaceId = action.payload?.toString();
+      state.workspaces = state.workspaces.filter(
+        (item) => item._id?.toString() !== workspaceId,
+      );
+      if (state.currWorkspace?._id?.toString() === workspaceId) {
+        state.currWorkspace = state.workspaces[0] || {};
+      }
+    },
   },
 });
 
@@ -52,6 +61,7 @@ export const {
   setCurrWorkspace,
   setIsWorkspaceMemberLoaded,
   mergeWorkspace,
+  removeWorkspace,
 } = workspaceSlice.actions;
 
 export default workspaceSlice.reducer;
