@@ -19,6 +19,8 @@ import Axios from '../utils/axios';
 import { LuGitCommitHorizontal } from "react-icons/lu";
 import { setIsProjectLoaded } from '../store/project.slice';
 import { getTasks } from '../utils/getTasks';
+import { apiList } from '../common/apiList';
+import { toast } from 'react-toastify';
 const ProjectDetail = () => {
     const params = useParams()
     const [isCreateModal, setIsCreateModal] = useState(false)
@@ -28,10 +30,12 @@ const ProjectDetail = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { tasks, isTaskLoaded } = useSelector((state) => state.task);
+    const { currWorkspace } = useSelector((state) => state.workspace)
     const [query, setQuery] = useState("")
     const [status, setStatus] = useState("ALL");
     const [priority, setPriority] = useState("ALL");
     const [type, setType] = useState("ALL");
+    const [updatingTaskId, setUpdatingTaskId] = useState('')
     const filteredTasks = tasks?.filter((tasks) => {
         const matchesSearch =
             tasks.title?.toLowerCase().includes(query.toLowerCase());
@@ -83,6 +87,40 @@ const ProjectDetail = () => {
         }
         statusCount();
     }, [completedCount, inProgressCount, tasks])
+
+    const handleTaskStatusUpdate = async (task, nextStatus) => {
+        if (!currProject?._id || !currWorkspace?._id || task.status === nextStatus) return
+
+        try {
+            setUpdatingTaskId(task._id)
+            const response = await Axios({
+                ...apiList.updateTask,
+                data: {
+                    taskId: task._id,
+                    workspaceId: currWorkspace._id,
+                    projectId: currProject._id,
+                    title: task.title,
+                    description: task.description,
+                    type: task.type,
+                    status: nextStatus,
+                    priority: task.priority,
+                    dueDate: task.dueDate,
+                    assignees: task.assignees || [],
+                    labels: task.labels || [],
+                }
+            })
+            if (response.data.success) {
+                toast.success('Task status updated')
+                dispatch(setIsTaskLoaded(false))
+                dispatch(setIsProjectLoaded(false))
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error(error.response?.data?.message || 'Failed to update task status')
+        } finally {
+            setUpdatingTaskId('')
+        }
+    }
     return (
         <>
             <div className='dashboard-head'>
@@ -218,9 +256,17 @@ const ProjectDetail = () => {
                                 ${item.priority == "MEDIUM" && "medium-priority"}`}>{item.priority}</span>
                                 </div>
                                 <div>
-                                    {item.status == "IN_PROGRESS" && "In Progress"}
-                                    {item.status == "TO_DO" && "To Do"}
-                                    {item.status == "DONE" && "Done"}
+                                    <select
+                                        className='task-status-select'
+                                        value={item.status}
+                                        disabled={updatingTaskId === item._id}
+                                        onClick={(e) => e.stopPropagation()}
+                                        onChange={(e) => handleTaskStatusUpdate(item, e.target.value)}
+                                    >
+                                        <option value="TO_DO">To Do</option>
+                                        <option value="IN_PROGRESS">In Progress</option>
+                                        <option value="DONE">Done</option>
+                                    </select>
                                 </div>
                                 <div>{formatDate(item.dueDate).split(",")[0]}</div>
                             </div>

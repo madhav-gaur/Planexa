@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { LuLayoutDashboard } from "react-icons/lu";
 import { LuUsers } from "react-icons/lu";
@@ -10,25 +10,29 @@ import { FaRegFolderOpen } from "react-icons/fa";
 import "../components/Styles/Sidebar.css"
 import { TbLayoutSidebarLeftCollapseFilled, TbLayoutSidebarRightCollapseFilled } from "react-icons/tb";
 import { FaCheck } from "react-icons/fa";
-import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import { setCurrWorkspace, setIsWorkspaceMemberLoaded } from '../store/workspace.slice';
 import { GoSidebarCollapse } from "react-icons/go";
 import { setIsProjectLoaded } from '../store/project.slice';
 import { toast } from 'react-toastify';
+import { getUserTasks } from '../utils/getUserTasks';
+import { apiList } from '../common/apiList';
+import Axios from '../utils/axios';
 const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarCollapsed, isSidebarHovering, setIsSidebarHovering, }) => {
 
     const dispatch = useDispatch()
     const navigate = useNavigate();
 
     const { workspaces, currWorkspace } = useSelector(state => state.workspace)
-
+    const { userDetails } = useSelector(state => state.user)
 
     const [isTaskList, setIsTaskList] = useState(false)
     const [isCreateModal, setIsCreateModal] = useState(false)
     const [isDropdown, setIsDropdown] = useState(false)
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1100);
+    const [userTasks, setUserTasks] = useState([])
+    const [isTasksLoading, setIsTasksLoading] = useState(false)
     const workLogo = currWorkspace?.name?.split("")[0].toUpperCase()
 
     useEffect(() => {
@@ -39,6 +43,21 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+    useEffect(() => {
+        const fetchUserTasks = async () => {
+            if (currWorkspace && userDetails) {
+                setIsTasksLoading(true)
+                const tasks = await getUserTasks({
+                    workspaceId: currWorkspace._id,
+                    userId: userDetails._id
+                })
+                setUserTasks(tasks)
+                setIsTasksLoading(false)
+            }
+        }
+        fetchUserTasks()
+    }, [currWorkspace, userDetails])
 
     const isExpanded = isMobile
         ? true
@@ -52,6 +71,29 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
         dispatch(setIsWorkspaceMemberLoaded(false))
         toast(`Workspace changed to ${item.name.slice(0, 12)}...`)
         navigate("/")
+    }
+
+    const toggleTaskCompletion = async (task) => {
+        try {
+            const newStatus = task.status === 'DONE' ? 'TO_DO' : 'DONE'
+            await Axios({
+                ...apiList.updateTask,
+                data: {
+                    taskId: task._id,
+                    workspaceId: task.workspaceId,
+                    projectId: task.projectId,
+                    status: newStatus
+                }
+            })
+            setUserTasks(prevTasks =>
+                prevTasks.map(t =>
+                    t._id === task._id ? { ...t, status: newStatus } : t
+                )
+            )
+        } catch (error) {
+            console.error('Error updating task:', error)
+            toast.error('Failed to update task')
+        }
     }
     return (
         <div className={`sidebar-wrapper ${isSidebar ? 'isSidebar' : ""}`}
@@ -235,7 +277,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                             {isExpanded ? <><div>
                                 <FiCheckSquare />
                                 <p>My Tasks</p>
-                                <span>2</span>
+                                <span>{userTasks.filter(task => task.status !== 'DONE').length}</span>
                             </div>
                                 <div
                                     style={{ transform: isTaskList ? "rotate(90deg)" : "" }}>
@@ -247,12 +289,44 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                 </div>
                             }
                         </div>
-                        {isTaskList && <div className='task-nav-list'>
-                            <span></span>
-                            <div>
-                                <p>Project Name</p>
-                                <span>Project Status</span>
-                            </div>
+                        {isTaskList && isExpanded && <div className='task-nav-list'>
+                            {isTasksLoading ? (
+                                <div style={{ padding: '10px', textAlign: 'center' }}>Loading...</div>
+                            ) : userTasks.length === 0 ? (
+                                <div style={{ padding: '10px', textAlign: 'center' }}>No tasks assigned</div>
+                            ) : (
+                                userTasks
+                                    .filter(task => isExpanded || task.status !== 'DONE')
+                                    .map(task => (
+                                        <div key={task._id} className='task-nav-item'
+                                            onClick={() => navigate(`/projects/${task.projectId._id}/tasks/${task._id}`)}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={task.status === 'DONE'}
+                                                    onChange={(e) => {
+                                                        e.stopPropagation();
+                                                        toggleTaskCompletion(task);
+                                                    }}
+                                                    style={{ cursor: 'pointer' }}
+                                                />
+                                                <div style={{ flex: 1 }}>
+                                                    <p style={{
+                                                        textDecoration: task.status === 'DONE' ? 'line-through' : 'none',
+                                                        opacity: task.status === 'DONE' ? 0.6 : 1
+                                                    }}>
+                                                        {task.title}
+                                                    </p>
+                                                    {isExpanded && (
+                                                        <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                                                            {task.projectId?.name || 'Unknown Project'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                            )}
                         </div>}
                     </div>
                 </div>

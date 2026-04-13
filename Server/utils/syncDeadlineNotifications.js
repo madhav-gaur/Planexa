@@ -70,7 +70,7 @@ export const syncDeadlineNotifications = async (userId) => {
           name: user?.name,
           taskTitle: task.title,
           dueDateLabel: dueLabel,
-          taskLink: `${process.env.FRONTEND_URL}/projects/${task.projectId}/tasks/${task._id}`,
+          taskLink: `http://${process.env.FRONTEND_URL}/projects/${task.projectId}/tasks/${task._id}`,
         });
       }
       continue;

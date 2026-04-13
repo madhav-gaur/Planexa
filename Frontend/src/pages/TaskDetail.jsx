@@ -282,7 +282,7 @@ const TaskDetail = () => {
 
     if (!currTask) {
         return (
-            <div className='empty-model' style={{ marginTop: 0, top:'50%' }}>
+            <div className='empty-model' style={{ marginTop: 0, top: '50%' }}>
                 <span><MdOutlineEventAvailable /></span>
                 <h3>Task not found</h3>
                 <button type="button" className="primary-button" style={{ marginLeft: '0rem' }} onClick={() => navigate(`/projects/${params.projectId}`)}>Back to project</button>
@@ -291,278 +291,281 @@ const TaskDetail = () => {
     }
 
     return (
-        <div className='project-setting-wrapper'>
-            <div className='project-setting-container'>
-                <div className='app-form-container' onClick={(e) => e.stopPropagation()}>
-                    <div className='app-form-setting-head' style={{ position: "relative" }}>
-                        <div onClick={() => navigate(`/projects/${currProject?._id}`)}>
-                            <IoArrowBack />
-                            <span>Back</span>
-                        </div>
-                        <div>
-                            <h2>{currTask?.title}</h2>
-                        </div>
-                    </div>
-                    <form className='app-form' onSubmit={handleSubmit}>
-                        <div className='app-form-item'>
-                            <span>Title</span>
+        <div style={{display:'flex', alignItems:'center', flexDirection:'column'}}>
+            <div className='project-setting-wrapper'>
+                <div className='project-setting-container'>
+                    <div className='app-form-container' onClick={(e) => e.stopPropagation()}>
+                        <div className='app-form-setting-head' style={{ position: "relative" }}>
+                            <div onClick={() => navigate(`/projects/${currProject?._id}`)}>
+                                <IoArrowBack />
+                                <span>Back</span>
+                            </div>
                             <div>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder=""
-                                    id='title'
-                                    name='title'
-                                    onChange={handleInput}
-                                    value={data.title}
-                                />
-                                <label htmlFor='title'>Enter task Title</label>
+                                <h2>{currTask?.title}</h2>
                             </div>
                         </div>
-                        <div className='app-form-item'>
-                            <span>Description</span>
-                            <div>
-                                <input
-                                    type="text"
-                                    id='description'
-                                    name='description'
-                                    onChange={handleInput}
-                                    value={data.description}
-                                    placeholder=" "
-                                />
-                                <label htmlFor='description'>Enter Description</label>
-                            </div>
-                        </div>
-                        <div className='app-form-item'>
-                            <span>Type</span>
-                            <div>
-                                <select value={data.type} required onChange={handleInput} name="type" id="type">
-                                    <option value="BUG">Bug</option>
-                                    <option value="FEATURE">Feature</option>
-                                    <option value="TASK">Task</option>
-                                    <option value="IMPROVEMENT">Improvement</option>
-                                    <option value="OTHER">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "center", width: "100%", gap: "1rem" }}>
+                        <form className='app-form' onSubmit={handleSubmit}>
                             <div className='app-form-item'>
-                                <span>Status</span>
+                                <span>Title</span>
                                 <div>
-                                    <select value={data.status} required onChange={handleInput} name="status" id="status">
-                                        <option value="TO_DO">To do</option>
-                                        <option value="IN_PROGRESS">In Progress</option>
-                                        <option value="DONE">Done</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className='app-form-item'>
-                                <span>Priority</span>
-                                <div>
-                                    <select value={data.priority} required onChange={handleInput} name="priority" id="priority">
-                                        <option value="MEDIUM">MEDIUM</option>
-                                        <option value="LOW">LOW</option>
-                                        <option value="HIGH">HIGH</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='app-form-item'>
-                            <span>Due Date</span>
-                            <div>
-                                <input
-                                    onChange={handleInput}
-                                    type="date"
-                                    name='dueDate'
-                                    id='dueDate'
-                                    value={data.dueDate}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className='app-form-item'>
-                            <span>Assignees</span>
-                            <div>
-                                <select name="assignees" id="assignees" onChange={(e) => addMember(e.target.value)}>
-                                    <option value="">Add Assignees</option>
-                                    {workspaceMember.map((item, idx) => (
-                                        <option key={item._id + idx} value={item._id}>{item.email}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <div className='app-form-item'>
-                            <span>Labels</span>
-                            <div>
-                                <input
-                                    type="text"
-                                    id='labels'
-                                    name='labels'
-                                    onChange={handleInput}
-                                    value={data.labels}
-                                    placeholder=" "
-                                />
-                                <label htmlFor='labels'>Comma separated labels</label>
-                            </div>
-                        </div>
-                        <div className="team-member-pill-wrapper">
-                            {data?.assignees?.map((memberId) => {
-                                const assignee = workspaceMember.find(u => u._id === memberId)
-                                if (!assignee) return null
-
-                                return (
-                                    <div key={memberId} className="team-member-pill">
-                                        <p>{assignee.email}</p>
-                                        <span onClick={() => removeMember(memberId)}>
-                                            <IoClose />
-                                        </span>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                        {(currTask?.labels ?? []).length > 0 && (
-                            <div className="team-member-pill-wrapper">
-                                {currTask.labels.map((label, idx) => (
-                                    <div key={`${label}-${idx}`} className="team-member-pill">
-                                        <p>{label}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'end' }}>
-                            <div className='task-delete-btn'>
-                                <button type='button' onClick={handleArchiveTask} className='primary-button danger-button'>Archive Task</button>
-                            </div>
-                            <div style={{ display: 'flex' }}>
-                                <button className='primary-button'>
-                                    {loading ? <>Saving... <ButtonLoading /></> : "Update Task"}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div className='project-secondary-settings'>
-                <div className='app-form-container' style={{ gap: 0, padding: "1rem" }}>
-                    <div className='task-comment-wrapper'>
-                        <div>
-                            <h2>Comments</h2>
-                        </div>
-                        <Comments comments={currTask?.comments} />
-                        <div>
-                            {(currTask?.comments?.length ?? 0) === 0 && (
-                                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem 1rem 0', color: 'var(--text-light)' }}>
-                                    No Comments Yet
-                                </div>
-                            )}
-                            {commentsEnabled ? (
-                                <form onSubmit={handleComment} className='post-comment app-form-item'>
                                     <input
                                         type="text"
-                                        name='comment'
-                                        id='comment'
-                                        value={comment}
-                                        onChange={(e) => setComment(e.target.value)}
+                                        required
+                                        placeholder=""
+                                        id='title'
+                                        name='title'
+                                        onChange={handleInput}
+                                        value={data.title}
+                                    />
+                                    <label htmlFor='title'>Enter task Title</label>
+                                </div>
+                            </div>
+                            <div className='app-form-item'>
+                                <span>Description</span>
+                                <div>
+                                    <input
+                                        type="text"
+                                        id='description'
+                                        name='description'
+                                        onChange={handleInput}
+                                        value={data.description}
+                                        placeholder=" "
+                                    />
+                                    <label htmlFor='description'>Enter Description</label>
+                                </div>
+                            </div>
+                            <div className='app-form-item'>
+                                <span>Type</span>
+                                <div>
+                                    <select value={data.type} required onChange={handleInput} name="type" id="type">
+                                        <option value="BUG">Bug</option>
+                                        <option value="FEATURE">Feature</option>
+                                        <option value="TASK">Task</option>
+                                        <option value="IMPROVEMENT">Improvement</option>
+                                        <option value="OTHER">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "center", width: "100%", gap: "1rem" }}>
+                                <div className='app-form-item'>
+                                    <span>Status</span>
+                                    <div>
+                                        <select value={data.status} required onChange={handleInput} name="status" id="status">
+                                            <option value="TO_DO">To do</option>
+                                            <option value="IN_PROGRESS">In Progress</option>
+                                            <option value="DONE">Done</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className='app-form-item'>
+                                    <span>Priority</span>
+                                    <div>
+                                        <select value={data.priority} required onChange={handleInput} name="priority" id="priority">
+                                            <option value="MEDIUM">MEDIUM</option>
+                                            <option value="LOW">LOW</option>
+                                            <option value="HIGH">HIGH</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='app-form-item'>
+                                <span>Due Date</span>
+                                <div>
+                                    <input
+                                        onChange={handleInput}
+                                        type="date"
+                                        name='dueDate'
+                                        id='dueDate'
+                                        value={data.dueDate}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className='app-form-item'>
+                                <span>Assignees</span>
+                                <div>
+                                    <select name="assignees" id="assignees" onChange={(e) => addMember(e.target.value)}>
+                                        <option value="">Add Assignees</option>
+                                        {workspaceMember.map((item, idx) => (
+                                            <option key={item._id + idx} value={item._id}>{item.email}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className='app-form-item'>
+                                <span>Labels</span>
+                                <div>
+                                    <input
+                                        type="text"
+                                        id='labels'
+                                        name='labels'
+                                        onChange={handleInput}
+                                        value={data.labels}
+                                        placeholder=" "
+                                    />
+                                    <label htmlFor='labels'>Comma separated labels</label>
+                                </div>
+                            </div>
+                            <div className="team-member-pill-wrapper">
+                                {data?.assignees?.map((memberId) => {
+                                    const assignee = workspaceMember.find(u => u._id === memberId)
+                                    if (!assignee) return null
+
+                                    return (
+                                        <div key={memberId} className="team-member-pill">
+                                            <p>{assignee.email}</p>
+                                            <span onClick={() => removeMember(memberId)}>
+                                                <IoClose />
+                                            </span>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                            {(currTask?.labels ?? []).length > 0 && (
+                                <div className="team-member-pill-wrapper">
+                                    {currTask.labels.map((label, idx) => (
+                                        <div key={`${label}-${idx}`} className="team-member-pill">
+                                            <p>{label}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'end' }}>
+                                <div className='task-delete-btn'>
+                                    <button type='button' onClick={handleArchiveTask} className='primary-button danger-button'>Archive Task</button>
+                                </div>
+                                <div style={{ display: 'flex' }}>
+                                    <button className='primary-button'>
+                                        {loading ? <>Saving... <ButtonLoading /></> : "Update Task"}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div className='project-secondary-settings'>
+                    <div className='app-form-container' style={{ padding: '1rem', maxHeight:'24rem' }}>
+                        <div>
+                            <h2>Attachments</h2>
+                        </div>
+                        <div className='task-attachments'>
+                            {fileUploadsEnabled ? (
+                                <>
+                                    <div className='task-attachment-upload'>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
+                                        />
+                                        <button type='button' className='primary-button' onClick={handleAttachmentUpload} disabled={!attachmentFile || uploadingAttachment}>
+                                            {uploadingAttachment ? 'Uploading...' : 'Upload'}
+                                        </button>
+                                    </div>
+                                    <div style={{ color: 'var(--text-light)', fontSize: '12px' }}>
+                                        You can upload images, PDFs, docs, spreadsheets, and other common attachments up to 15MB.
+                                    </div>
+                                </>
+                            ) : (
+                                <div className='task-setting-note'>
+                                    File uploads are disabled for this workspace.
+                                </div>
+                            )}
+                            {(currTask?.attachments ?? []).length === 0 && (
+                                <div style={{ color: 'var(--text-light)', fontSize: '14px' }}>No attachments yet</div>
+                            )}
+                            {(currTask?.attachments ?? []).map((item, idx) => (
+                                <a
+                                    key={`${item.fileUrl}-${idx}`}
+                                    href={getAttachmentUrl(item)}
+                                    target={shouldOpenInline(item.fileName) ? "_blank" : undefined}
+                                    rel={shouldOpenInline(item.fileName) ? "noreferrer" : undefined}
+                                    download={shouldOpenInline(item.fileName) ? undefined : item.fileName}
+                                    className='task-attachment-item'
+                                >
+                                    {item.fileName || `Attachment ${idx + 1}`}
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                    <div className='app-form-container' style={{ padding: '1rem' }}>
+                        <div>
+                            <h2>Sub Tasks</h2>
+                        </div>
+                        <div className='subtask-container'>
+                            {subtasksEnabled ? (
+                                <form onSubmit={handleSubtask} className='post-comment app-form-item' style={{ marginTop: '5px', position: "sticky", top: '0', zIndex: 100 }}>
+                                    <input
+                                        type="text"
+                                        name='subtask'
+                                        id='subtask'
+                                        value={subtask}
+                                        onChange={(e) => setSubtask(e.target.value)}
                                         placeholder=' '
                                     />
-                                    <label htmlFor="comment">Comment..</label>
-                                    <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Post</button>
+                                    <label htmlFor="subtask">Add Sub Task</label>
+                                    <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Add</button>
                                 </form>
                             ) : (
                                 <div className='task-setting-note'>
-                                    Comments are disabled for this workspace.
+                                    Subtasks are disabled for this workspace.
                                 </div>
                             )}
+                            {(currTask?.subTasks?.length ?? 0) === 0 && (
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem', color: 'var(--text-light)' }}>
+                                    No Subtasks Yet
+                                </div>
+                            )}
+                            {(currTask?.subTasks ?? []).map((task, idx) => (
+                                <div className='subtask-item' key={task._id + idx}>
+                                    <div>{task?.title}</div>
+                                    <div className="checkbox-wrapper-18">
+                                        <div className="round">
+                                            <input
+                                                checked={!!task.isCompleted}
+                                                disabled={!subtasksEnabled}
+                                                onChange={() => handleToggleSubtask(task._id)}
+                                                type="checkbox"
+                                                id={`checkbox-18${idx}`}
+                                            />
+                                            <label htmlFor={`checkbox-18${idx}`}></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
-                <div className='app-form-container' style={{ padding: '1rem' }}>
+
+            </div>
+            <div className='app-form-container' style={{ gap: 0, padding: "1rem", maxWidth:'1005px' }}>
+                <div className='task-comment-wrapper'>
                     <div>
-                        <h2>Attachments</h2>
+                        <h2>Comments</h2>
                     </div>
-                    <div className='task-attachments'>
-                        {fileUploadsEnabled ? (
-                            <>
-                                <div className='task-attachment-upload'>
-                                    <input
-                                        type="file"
-                                        onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
-                                    />
-                                    <button type='button' className='primary-button' onClick={handleAttachmentUpload} disabled={!attachmentFile || uploadingAttachment}>
-                                        {uploadingAttachment ? 'Uploading...' : 'Upload'}
-                                    </button>
-                                </div>
-                                <div style={{ color: 'var(--text-light)', fontSize: '12px' }}>
-                                    You can upload images, PDFs, docs, spreadsheets, and other common attachments up to 15MB.
-                                </div>
-                            </>
-                        ) : (
-                            <div className='task-setting-note'>
-                                File uploads are disabled for this workspace.
+                    <Comments comments={currTask?.comments} />
+                    <div>
+                        {(currTask?.comments?.length ?? 0) === 0 && (
+                            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem 1rem 0', color: 'var(--text-light)' }}>
+                                No Comments Yet
                             </div>
                         )}
-                        {(currTask?.attachments ?? []).length === 0 && (
-                            <div style={{ color: 'var(--text-light)', fontSize: '14px' }}>No attachments yet</div>
-                        )}
-                        {(currTask?.attachments ?? []).map((item, idx) => (
-                            <a
-                                key={`${item.fileUrl}-${idx}`}
-                                href={getAttachmentUrl(item)}
-                                target={shouldOpenInline(item.fileName) ? "_blank" : undefined}
-                                rel={shouldOpenInline(item.fileName) ? "noreferrer" : undefined}
-                                download={shouldOpenInline(item.fileName) ? undefined : item.fileName}
-                                className='task-attachment-item'
-                            >
-                                {item.fileName || `Attachment ${idx + 1}`}
-                            </a>
-                        ))}
-                    </div>
-                </div>
-                <div className='app-form-container' style={{ padding: '1rem' }}>
-                    <div>
-                        <h2>Sub Tasks</h2>
-                    </div>
-                    <div className='subtask-container'>
-                        {subtasksEnabled ? (
-                            <form onSubmit={handleSubtask} className='post-comment app-form-item' style={{ marginTop: '5px', position: "sticky", top: '0', zIndex: 100 }}>
+                        {commentsEnabled ? (
+                            <form onSubmit={handleComment} className='post-comment app-form-item'>
                                 <input
                                     type="text"
-                                    name='subtask'
-                                    id='subtask'
-                                    value={subtask}
-                                    onChange={(e) => setSubtask(e.target.value)}
+                                    name='comment'
+                                    id='comment'
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
                                     placeholder=' '
                                 />
-                                <label htmlFor="subtask">Add Sub Task</label>
-                                <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Add</button>
+                                <label htmlFor="comment">Comment..</label>
+                                <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Post</button>
                             </form>
                         ) : (
                             <div className='task-setting-note'>
-                                Subtasks are disabled for this workspace.
+                                Comments are disabled for this workspace.
                             </div>
                         )}
-                        {(currTask?.subTasks?.length ?? 0) === 0 && (
-                            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem', color: 'var(--text-light)' }}>
-                                No Subtasks Yet
-                            </div>
-                        )}
-                        {(currTask?.subTasks ?? []).map((task, idx) => (
-                            <div className='subtask-item' key={task._id + idx}>
-                                <div>{task?.title}</div>
-                                <div className="checkbox-wrapper-18">
-                                    <div className="round">
-                                        <input
-                                            checked={!!task.isCompleted}
-                                            disabled={!subtasksEnabled}
-                                            onChange={() => handleToggleSubtask(task._id)}
-                                            type="checkbox"
-                                            id={`checkbox-18${idx}`}
-                                        />
-                                        <label htmlFor={`checkbox-18${idx}`}></label>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
                     </div>
                 </div>
             </div>

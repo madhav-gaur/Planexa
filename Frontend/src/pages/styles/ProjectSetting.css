@@ -5,6 +5,8 @@
   gap: 1rem;
   z-index: 10;
   position: relative;
+  flex-direction: row;
+  margin-bottom: 1rem;
 }
 
 .project-setting-container {

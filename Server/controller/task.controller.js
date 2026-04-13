@@ -5,7 +5,10 @@ import { workspaceModel } from "../models/workspaceModel.js";
 import { logActivity } from "../utils/logActivity.js";
 import { createNotification } from "../utils/createNotification.js";
 import { syncProjectProgress } from "../utils/projectProgress.js";
-import { ensureWorkspaceExists, getWorkspaceRules } from "../utils/workspaceRules.js";
+import {
+  ensureWorkspaceExists,
+  getWorkspaceRules,
+} from "../utils/workspaceRules.js";
 import cloudinary from "../utils/cloudinary.js";
 import { Readable } from "node:stream";
 import { sendTaskAssignmentEmail } from "../utils/sendTaskEmail.js";
@@ -62,9 +65,9 @@ export const createTask = async (req, res) => {
     const workspace = await getWorkspaceRules(workspaceId);
     if (!ensureWorkspaceExists(workspace, res)) return;
 
-    const project = await projectModel.findById(projectId).select(
-      "projectHeadId workspaceId",
-    );
+    const project = await projectModel
+      .findById(projectId)
+      .select("projectHeadId workspaceId");
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -79,7 +82,10 @@ export const createTask = async (req, res) => {
           ? [project.projectHeadId]
           : [];
 
-    if (!workspace.settings.taskAutoAssign && normalizedAssignees.length === 0) {
+    if (
+      !workspace.settings.taskAutoAssign &&
+      normalizedAssignees.length === 0
+    ) {
       return res.status(400).json({
         success: false,
         message: "Select at least one assignee",
@@ -135,9 +141,11 @@ export const createTask = async (req, res) => {
       metadata: { projectId, assignees: normalizedAssignees },
     });
 
-    const assignedUsers = await userModel.find({
-      _id: { $in: normalizedAssignees },
-    }).select("name email");
+    const assignedUsers = await userModel
+      .find({
+        _id: { $in: normalizedAssignees },
+      })
+      .select("name email");
 
     // Notify assignees
     for (const assigneeId of normalizedAssignees) {
@@ -182,15 +190,21 @@ export const createTask = async (req, res) => {
 
 export const getAllWorkspaceTasks = async (req, res) => {
   try {
-    const { workspaceId } = req.body;
+    const { workspaceId, userId } = req.body;
 
     if (!workspaceId) {
       return res.status(400).json({
         success: false,
-        message: "Provide projectId",
+        message: "Provide workspaceId",
       });
     }
-    const tasks = await taskModel.find({ workspaceId, isActive: true });
+
+    const query = { workspaceId, isActive: true };
+    if (userId) {
+      query.assignees = userId;
+    }
+
+    const tasks = await taskModel.find(query).populate("projectId", "name");
 
     if (!tasks) {
       return res.status(404).json({
@@ -306,9 +320,11 @@ export const updateTask = async (req, res) => {
               currentAssignee.toString() === assigneeId.toString(),
           ),
       );
-      const assignedUsers = await userModel.find({
-        _id: { $in: newlyAssignedIds },
-      }).select("name email");
+      const assignedUsers = await userModel
+        .find({
+          _id: { $in: newlyAssignedIds },
+        })
+        .select("name email");
 
       for (const assigneeId of assignees) {
         if (assigneeId.toString() !== req.userId) {
@@ -567,10 +583,7 @@ export const archiveTask = async (req, res) => {
       projectModel.findByIdAndUpdate(task.projectId, {
         $pull: { tasks: task._id },
       }),
-      userModel.updateMany(
-        { task: task._id },
-        { $pull: { task: task._id } },
-      ),
+      userModel.updateMany({ task: task._id }, { $pull: { task: task._id } }),
     ]);
 
     await logActivity({
