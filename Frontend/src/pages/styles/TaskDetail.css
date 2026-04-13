@@ -109,6 +109,15 @@
   background-color: var(--surface-hover-light);
 }
 
+.task-setting-note {
+  color: var(--text-light);
+  font-size: 13px;
+  border: var(--border);
+  border-radius: 7px;
+  padding: 0.85rem 1rem;
+  background-color: var(--surface-hover-light);
+}
+
 /* ? CHECKBOX */
 .checkbox-wrapper-18 .round {
   position: relative;

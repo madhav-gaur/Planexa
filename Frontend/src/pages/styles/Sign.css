@@ -216,7 +216,7 @@
 
   .team-member-pill {
     position: relative;
-    background-color: var(--surface);
+    /* background-color: var(--surface); */
     font-size: 12px;
     border: var(--border);
     border-radius: 1rem;
@@ -227,7 +227,7 @@
     top: -5px;
     cursor: pointer;
     right: -5px;
-    background-color: black;
+    background-color: var(--text-normal);
     color: var(--surface);
     width: 1rem;
     height: 1rem;

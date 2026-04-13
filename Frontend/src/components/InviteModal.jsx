@@ -5,14 +5,26 @@ import { IoClose } from 'react-icons/io5'
 import ButtonLoading from './ButtonLoading'
 import { useSelector } from 'react-redux'
 import { apiList } from '../common/apiList'
+import { toast } from 'react-toastify'
 const InviteModal = ({ close }) => {
     const [link, setLink] = useState("")
     const [copyMsg, setCopyMsg] = useState("Copy Link")
     const { currWorkspace } = useSelector(state => state.workspace)
     const [role, setRole] = useState("")
+    const [loading, setLoading] = useState(false)
     const user = useSelector(state => state.user.userDetails)
     const temp = user.workspaces.find(item => item.workspaceId == currWorkspace._id)
+    const guestAccessDisabled = currWorkspace?.settings && !currWorkspace.settings.allowGuestAccess
+    const memberLimitReached = currWorkspace?.settings && (currWorkspace?.members?.length || 0) >= currWorkspace.settings.maxMembers
     const generateLink = async () => {
+        if (guestAccessDisabled) {
+            toast.error("Guest access is disabled for this workspace")
+            return
+        }
+        if (memberLimitReached) {
+            toast.error(`Workspace member limit reached (${currWorkspace.settings.maxMembers})`)
+            return
+        }
         if (link) {
             navigator.clipboard.writeText(link);
             setCopyMsg("Link Copied !!")
@@ -21,6 +33,7 @@ const InviteModal = ({ close }) => {
             }, 2000);
         }
         try {
+            setLoading(true)
             const response = await Axios({
                 ...apiList.getInviteLink,
                 data: {
@@ -31,10 +44,11 @@ const InviteModal = ({ close }) => {
             if (response.data.success) {
                 setLink(response.data.link)
             }
-            console.log(response)
-
         } catch (error) {
             console.error(error)
+            toast.error(error.response?.data?.message || 'Failed to generate invite link')
+        } finally {
+            setLoading(false)
         }
     }
     return (
@@ -56,8 +70,22 @@ const InviteModal = ({ close }) => {
                     </div>
                 </div>
             </form>
+            {(guestAccessDisabled || memberLimitReached) && (
+                <p style={{ color: 'var(--text-light)', fontSize: '13px' }}>
+                    {guestAccessDisabled
+                        ? 'Invites are disabled because guest access is turned off in workspace settings.'
+                        : `Invites are disabled because the workspace already reached its member limit (${currWorkspace.settings.maxMembers}).`}
+                </p>
+            )}
             <div>
-                <button onClick={() => generateLink()} className='primary-button' style={{ width: '100%' }}>{link ? copyMsg : "Get Link"}</button>
+                <button
+                    onClick={() => generateLink()}
+                    disabled={loading || guestAccessDisabled || memberLimitReached}
+                    className='primary-button'
+                    style={{ width: '100%' }}
+                >
+                    {loading && <ButtonLoading />} {link ? copyMsg : "Get Link"}
+                </button>
             </div>
             <p style={{ wordBreak: "break-all" }}>{link}</p>
         </div>

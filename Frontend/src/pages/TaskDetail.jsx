@@ -12,6 +12,8 @@ import ButtonLoading from '../components/ButtonLoading'
 import { getTasks } from '../utils/getTasks'
 import Loading from '../components/Loading'
 import { setIsProjectLoaded } from '../store/project.slice'
+import { FaRegFolderOpen } from 'react-icons/fa'
+import { MdOutlineEventAvailable } from 'react-icons/md'
 
 const emptyForm = () => ({
     title: '',
@@ -61,6 +63,10 @@ const TaskDetail = () => {
     const [subtask, setSubtask] = useState('')
     const [data, setData] = useState(emptyForm)
     const toggleTimeout = useRef({})
+
+    const commentsEnabled = currWorkspace?.settings?.allowComments !== false
+    const subtasksEnabled = currWorkspace?.settings?.allowSubtasks !== false
+    const fileUploadsEnabled = currWorkspace?.settings?.allowFileUploads !== false
 
     const transformDate = (date) => {
         if (!date) return ''
@@ -276,9 +282,10 @@ const TaskDetail = () => {
 
     if (!currTask) {
         return (
-            <div className='project-setting-wrapper'>
-                <p style={{ padding: '2rem', color: 'var(--text-light)' }}>Task not found.</p>
-                <button type="button" className="primary-button" style={{ marginLeft: '2rem' }} onClick={() => navigate(`/projects/${params.projectId}`)}>Back to project</button>
+            <div className='empty-model' style={{ marginTop: 0, top:'50%' }}>
+                <span><MdOutlineEventAvailable /></span>
+                <h3>Task not found</h3>
+                <button type="button" className="primary-button" style={{ marginLeft: '0rem' }} onClick={() => navigate(`/projects/${params.projectId}`)}>Back to project</button>
             </div>
         )
     }
@@ -448,18 +455,24 @@ const TaskDetail = () => {
                                     No Comments Yet
                                 </div>
                             )}
-                            <form onSubmit={handleComment} className='post-comment app-form-item'>
-                                <input
-                                    type="text"
-                                    name='comment'
-                                    id='comment'
-                                    value={comment}
-                                    onChange={(e) => setComment(e.target.value)}
-                                    placeholder=' '
-                                />
-                                <label htmlFor="comment">Comment..</label>
-                                <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Post</button>
-                            </form>
+                            {commentsEnabled ? (
+                                <form onSubmit={handleComment} className='post-comment app-form-item'>
+                                    <input
+                                        type="text"
+                                        name='comment'
+                                        id='comment'
+                                        value={comment}
+                                        onChange={(e) => setComment(e.target.value)}
+                                        placeholder=' '
+                                    />
+                                    <label htmlFor="comment">Comment..</label>
+                                    <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Post</button>
+                                </form>
+                            ) : (
+                                <div className='task-setting-note'>
+                                    Comments are disabled for this workspace.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -467,19 +480,27 @@ const TaskDetail = () => {
                     <div>
                         <h2>Attachments</h2>
                     </div>
-                        <div className='task-attachments'>
-                            <div className='task-attachment-upload'>
-                            <input
-                                type="file"
-                                onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
-                            />
-                            <button type='button' className='primary-button' onClick={handleAttachmentUpload} disabled={!attachmentFile || uploadingAttachment}>
-                                {uploadingAttachment ? 'Uploading...' : 'Upload'}
-                            </button>
-                        </div>
-                        <div style={{ color: 'var(--text-light)', fontSize: '12px' }}>
-                            You can upload images, PDFs, docs, spreadsheets, and other common attachments up to 15MB.
-                        </div>
+                    <div className='task-attachments'>
+                        {fileUploadsEnabled ? (
+                            <>
+                                <div className='task-attachment-upload'>
+                                    <input
+                                        type="file"
+                                        onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
+                                    />
+                                    <button type='button' className='primary-button' onClick={handleAttachmentUpload} disabled={!attachmentFile || uploadingAttachment}>
+                                        {uploadingAttachment ? 'Uploading...' : 'Upload'}
+                                    </button>
+                                </div>
+                                <div style={{ color: 'var(--text-light)', fontSize: '12px' }}>
+                                    You can upload images, PDFs, docs, spreadsheets, and other common attachments up to 15MB.
+                                </div>
+                            </>
+                        ) : (
+                            <div className='task-setting-note'>
+                                File uploads are disabled for this workspace.
+                            </div>
+                        )}
                         {(currTask?.attachments ?? []).length === 0 && (
                             <div style={{ color: 'var(--text-light)', fontSize: '14px' }}>No attachments yet</div>
                         )}
@@ -502,18 +523,24 @@ const TaskDetail = () => {
                         <h2>Sub Tasks</h2>
                     </div>
                     <div className='subtask-container'>
-                        <form onSubmit={handleSubtask} className='post-comment app-form-item' style={{ marginTop: '5px', position: "sticky", top: '0', zIndex: 100 }}>
-                            <input
-                                type="text"
-                                name='subtask'
-                                id='subtask'
-                                value={subtask}
-                                onChange={(e) => setSubtask(e.target.value)}
-                                placeholder=' '
-                            />
-                            <label htmlFor="subtask">Add Sub Task</label>
-                            <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Add</button>
-                        </form>
+                        {subtasksEnabled ? (
+                            <form onSubmit={handleSubtask} className='post-comment app-form-item' style={{ marginTop: '5px', position: "sticky", top: '0', zIndex: 100 }}>
+                                <input
+                                    type="text"
+                                    name='subtask'
+                                    id='subtask'
+                                    value={subtask}
+                                    onChange={(e) => setSubtask(e.target.value)}
+                                    placeholder=' '
+                                />
+                                <label htmlFor="subtask">Add Sub Task</label>
+                                <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Add</button>
+                            </form>
+                        ) : (
+                            <div className='task-setting-note'>
+                                Subtasks are disabled for this workspace.
+                            </div>
+                        )}
                         {(currTask?.subTasks?.length ?? 0) === 0 && (
                             <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem', color: 'var(--text-light)' }}>
                                 No Subtasks Yet
@@ -526,6 +553,7 @@ const TaskDetail = () => {
                                     <div className="round">
                                         <input
                                             checked={!!task.isCompleted}
+                                            disabled={!subtasksEnabled}
                                             onChange={() => handleToggleSubtask(task._id)}
                                             type="checkbox"
                                             id={`checkbox-18${idx}`}

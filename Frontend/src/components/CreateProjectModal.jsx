@@ -28,6 +28,7 @@ const CreateProjectModal = ({ close }) => {
         members: []
     })
     const { workspaceMember } = useSelector(state => state.workspace)
+    const projectLimitReached = currWorkspace?.settings && (currWorkspace?.projects?.length || 0) >= currWorkspace.settings.maxProjects
     const handleInput = (e) => {
         const { name, value } = e.target;
 
@@ -51,7 +52,7 @@ const CreateProjectModal = ({ close }) => {
         }));
     };
     const removeMember = (email) => {
-            const lead = workspaceMember.find(m => m._id === data.projectLead);
+        const lead = workspaceMember.find(m => m._id === data.projectLead);
         if (lead?.email === email) return;
 
         setData(prev => ({
@@ -72,6 +73,10 @@ const CreateProjectModal = ({ close }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (projectLimitReached) {
+            toast.error(`Project limit reached for this workspace (${currWorkspace.settings.maxProjects})`)
+            return
+        }
         setLoading(true)
         try {
             const response = await Axios({
@@ -109,6 +114,11 @@ const CreateProjectModal = ({ close }) => {
                 <p>In workspace <a style={{ color: 'var(--primary-blue)' }}>{currWorkspace?.name}</a> </p>
                 <span onClick={close}><IoClose /></span>
             </div>
+            {projectLimitReached && (
+                <p style={{ color: 'var(--danger-red)', justifyContent: 'center', fontSize: '13px' }}>
+                    This workspace has reached its project limit ({currWorkspace.settings.maxProjects}). Contact Admin to Increase the limit in workspace settings to create more projects.
+                </p>
+            )}
             <form className='app-form' onSubmit={handleSubmit} >
                 <div className='app-form-item'>
                     <span>Project Name</span>
@@ -262,6 +272,7 @@ const CreateProjectModal = ({ close }) => {
 
                 <div>
                     <button
+                        disabled={projectLimitReached || loading}
                         className='primary-button'
                         style={{ width: '100%' }}>
                         {loading ? <>Creating... <ButtonLoading />

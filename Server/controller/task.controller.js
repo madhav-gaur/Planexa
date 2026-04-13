@@ -8,6 +8,7 @@ import { syncProjectProgress } from "../utils/projectProgress.js";
 import { ensureWorkspaceExists, getWorkspaceRules } from "../utils/workspaceRules.js";
 import cloudinary from "../utils/cloudinary.js";
 import { Readable } from "node:stream";
+import { sendTaskAssignmentEmail } from "../utils/sendTaskEmail.js";
 
 const normalizeTaskLabels = (labels = []) => {
   if (!Array.isArray(labels)) return [];
@@ -26,6 +27,17 @@ const getCompletedAtValue = (status, previousCompletedAt = null) => {
   if (status === "DONE") return previousCompletedAt || new Date();
   return null;
 };
+
+const formatDueDate = (date) =>
+  date
+    ? new Intl.DateTimeFormat("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(new Date(date))
+    : "";
 
 export const createTask = async (req, res) => {
   try {
@@ -123,6 +135,10 @@ export const createTask = async (req, res) => {
       metadata: { projectId, assignees: normalizedAssignees },
     });
 
+    const assignedUsers = await userModel.find({
+      _id: { $in: normalizedAssignees },
+    }).select("name email");
+
     // Notify assignees
     for (const assigneeId of normalizedAssignees) {
       await createNotification({
@@ -133,6 +149,19 @@ export const createTask = async (req, res) => {
         entityId: newTask._id,
         workspaceId,
         createdBy: req.userId,
+      });
+
+      const assignee = assignedUsers.find(
+        (item) => item._id.toString() === assigneeId.toString(),
+      );
+      await sendTaskAssignmentEmail({
+        email: assignee?.email,
+        name: assignee?.name,
+        taskTitle: title,
+        dueDateLabel: formatDueDate(dueDate),
+        taskLink: projectId
+          ? `http://${process.env.FRONTEND_URL}/projects/${projectId}/tasks/${newTask._id}`
+          : undefined,
       });
     }
     await syncProjectProgress(projectId);
@@ -270,6 +299,17 @@ export const updateTask = async (req, res) => {
     });
 
     if (assignees && assignees.length > 0) {
+      const newlyAssignedIds = assignees.filter(
+        (assigneeId) =>
+          !existingTask.assignees.some(
+            (currentAssignee) =>
+              currentAssignee.toString() === assigneeId.toString(),
+          ),
+      );
+      const assignedUsers = await userModel.find({
+        _id: { $in: newlyAssignedIds },
+      }).select("name email");
+
       for (const assigneeId of assignees) {
         if (assigneeId.toString() !== req.userId) {
           await createNotification({
@@ -282,6 +322,21 @@ export const updateTask = async (req, res) => {
             createdBy: req.userId,
           });
         }
+      }
+
+      for (const assigneeId of newlyAssignedIds) {
+        const assignee = assignedUsers.find(
+          (item) => item._id.toString() === assigneeId.toString(),
+        );
+        await sendTaskAssignmentEmail({
+          email: assignee?.email,
+          name: assignee?.name,
+          taskTitle: title,
+          dueDateLabel: formatDueDate(dueDate),
+          taskLink: projectId
+            ? `http://${process.env.FRONTEND_URL}/projects/${projectId}/tasks/${updatedTask._id}`
+            : undefined,
+        });
       }
     }
     await syncProjectProgress(projectId || updatedTask.projectId);

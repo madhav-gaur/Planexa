@@ -325,7 +325,6 @@ const Account = () => {
                                     <span style={{ color: 'var(--danger-red)', }}>{pswdError}</span>
                                 </div>
                                 <button
-                                    // disabled={validateButton()}
                                     className='primary-button'
                                     onClick={handlePasswordUpdate}>
                                     {pswdUpdateLoading ? <><ButtonLoading /> Updating...

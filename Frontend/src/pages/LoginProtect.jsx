@@ -27,14 +27,15 @@ const LoginProtect = ({ children }) => {
                     borderRadius: "13px",
                     border: "var(--border)",
                     width: "fit-content",
-                    backgroundColor: "#fefefe",
+                    backgroundColor: "var(--surface)",
                     textAlign: "center"
                 }}>
                     <p style={{
                         fontSize: "1.2rem",
                         fontWeight: 600,
                         color: "var(--text-normal2)",
-                        marginBottom: "1rem"
+                        marginBottom: "1rem",
+
                     }}>
                         Please login to access this page.
                     </p>

@@ -23,8 +23,8 @@
 .dark {
   /* --primary-blue: rgb(59, 130, 246); */
   /* --danger-red: #ef4444; */
-  /* --primary-blue-hover: #3b82f6;
-  --primary-blue-disabled: #1e3a8a; */
+  /* --primary-blue-hover: #3b82f6; */
+  --primary-blue-disabled: rgb(62, 123, 255);
 
   --surface: #101013;
   /* main background */
@@ -109,7 +109,9 @@ select {
 button {
   transition: all 0.3s ease;
 }
-
+button:disabled {
+  cursor:auto;
+}
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -160,7 +162,7 @@ button {
   }
 
   &:disabled {
-    cursor: not-allowed;
+    cursor: default;
     background-color: var(--primary-blue-disabled);
   }
 }

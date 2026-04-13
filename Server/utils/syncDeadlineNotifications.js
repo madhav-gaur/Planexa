@@ -1,5 +1,7 @@
 import { notification } from "../models/notificationModel.js";
 import { taskModel } from "../models/taskModel.js";
+import { userModel } from "../models/userModel.js";
+import { sendTaskOverdueEmail } from "./sendTaskEmail.js";
 
 const REMINDER_WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -35,10 +37,13 @@ const ensureNotification = async ({
     message,
     type: "TASK",
   });
+
+  return true;
 };
 
 export const syncDeadlineNotifications = async (userId) => {
   const now = new Date();
+  const user = await userModel.findById(userId).select("name email");
   const tasks = await taskModel.find({
     assignees: userId,
     isActive: true,
@@ -52,13 +57,22 @@ export const syncDeadlineNotifications = async (userId) => {
     const dueLabel = formatDueDate(dueAt);
 
     if (msUntilDue < 0) {
-      await ensureNotification({
+      const created = await ensureNotification({
         userId,
         entityId: task._id,
         workspaceId: task.workspaceId,
         title: "Task overdue",
         message: `"${task.title}" is overdue. It was due on ${dueLabel}.`,
       });
+      if (created) {
+        await sendTaskOverdueEmail({
+          email: user?.email,
+          name: user?.name,
+          taskTitle: task.title,
+          dueDateLabel: dueLabel,
+          taskLink: `${process.env.FRONTEND_URL}/projects/${task.projectId}/tasks/${task._id}`,
+        });
+      }
       continue;
     }
 

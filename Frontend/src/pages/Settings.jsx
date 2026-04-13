@@ -192,13 +192,13 @@ const Settings = () => {
                       placeholder=' '
                       onChange={handleLogoPick}
                     />
-                    <label htmlFor="ws-logo" className={`ghost-button ${!isAdmin ? 'disabled' : ''}`}>
+                    <label htmlFor="ws-logo" className={`primary-button ghost-button ${!isAdmin ? 'disabled' : ''}`}>
                       Choose image
                     </label>
                     <button
                       type="button"
                       className="primary-button"
-                      disabled={!isAdmin || !logoFile || savingLogo}
+                      // disabled={}
                       onClick={handleUploadLogo}
                     >
                       {savingLogo ? (
@@ -249,6 +249,7 @@ const Settings = () => {
                           border: 'var(--border)',
                           borderRadius: '7px',
                           width: '100%',
+                          minHeight:'8rem',
                           maxWidth: 'none',
                           resize: 'vertical',
                         }}
@@ -330,7 +331,7 @@ const Settings = () => {
                         style={{ maxWidth: 'none' }}
                         id="max-p"
                         type="number"
-                        min={1}
+                        min={currWorkspace.projects.length}
                         max={10000}
                         value={settings.maxProjects}
                         disabled={!isAdmin}
@@ -347,7 +348,7 @@ const Settings = () => {
                         style={{ maxWidth: 'none' }}
                         id="max-m"
                         type="number"
-                        min={1}
+                        min={currWorkspace.members.length}
                         max={10000}
                         value={settings.maxMembers}
                         disabled={!isAdmin}

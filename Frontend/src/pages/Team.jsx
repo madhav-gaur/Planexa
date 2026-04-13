@@ -48,6 +48,8 @@ const Team = () => {
     const currentUserRole = user?.workspaces?.find(
         w => w.workspaceId.toString() === currWorkspace._id.toString()
     )?.role;
+    const guestAccessDisabled = currWorkspace?.settings && !currWorkspace.settings.allowGuestAccess
+    const memberLimitReached = currWorkspace?.settings && (currWorkspace?.members?.length || 0) >= currWorkspace.settings.maxMembers
 
 
     const removeWorkspaceMember = async (memberId) => {
@@ -105,10 +107,23 @@ const Team = () => {
                     <p>Manage Team members</p>
                 </div>
                 <div className='dashboard-head-right'>
-                    <button onClick={() => setIsInviteModal(true)} className='primary-button'>+ Invite Members</button>
+                    <button
+                        onClick={() => setIsInviteModal(true)}
+                        disabled={guestAccessDisabled || memberLimitReached}
+                        className='primary-button'
+                    >
+                        + Invite Members
+                    </button>
                 </div>
 
             </div>
+            {(guestAccessDisabled || memberLimitReached) && (
+                <p style={{ color: 'var(--text-light)', fontSize: '13px', marginTop: '0.5rem' }}>
+                    {guestAccessDisabled
+                        ? 'Invites are disabled because guest access is turned off in workspace settings.'
+                        : `Invites are disabled because this workspace has reached its member limit (${currWorkspace.settings.maxMembers}).`}
+                </p>
+            )}
             {isInviteModal &&
                 <div className='create-modal-wrapper' onClick={() => setIsInviteModal(false)}>
                     <InviteModal close={() => {
