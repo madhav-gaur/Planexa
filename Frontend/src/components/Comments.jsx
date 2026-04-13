@@ -8,10 +8,6 @@ const Comments = ({ comments }) => {
     const user = useSelector((state) => state.user.userDetails);
     const { workspaceMember } = useSelector(state => state.workspace)
 
-    console.log(workspaceMember)
-
-
-    console.log(comments)
     useEffect(() => {
         const el = containerRef.current;
         if (el) {
@@ -21,7 +17,7 @@ const Comments = ({ comments }) => {
     return (
         <div className='task-comment-container' ref={containerRef}>
             {comments.map((item, idx) => {
-                const temp = workspaceMember.find(memb => memb._id == item.userId).email
+                const temp = workspaceMember.find(memb => memb._id == item.userId)?.email
                 const email = temp?.split('@')[0];
                 return <div key={item._id + idx} className={`task-comment ${item.userId == user._id ? 'my-comment' : ""}`}>
                     <div className="task-comment-item ">

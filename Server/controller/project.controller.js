@@ -5,6 +5,8 @@ import { workspaceModel } from "../models/workspaceModel.js";
 import { logActivity } from "../utils/logActivity.js";
 import { createNotification } from "../utils/createNotification.js";
 import mongoose from "mongoose";
+import { syncProjectProgress } from "../utils/projectProgress.js";
+import { ensureWorkspaceExists, getWorkspaceRules } from "../utils/workspaceRules.js";
 export const createProject = async (req, res) => {
   try {
     const {
@@ -25,6 +27,20 @@ export const createProject = async (req, res) => {
         message: "Provide all required Feilds",
       });
     }
+    const workspace = await getWorkspaceRules(workspaceId);
+    if (!ensureWorkspaceExists(workspace, res)) return;
+
+    const activeProjectCount = await projectModel.countDocuments({
+      workspaceId,
+      isActive: true,
+    });
+    if (activeProjectCount >= workspace.settings.maxProjects) {
+      return res.status(400).json({
+        success: false,
+        message: `Project limit reached for this workspace (${workspace.settings.maxProjects})`,
+      });
+    }
+
     const newProject = await projectModel.create({
       workspaceId,
       projectHeadId,
@@ -65,15 +81,15 @@ export const createProject = async (req, res) => {
       metadata: { projectHeadId, name },
     });
 
-    const workspace = await workspaceModel
+    const workspaceWithMembers = await workspaceModel
       .findById(workspaceId)
-      .populate("members.userId");
-    for (const member of workspace.members) {
-      if (member.userId._id.toString() !== req.userId) {
+      .populate("members", "name email");
+    for (const member of workspaceWithMembers?.members || []) {
+      if (member._id.toString() !== req.userId) {
         await createNotification({
-          userId: member.userId._id,
+          userId: member._id,
           title: "New Project Created",
-          message: `A new project "${name}" has been created in workspace "${workspace.name}"`,
+          message: `A new project "${name}" has been created in workspace "${workspaceWithMembers.name}"`,
           type: "PROJECT",
           entityId: newProject._id,
           workspaceId,
@@ -81,6 +97,7 @@ export const createProject = async (req, res) => {
         });
       }
     }
+    await syncProjectProgress(newProject._id);
     return res.status(200).json({
       success: true,
       message: "Project Created",

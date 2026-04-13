@@ -4,6 +4,7 @@ import { LuLayoutDashboard } from "react-icons/lu";
 import { LuUsers } from "react-icons/lu";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { IoClose, IoMenu, IoSettingsOutline } from "react-icons/io5";
+import { IoPulseOutline } from "react-icons/io5";
 import { FiCheckSquare } from "react-icons/fi";
 import { FaRegFolderOpen } from "react-icons/fa";
 import "../components/Styles/Sidebar.css"
@@ -171,6 +172,15 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                 `${isActive ? 'nav-item active' : 'nav-item'
                                 }`
                             }
+                            to="/activity">
+                            <IoPulseOutline />
+                            <p>Activity</p>
+                        </NavLink>
+                        <NavLink
+                            className={({ isActive }) =>
+                                `${isActive ? 'nav-item active' : 'nav-item'
+                                }`
+                            }
                             to="/settings">
                             <IoSettingsOutline />
                             <p>Settings</p>
@@ -202,14 +212,22 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                 to="/team">
                                 <LuUsers />
                             </NavLink>
-                            <NavLink
-                                className={({ isActive }) =>
-                                    `${isActive ? 'nav-item active' : 'nav-item'
-                                    }`
-                                }
-                                to="/settings">
-                                <IoSettingsOutline />
-                            </NavLink>
+                        <NavLink
+                            className={({ isActive }) =>
+                                `${isActive ? 'nav-item active' : 'nav-item'
+                                }`
+                            }
+                            to="/activity">
+                            <IoPulseOutline />
+                        </NavLink>
+                        <NavLink
+                            className={({ isActive }) =>
+                                `${isActive ? 'nav-item active' : 'nav-item'
+                                }`
+                            }
+                            to="/settings">
+                            <IoSettingsOutline />
+                        </NavLink>
                         </nav>}
                     <div className='task-nav'>
                         <div className='task-nav-head' onClick={() => setIsTaskList(!isTaskList)}>

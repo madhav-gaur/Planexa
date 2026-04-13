@@ -1,42 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import logo from "../assets/Favicon.png"
 import { useNavigate } from 'react-router-dom'
-import { IoClose, IoMenu, IoNotificationsOutline, IoReorderThreeOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoClose, IoMenu, IoSettingsOutline } from "react-icons/io5";
 import { useSelector } from 'react-redux';
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuMoon, LuSun } from "react-icons/lu";
 import { CiLogout } from 'react-icons/ci';
-import Axios from '../utils/axios';
-import { apiList } from '../common/apiList';
+import { fetchNotifications } from '../utils/fetchNotifications';
 const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
     const navigate = useNavigate()
     const user = useSelector(state => state.user.userDetails)
     const userName = user?.name?.split("")[0].toUpperCase()
     const [isUserCard, setIsUserCard] = useState(false)
-    const [unreadCount, setUnreadCount] = useState(0)
+    const [isNotifyCard, setIsNotifyCard] = useState(false)
+
+    const [notifications, setNotifications] = useState([])
+    const [loading, setLoading] = useState(true)
+    const unreadCount = notifications.filter(item => !item.isRead).length
 
     useEffect(() => {
-        const fetchUnreadCount = async () => {
-            try {
-                const response = await Axios({
-                    ...apiList.getNotifications,
-                    params: { page: 1, limit: 1 },
-                })
-                if (response.data.success) {
-                    const allResponse = await Axios({
-                        ...apiList.getNotifications,
-                        params: { page: 1, limit: 99 },
-                    })
-                    if (allResponse.data.success) {
-                        const unread = allResponse.data.data.filter(n => !n.isRead).length
-                        setUnreadCount(unread)
-                    }
-                }
-            } catch (error) {
-                console.error('Fetch unread count error:', error)
-            }
-        }
-        if (user) fetchUnreadCount()
+        if (!user) return
+        fetchNotifications({ pageNum: 1, setLoading, setHasMore: () => { }, setNotifications })
     }, [user])
 
     return (
@@ -52,7 +36,7 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
                     <h1 onClick={() => navigate("/")}>Planexa</h1>
                 </div>
                 <div className='topbar-right'>
-                    <div className='topbar-right-item' onClick={() => navigate('/notifications')}>
+                    <div className='topbar-right-item' onClick={() => setIsNotifyCard(prev => !prev)}>
                         <div style={{ position: 'relative' }} >
                             <IoIosNotificationsOutline />
                             {unreadCount > 0 && (
@@ -94,6 +78,42 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
                                     <CiLogout />
                                     <span >Sign Out</span>
                                 </div>
+                            </div>
+                        </div>
+                    }
+                    {
+                        isNotifyCard &&
+                        <div
+                            style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+                            onClick={() => setIsNotifyCard(false)}
+                        >
+                            <div className='user-pop-over-card' onClick={(e) => e.stopPropagation()}>
+                                <div style={{ display: 'none' }}></div>
+                                <div style={{ padding: '1rem', fontSize: '14px', cursor: 'pointer' }} onClick={() => {
+                                    setIsNotifyCard(false)
+                                    navigate("/notifications")
+                                }}>
+                                    <span>View All Notifications</span>
+                                </div>
+                                {loading ? (
+                                    <div style={{ padding: '1rem', fontSize: '14px', color: 'var(--text-light)' }}>
+                                        Loading notifications...
+                                    </div>
+                                ) : notifications.length === 0 ? (
+                                    <div style={{ padding: '1rem', fontSize: '14px', color: 'var(--text-light)' }}>
+                                        No notifications yet.
+                                    </div>
+                                ) : (
+                                    notifications.slice(0, 5).map((item) => (
+                                        <div key={item._id} style={{ padding: '10px', fontSize: '14px', flexDirection: 'column', alignItems: 'start', gap: '0px' }}>
+                                            <span>{item.title}</span>
+                                            <p style={{ color: 'var(--text-light)', fontSize: '12px' }}>
+                                                {item.message.length > 30 ? item.message.slice(0, 30) + '...' : item.message}
+                                            </p>
+                                        </div>
+                                    ))
+                                )}
+
                             </div>
                         </div>
                     }

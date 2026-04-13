@@ -110,17 +110,46 @@ export const getWorkspaceMembers = async (req, res) => {
 
 // ?Generate invite link
 
-export const getInviteLink = (req, res) => {
-  const { workspaceId, role } = req.body;
+export const getInviteLink = async (req, res) => {
+  try {
+    const { workspaceId, role } = req.body;
+    const workspace = await workspaceModel.findById(workspaceId).select(
+      "settings members",
+    );
 
-  const token = generateInviteLink(workspaceId, role);
+    if (!workspace) {
+      return res.status(404).json({
+        success: false,
+        message: "Workspace not found",
+      });
+    }
+    if (!workspace.settings.allowGuestAccess) {
+      return res.status(400).json({
+        success: false,
+        message: "Guest access is disabled for this workspace",
+      });
+    }
+    if (workspace.members.length >= workspace.settings.maxMembers) {
+      return res.status(400).json({
+        success: false,
+        message: `Workspace member limit reached (${workspace.settings.maxMembers})`,
+      });
+    }
 
-  const link = `${process.env.FRONTEND_URL}/invite/${token}`;
+    const token = generateInviteLink(workspaceId, role);
+    const link = `${process.env.FRONTEND_URL}/invite/${token}`;
 
-  res.json({
-    success: true,
-    link,
-  });
+    return res.json({
+      success: true,
+      link,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
 };
 // ?invite member
 
@@ -138,6 +167,24 @@ export const joinWorkspace = async (req, res) => {
       });
     }
     const workspace = await workspaceModel.findById(workspaceId);
+    if (!workspace) {
+      return res.status(404).json({
+        success: false,
+        message: "Workspace not found",
+      });
+    }
+    if (!workspace.settings.allowGuestAccess) {
+      return res.status(400).json({
+        success: false,
+        message: "Guest access is disabled for this workspace",
+      });
+    }
+    if (workspace.members.length >= workspace.settings.maxMembers) {
+      return res.status(400).json({
+        success: false,
+        message: `Workspace member limit reached (${workspace.settings.maxMembers})`,
+      });
+    }
 
     const alreadyMember = workspace.members.some(
       (memb) => memb.toString() == userId,
@@ -220,7 +267,7 @@ export const removeWorkspaceMember = async (req, res) => {
         message: "Can't remove Admin",
       });
     }
-    await projectModel.findByIdAndUpdate(
+    await workspaceModel.findByIdAndUpdate(
       workspaceId,
       {
         $pull: { members: new mongoose.Types.ObjectId(memberId) },

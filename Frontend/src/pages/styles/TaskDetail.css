@@ -85,6 +85,30 @@
   margin-right: 1rem;
 }
 
+.task-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-attachment-upload {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.task-attachment-item {
+  border: var(--border);
+  border-radius: 7px;
+  padding: 0.75rem 1rem;
+  color: var(--text-normal);
+  text-decoration: none;
+}
+
+.task-attachment-item:hover {
+  background-color: var(--surface-hover-light);
+}
+
 /* ? CHECKBOX */
 .checkbox-wrapper-18 .round {
   position: relative;

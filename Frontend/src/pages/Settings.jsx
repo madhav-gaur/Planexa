@@ -147,7 +147,7 @@ const Settings = () => {
       <div className="dashboard-head">
         <div className="dashboard-head-left">
           <h2>Workspace settings</h2>
-          <p>Manage {currWorkspace.name} — profile and rules for this workspace</p>
+          <p>Manage {currWorkspace.name} - profile and rules for this workspace</p>
         </div>
       </div>
 
@@ -160,7 +160,7 @@ const Settings = () => {
           fontSize: '14px',
           color: 'var(--text-light)',
         }}>
-          Only workspace <strong style={{ color: 'var(--text-normal)' }}>admins</strong> can edit these settings. You can view them with your current role ({currentUserRole || '—'}).
+          Only workspace <strong style={{ color: 'var(--text-normal)' }}>admins</strong> can edit these settings. You can view them with your current role ({currentUserRole || '-'}).
         </div>
       )}
 

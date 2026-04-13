@@ -19,10 +19,12 @@ const CreateTaskModal = ({ close, currProject }) => {
         status: "TO_DO",
         priority: "MEDIUM",
         dueDate: undefined,
-        assignees: []
+        assignees: [],
+        labels: "",
     })
     // console.log(data)
     const { workspaceMember, currWorkspace } = useSelector(state => state.workspace)
+    const autoAssignEnabled = currWorkspace?.settings?.taskAutoAssign
     const handleInput = (e) => {
         const { name, value } = e.target;
 
@@ -67,6 +69,7 @@ const CreateTaskModal = ({ close, currProject }) => {
                     priority: data.priority,
                     dueDate: data.dueDate,
                     assignees: data.assignees,
+                    labels: data.labels.split(',').map(item => item.trim()).filter(Boolean),
                 }
             })
             console.log(response)
@@ -173,7 +176,6 @@ const CreateTaskModal = ({ close, currProject }) => {
                     <span>Assignees</span>
                     <div>
                         <select
-                            required
                             name="assignees"
                             id="assignees"
                             onChange={(e) => addMember(e.target.value)}
@@ -183,6 +185,20 @@ const CreateTaskModal = ({ close, currProject }) => {
                                 return <option key={item._id + idx} value={item._id}>{item.email}</option>
                             })}
                         </select>
+                    </div>
+                </div>
+                <div className='app-form-item'>
+                    <span>Labels</span>
+                    <div>
+                        <input
+                            type="text"
+                            id='labels'
+                            name='labels'
+                            onChange={handleInput}
+                            value={data.labels}
+                            placeholder=" "
+                        />
+                        <label htmlFor='labels'>Comma separated labels</label>
                     </div>
                 </div>
                 <div className="team-member-pill-wrapper">
@@ -202,6 +218,11 @@ const CreateTaskModal = ({ close, currProject }) => {
                         );
                     })}
                 </div>
+                {autoAssignEnabled && data.assignees.length === 0 && (
+                    <p style={{ fontSize: '12px', color: 'var(--text-light)' }}>
+                        No assignees selected. The project lead will be auto-assigned by workspace rules.
+                    </p>
+                )}
                 <div>
                     <button
                         className='primary-button'

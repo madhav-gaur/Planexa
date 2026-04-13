@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import CreateProjectModal from '../components/CreateProjectModal'
@@ -26,7 +25,6 @@ const Projects = () => {
     const [status, setStatus] = useState("ALL");
     const [priority, setPriority] = useState("ALL");
     const [view, setView] = useState('GRID')
-    const { tasks } = useSelector((state) => state.task);
     const filteredProjects = projects?.filter((project) => {
         const matchesSearch =
             project.name?.toLowerCase().includes(query.toLowerCase());
@@ -47,13 +45,6 @@ const Projects = () => {
             setPriority("ALL")
         }
     }
-    const getProjectProgress = (tasks = []) => {
-        if (!tasks.length) return 0;
-
-        const completed = tasks.filter(t => t.status === "DONE").length;
-
-        return Math.floor((completed / tasks.length) * 100);
-    };
     return (
         <>
             <div className='dashboard-head'>
@@ -117,9 +108,7 @@ const Projects = () => {
                 <div className={`project-container `}>
                     {
                         filteredProjects.map((item, idx) => {
-                            const projectTasks = tasks.filter(t => t.projectId === item._id);
-
-                            const progress = getProjectProgress(projectTasks);
+                            const progress = item.progress ?? 0;
                             return <div key={item._id + idx} className='project-card' onClick={() => navigate(`/projects/${item._id}`)}>
                                 <div className='project-card-head'>
                                     <div>

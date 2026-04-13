@@ -1,9 +1,11 @@
 import { notification } from "../models/notificationModel.js";
+import { syncDeadlineNotifications } from "../utils/syncDeadlineNotifications.js";
 
 export const getNotifications = async (req, res) => {
   try {
     const userId = req.userId;
     const { page = 1, limit = 20 } = req.query;
+    await syncDeadlineNotifications(userId);
 
     const notifications = await notification
       .find({ userId })

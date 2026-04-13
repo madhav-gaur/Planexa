@@ -212,6 +212,10 @@ nav:has(a.nav-item:nth-of-type(4).active)::before {
   transform: translateY(110px);
 }
 
+nav:has(a.nav-item:nth-of-type(5).active)::before {
+  transform: translateY(148px);
+}
+
 .sidebar-nav-wrapper .task-nav {
   margin-top: 3rem;
 }

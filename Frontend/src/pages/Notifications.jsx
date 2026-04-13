@@ -5,35 +5,17 @@ import { toast } from 'react-toastify'
 import Loading from '../components/Loading'
 import { formatDistanceToNow } from 'date-fns'
 import './styles/Notifications.css'
+import { fetchNotifications } from '../utils/fetchNotifications'
 
 const Notifications = () => {
     const [notifications, setNotifications] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [page, setPage] = useState(1)
     const [hasMore, setHasMore] = useState(true)
 
-    const fetchNotifications = async (pageNum = 1) => {
-        try {
-            const response = await Axios({
-                ...apiList.getNotifications,
-                params: { page: pageNum, limit: 20 },
-            })
-            if (response.data.success) {
-                const newNotifications = response.data.data
-                if (pageNum === 1) {
-                    setNotifications(newNotifications)
-                } else {
-                    setNotifications(prev => [...prev, ...newNotifications])
-                }
-                setHasMore(newNotifications.length === 20)
-            }
-        } catch (error) {
-            console.error('Fetch notifications error:', error)
-            toast.error('Failed to load notifications')
-        } finally {
-            setLoading(false)
-        }
-    }
+    useEffect(() => {
+        fetchNotifications({ pageNum: 1, setLoading, setHasMore, setNotifications })
+    }, [])
 
     const markAsRead = async (notificationId) => {
         try {
@@ -47,7 +29,7 @@ const Notifications = () => {
                         notif._id === notificationId ? { ...notif, isRead: true } : notif
                     )
                 )
-                
+
             }
         } catch (error) {
             console.error('Mark read error:', error)
@@ -71,14 +53,10 @@ const Notifications = () => {
         }
     }
 
-    useEffect(() => {
-        fetchNotifications()
-    }, [])
-
     const loadMore = () => {
         const nextPage = page + 1
         setPage(nextPage)
-        fetchNotifications(nextPage)
+        fetchNotifications({ pageNum: nextPage, setLoading, setHasMore, setNotifications })
     }
 
     if (loading) return <Loading />

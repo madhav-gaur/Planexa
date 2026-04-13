@@ -1,10 +1,7 @@
-import React from 'react'
-import { FaArrowLeft } from 'react-icons/fa6'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import '../pages/styles/TaskDetail.css'
-import { FaRegCommentDots, FaRegEdit } from "react-icons/fa";
-import { useState } from 'react'
 import Axios from '../utils/axios'
 import { apiList } from '../common/apiList'
 import { toast } from 'react-toastify'
@@ -12,10 +9,9 @@ import { setIsTaskLoaded } from '../store/task.slice'
 import { IoArrowBack, IoClose } from 'react-icons/io5'
 import Comments from '../components/Comments'
 import ButtonLoading from '../components/ButtonLoading'
-import { useEffect } from 'react'
 import { getTasks } from '../utils/getTasks'
-import { useRef } from "react";
 import Loading from '../components/Loading'
+import { setIsProjectLoaded } from '../store/project.slice'
 
 const emptyForm = () => ({
     title: '',
@@ -25,31 +21,52 @@ const emptyForm = () => ({
     priority: 'MEDIUM',
     dueDate: '',
     assignees: [],
+    labels: '',
 })
+
+const getAttachmentUrl = (attachment = {}) => {
+    const originalUrl = attachment.fileUrl || ''
+    const fileName = attachment.fileName || ''
+    const lowerFile = fileName.toLowerCase()
+    const isImage = /\.(png|jpe?g|webp|gif|bmp|svg)$/.test(lowerFile)
+
+    if (!originalUrl.includes('res.cloudinary.com') || isImage) return originalUrl
+
+    if (originalUrl.includes('/image/upload/')) {
+        return originalUrl.replace('/image/upload/', '/raw/upload/')
+    }
+
+    return originalUrl
+}
+
+const shouldOpenInline = (fileName = '') => {
+    const lowerFile = fileName.toLowerCase()
+    return /\.(png|jpe?g|webp|gif|bmp|svg|pdf)$/.test(lowerFile)
+}
 
 const TaskDetail = () => {
     const navigate = useNavigate()
-    const { tasks, isTaskLoaded, isTaskLoading } = useSelector(state => state.task)
+    const dispatch = useDispatch()
     const params = useParams()
-    const currTask = tasks?.find(item => item._id == params.taskId)
+    const { tasks, isTaskLoaded, isTaskLoading } = useSelector(state => state.task)
     const { projects, isProjectLoaded } = useSelector(state => state.project)
-    const currProject = projects?.find(item => item._id == params.projectId)
     const { workspaceMember, currWorkspace } = useSelector(state => state.workspace)
+    const currTask = tasks?.find(item => item._id == params.taskId)
+    const currProject = projects?.find(item => item._id == params.projectId)
+
     const [loading, setLoading] = useState(false)
+    const [uploadingAttachment, setUploadingAttachment] = useState(false)
+    const [attachmentFile, setAttachmentFile] = useState(null)
     const [comment, setComment] = useState('')
     const [subtask, setSubtask] = useState('')
-    // const [taskCompleted, setTaskCompleted] = useState(null)
-
-
-    const toggleTimeout = useRef({});
-    const dispatch = useDispatch()
-    const transformDate = (date) => {
-        if (!date) return "";
-        const temp = date.split('-',);
-        const finalDate = temp[0] + '-' + temp[1] + '-' + temp[2].split('T')[0];
-        return finalDate;
-    }
     const [data, setData] = useState(emptyForm)
+    const toggleTimeout = useRef({})
+
+    const transformDate = (date) => {
+        if (!date) return ''
+        const temp = date.split('-')
+        return `${temp[0]}-${temp[1]}-${temp[2].split('T')[0]}`
+    }
 
     useEffect(() => {
         if (!currTask) return
@@ -61,39 +78,46 @@ const TaskDetail = () => {
             priority: currTask.priority ?? 'MEDIUM',
             dueDate: transformDate(currTask.dueDate) || '',
             assignees: currTask.assignees ?? [],
+            labels: (currTask.labels ?? []).join(', '),
         })
     }, [currTask])
-    const handleInput = (e) => {
-        const { name, value } = e.target;
 
+    useEffect(() => {
+        if (currProject?._id && !isTaskLoaded) {
+            getTasks({ currProject, dispatch })
+        }
+    }, [currProject, dispatch, isTaskLoaded])
+
+    const handleInput = (e) => {
+        const { name, value } = e.target
         setData(prev => ({
             ...prev,
             [name]: value,
-        }));
-    };
+        }))
+    }
+
     const removeMember = (memberId) => {
-        const lead = workspaceMember.find(m => m._id === (currProject?.projectHeadId ?? currProject?.projectLead));
-        if (lead?._id === memberId) return;
+        const lead = workspaceMember.find(m => m._id === (currProject?.projectHeadId ?? currProject?.projectLead))
+        if (lead?._id === memberId) return
 
         setData(prev => ({
             ...prev,
             assignees: prev.assignees.filter(m => m !== memberId),
-        }));
-    };
-
+        }))
+    }
 
     const addMember = (userId) => {
+        if (!userId) return
         setData(prev => ({
             ...prev,
             assignees: prev.assignees.includes(userId)
                 ? prev.assignees
                 : [...prev.assignees, userId],
-        }));
+        }))
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (data === currTask) return;
         setLoading(true)
         try {
             const response = await Axios({
@@ -109,71 +133,69 @@ const TaskDetail = () => {
                     priority: data.priority,
                     dueDate: data.dueDate,
                     assignees: data.assignees,
+                    labels: data.labels.split(',').map(item => item.trim()).filter(Boolean),
                 },
-
             })
-            console.log(response)
             if (response.data.success) {
-                toast.success("Task Updated !!")
+                toast.success('Task updated')
                 dispatch(setIsTaskLoaded(false))
+                dispatch(setIsProjectLoaded(false))
             }
         } catch (error) {
             console.error(error)
+            toast.error(error.response?.data?.message || 'Failed to update task')
         } finally {
             setLoading(false)
         }
-
     }
+
     const handleComment = async (e) => {
         e.preventDefault()
-        if (!comment.trim()) return;
+        if (!comment.trim()) return
         try {
             const response = await Axios({
                 ...apiList.addComment,
                 data: {
                     taskId: currTask._id,
-                    message: comment
+                    message: comment,
                 },
-
             })
-            console.log(response)
             if (response.data.success) {
-                toast.success("Comment added !!")
+                toast.success('Comment added')
                 dispatch(setIsTaskLoaded(false))
-                setComment("")
+                setComment('')
             }
         } catch (error) {
             console.error(error)
+            toast.error(error.response?.data?.message || 'Failed to add comment')
         }
-
     }
+
     const handleSubtask = async (e) => {
         e.preventDefault()
-        if (!subtask.trim()) return;
+        if (!subtask.trim()) return
         try {
             const response = await Axios({
                 ...apiList.addSubtask,
                 data: {
                     taskId: currTask._id,
-                    title: subtask
+                    title: subtask,
                 },
-
             })
-            console.log(response)
             if (response.data.success) {
-                toast.success("Subtask added")
+                toast.success('Subtask added')
                 dispatch(setIsTaskLoaded(false))
-                setSubtask("")
+                setSubtask('')
             }
         } catch (error) {
             console.error(error)
+            toast.error(error.response?.data?.message || 'Failed to add subtask')
         }
-
     }
-    const handleToggleSubtask = (subtaskId) => {
 
+    const handleToggleSubtask = (subtaskId) => {
         if (toggleTimeout.current[subtaskId]) {
-            clearTimeout(toggleTimeout.current[subtaskId]);
+            clearTimeout(toggleTimeout.current[subtaskId])
         }
         toggleTimeout.current[subtaskId] = setTimeout(async () => {
             try {
@@ -183,25 +205,61 @@ const TaskDetail = () => {
                         taskId: currTask._id,
                         subtaskId,
                     },
-                });
-
-                // if (response.data.success) {
-                // }
-
+                })
+                dispatch(setIsTaskLoaded(false))
             } catch (error) {
-                console.error(error);
+                console.error(error)
             }
-        }, 2000);
-    };
-    useEffect(() => {
-        if (currProject?._id && !isTaskLoaded) {
-            getTasks({ currProject, dispatch });
+        }, 500)
+    }
+
+    const handleArchiveTask = async () => {
+        try {
+            const response = await Axios({
+                ...apiList.archiveTask,
+                url: apiList.archiveTask.url.replace(':taskId', currTask._id),
+            })
+            if (response.data.success) {
+                toast.success('Task archived')
+                dispatch(setIsTaskLoaded(false))
+                dispatch(setIsProjectLoaded(false))
+                navigate(`/projects/${params.projectId}`)
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error(error.response?.data?.message || 'Failed to archive task')
         }
-    }, [currProject, dispatch, isTaskLoaded]);
+    }
+
+    const handleAttachmentUpload = async () => {
+        if (!attachmentFile) return
+        try {
+            setUploadingAttachment(true)
+            const formData = new FormData()
+            formData.append('attachment', attachmentFile)
+            const response = await Axios({
+                ...apiList.uploadTaskAttachment,
+                url: apiList.uploadTaskAttachment.url.replace(':taskId', currTask._id),
+                data: formData,
+                headers: { 'Content-Type': 'multipart/form-data' },
+            })
+            if (response.data.success) {
+                toast.success('Attachment uploaded')
+                setAttachmentFile(null)
+                dispatch(setIsTaskLoaded(false))
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error(error.response?.data?.message || 'Failed to upload attachment')
+        } finally {
+            setUploadingAttachment(false)
+        }
+    }
 
     if (!isProjectLoaded) {
         return <Loading />
     }
+
     if (!currProject) {
         return (
             <div className='project-setting-wrapper'>
@@ -215,6 +273,7 @@ const TaskDetail = () => {
     if (waitingForTask) {
         return <Loading />
     }
+
     if (!currTask) {
         return (
             <div className='project-setting-wrapper'>
@@ -234,12 +293,10 @@ const TaskDetail = () => {
                             <span>Back</span>
                         </div>
                         <div>
-                            <h2>
-                                {currTask?.title}
-                            </h2>
+                            <h2>{currTask?.title}</h2>
                         </div>
                     </div>
-                    <form className='app-form' onSubmit={handleSubmit} >
+                    <form className='app-form' onSubmit={handleSubmit}>
                         <div className='app-form-item'>
                             <span>Title</span>
                             <div>
@@ -273,7 +330,7 @@ const TaskDetail = () => {
                             <span>Type</span>
                             <div>
                                 <select value={data.type} required onChange={handleInput} name="type" id="type">
-                                    <option default value="BUG">Bug</option>
+                                    <option value="BUG">Bug</option>
                                     <option value="FEATURE">Feature</option>
                                     <option value="TASK">Task</option>
                                     <option value="IMPROVEMENT">Improvement</option>
@@ -285,11 +342,8 @@ const TaskDetail = () => {
                             <div className='app-form-item'>
                                 <span>Status</span>
                                 <div>
-                                    <select
-                                        value={data.status}
-                                        required onChange={handleInput}
-                                        name="status" id="status">
-                                        <option default value="TO_DO">To do</option>
+                                    <select value={data.status} required onChange={handleInput} name="status" id="status">
+                                        <option value="TO_DO">To do</option>
                                         <option value="IN_PROGRESS">In Progress</option>
                                         <option value="DONE">Done</option>
                                     </select>
@@ -299,7 +353,7 @@ const TaskDetail = () => {
                                 <span>Priority</span>
                                 <div>
                                     <select value={data.priority} required onChange={handleInput} name="priority" id="priority">
-                                        <option default value="MEDIUM">MEDIUM</option>
+                                        <option value="MEDIUM">MEDIUM</option>
                                         <option value="LOW">LOW</option>
                                         <option value="HIGH">HIGH</option>
                                     </select>
@@ -322,46 +376,60 @@ const TaskDetail = () => {
                         <div className='app-form-item'>
                             <span>Assignees</span>
                             <div>
-                                <select
-                                    name="assignees"
-                                    id="assignees"
-                                    onChange={(e) => addMember(e.target.value)}
-                                >
-                                    <option default value="">Add Assignees</option>
-                                    {workspaceMember.map((item, idx) => {
-                                        return <option key={item._id + idx} value={item._id}>{item.email}</option>
-                                    })}
+                                <select name="assignees" id="assignees" onChange={(e) => addMember(e.target.value)}>
+                                    <option value="">Add Assignees</option>
+                                    {workspaceMember.map((item, idx) => (
+                                        <option key={item._id + idx} value={item._id}>{item.email}</option>
+                                    ))}
                                 </select>
+                            </div>
+                        </div>
+                        <div className='app-form-item'>
+                            <span>Labels</span>
+                            <div>
+                                <input
+                                    type="text"
+                                    id='labels'
+                                    name='labels'
+                                    onChange={handleInput}
+                                    value={data.labels}
+                                    placeholder=" "
+                                />
+                                <label htmlFor='labels'>Comma separated labels</label>
                             </div>
                         </div>
                         <div className="team-member-pill-wrapper">
                             {data?.assignees?.map((memberId) => {
-                                const assignees = workspaceMember.find(u => u._id === memberId);
-                                if (!assignees) return null;
+                                const assignee = workspaceMember.find(u => u._id === memberId)
+                                if (!assignee) return null
 
                                 return (
                                     <div key={memberId} className="team-member-pill">
-                                        <p>{assignees.email}</p>
-                                        <span onClick={() => {
-                                            removeMember(memberId)
-                                        }}>
+                                        <p>{assignee.email}</p>
+                                        <span onClick={() => removeMember(memberId)}>
                                             <IoClose />
                                         </span>
                                     </div>
-                                );
+                                )
                             })}
                         </div>
+                        {(currTask?.labels ?? []).length > 0 && (
+                            <div className="team-member-pill-wrapper">
+                                {currTask.labels.map((label, idx) => (
+                                    <div key={`${label}-${idx}`} className="team-member-pill">
+                                        <p>{label}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'end' }}>
-                            
                             <div className='task-delete-btn'>
-                                <button type='button' className='primary-button danger-button'>Delete Task</button>
+                                <button type='button' onClick={handleArchiveTask} className='primary-button danger-button'>Archive Task</button>
                             </div>
                             <div style={{ display: 'flex' }}>
-                                <button
-                                    className='primary-button'
-                                >
-                                    {loading ? <>Saving... <ButtonLoading />
-                                    </> : "Update Task"}</button>
+                                <button className='primary-button'>
+                                    {loading ? <>Saving... <ButtonLoading /></> : "Update Task"}
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -371,17 +439,15 @@ const TaskDetail = () => {
                 <div className='app-form-container' style={{ gap: 0, padding: "1rem" }}>
                     <div className='task-comment-wrapper'>
                         <div>
-                            <h2>
-                                Comments
-                            </h2>
+                            <h2>Comments</h2>
                         </div>
                         <Comments comments={currTask?.comments} />
                         <div>
-                            {
-                                (currTask?.subTasks?.length ?? 0) === 0 && <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem 1rem 0', color: 'var(--text-light)' }}>
+                            {(currTask?.comments?.length ?? 0) === 0 && (
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem 1rem 0', color: 'var(--text-light)' }}>
                                     No Comments Yet
                                 </div>
-                            }
+                            )}
                             <form onSubmit={handleComment} className='post-comment app-form-item'>
                                 <input
                                     type="text"
@@ -389,7 +455,8 @@ const TaskDetail = () => {
                                     id='comment'
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
-                                    placeholder=' ' />
+                                    placeholder=' '
+                                />
                                 <label htmlFor="comment">Comment..</label>
                                 <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Post</button>
                             </form>
@@ -398,9 +465,41 @@ const TaskDetail = () => {
                 </div>
                 <div className='app-form-container' style={{ padding: '1rem' }}>
                     <div>
-                        <h2>
-                            Sub Tasks
-                        </h2>
+                        <h2>Attachments</h2>
+                    </div>
+                        <div className='task-attachments'>
+                            <div className='task-attachment-upload'>
+                            <input
+                                type="file"
+                                onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
+                            />
+                            <button type='button' className='primary-button' onClick={handleAttachmentUpload} disabled={!attachmentFile || uploadingAttachment}>
+                                {uploadingAttachment ? 'Uploading...' : 'Upload'}
+                            </button>
+                        </div>
+                        <div style={{ color: 'var(--text-light)', fontSize: '12px' }}>
+                            You can upload images, PDFs, docs, spreadsheets, and other common attachments up to 15MB.
+                        </div>
+                        {(currTask?.attachments ?? []).length === 0 && (
+                            <div style={{ color: 'var(--text-light)', fontSize: '14px' }}>No attachments yet</div>
+                        )}
+                        {(currTask?.attachments ?? []).map((item, idx) => (
+                            <a
+                                key={`${item.fileUrl}-${idx}`}
+                                href={getAttachmentUrl(item)}
+                                target={shouldOpenInline(item.fileName) ? "_blank" : undefined}
+                                rel={shouldOpenInline(item.fileName) ? "noreferrer" : undefined}
+                                download={shouldOpenInline(item.fileName) ? undefined : item.fileName}
+                                className='task-attachment-item'
+                            >
+                                {item.fileName || `Attachment ${idx + 1}`}
+                            </a>
+                        ))}
+                    </div>
+                </div>
+                <div className='app-form-container' style={{ padding: '1rem' }}>
+                    <div>
+                        <h2>Sub Tasks</h2>
                     </div>
                     <div className='subtask-container'>
                         <form onSubmit={handleSubtask} className='post-comment app-form-item' style={{ marginTop: '5px', position: "sticky", top: '0', zIndex: 100 }}>
@@ -410,47 +509,35 @@ const TaskDetail = () => {
                                 id='subtask'
                                 value={subtask}
                                 onChange={(e) => setSubtask(e.target.value)}
-                                placeholder=' ' />
+                                placeholder=' '
+                            />
                             <label htmlFor="subtask">Add Sub Task</label>
                             <button className='primary-button' style={{ marginRight: '10px' }} type='submit'>Add</button>
                         </form>
-                        {
-                            (currTask?.subTasks?.length ?? 0) === 0 && <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem', color: 'var(--text-light)' }}>
+                        {(currTask?.subTasks?.length ?? 0) === 0 && (
+                            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 1rem', color: 'var(--text-light)' }}>
                                 No Subtasks Yet
                             </div>
-                        }
-                        {(currTask?.subTasks ?? []).map((task, idx) => {
-                            console.log(task)
-                            return <div className='subtask-item' key={task._id + idx}>
+                        )}
+                        {(currTask?.subTasks ?? []).map((task, idx) => (
+                            <div className='subtask-item' key={task._id + idx}>
                                 <div>{task?.title}</div>
                                 <div className="checkbox-wrapper-18">
                                     <div className="round">
-                                        <input value={task.isCompleted} onChange={() => handleToggleSubtask(task._id)} type="checkbox" id={"checkbox-18" + idx} />
-                                        <label htmlFor={"checkbox-18" + idx}></label>
+                                        <input
+                                            checked={!!task.isCompleted}
+                                            onChange={() => handleToggleSubtask(task._id)}
+                                            type="checkbox"
+                                            id={`checkbox-18${idx}`}
+                                        />
+                                        <label htmlFor={`checkbox-18${idx}`}></label>
                                     </div>
                                 </div>
                             </div>
-                        })}
-
+                        ))}
                     </div>
                 </div>
             </div>
-            {/* {isAlertBox._id &&
-                <AlertDialog
-                    title={`Remove ${isAlertBox.name}`}
-                    subtitle={`Are you sure you want to remove ${isAlertBox.name}`}
-                    close={() => setIsAlertBox("")}
-                    action={() => { removeProjectMember(isAlertBox._id, currProject._id) }}
-                />}
-            {
-                isAlertBoxDel == currProject._id && <AlertDialog
-                    title={"Delete This Project"}
-                    subtitle={`Are you sure you want to delete this project this action can't be undone`}
-                    close={() => setIsAlertBoxDel("")}
-                    action={() => { deleteProject(currProject._id) }}
-                    actionBtnColor="var(--danger-red)"
-                />
-            } */}
         </div>
     )
 }

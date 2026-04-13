@@ -12,6 +12,8 @@ import { workspaceRouter } from "./routes/workspace.route.js";
 import { projectRouter } from "./routes/project.route.js";
 import { taskRouter } from "./routes/task.route.js";
 import notificationRouter from "./routes/notification.route.js";
+import { activityRouter } from "./routes/activity.route.js";
+import { reportRouter } from "./routes/report.route.js";
 
 const app = express();
 app.use(express.json());
@@ -47,6 +49,8 @@ app.use("/api/workspace", workspaceRouter);
 app.use("/api/project", projectRouter);
 app.use("/api/task", taskRouter);
 app.use("/api/notification", notificationRouter);
+app.use("/api/activity", activityRouter);
+app.use("/api/report", reportRouter);
 const PORT = process.env.PORT || 4000;
 
 connectDB()

@@ -122,4 +122,20 @@ export const apiList = {
     method: "PATCH",
     url: "/notification/:notificationId/read",
   },
+  getActivities: {
+    method: "GET",
+    url: "/activity",
+  },
+  getWorkspaceSummary: {
+    method: "GET",
+    url: "/report/summary",
+  },
+  archiveTask: {
+    method: "PATCH",
+    url: "/task/:taskId/archive",
+  },
+  uploadTaskAttachment: {
+    method: "POST",
+    url: "/task/:taskId/attachments",
+  },
 };
