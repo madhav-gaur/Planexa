@@ -9,6 +9,10 @@ export const apiList = {
     url: "/user/sign-in",
     method: "post",
   },
+  signOut: {
+    url: "/user/sign-out",
+    method: "post",
+  },
   forgotPassword: {
     url: "/user/forgot-password",
     method: "post",
@@ -61,6 +65,10 @@ export const apiList = {
     url: "/workspace/get-invite-link",
     method: "post",
   },
+  sendInviteEmail: {
+    url: "/workspace/send-invite-email",
+    method: "post",
+  },
   joinWorkspace: {
     url: "/workspace/join-workspace",
     method: "post",
@@ -84,6 +92,10 @@ export const apiList = {
   updateWorkspaceLogo: {
     url: "/workspace",
     method: "post",
+  },
+  deleteWorkspace: {
+    url: "/workspace",
+    method: "delete",
   },
   createProject: {
     url: "/project/create-project",

@@ -383,11 +383,20 @@ export const leaveWorkspace = async (req, res) => {
       });
     }
     if (workspace.adminId?.toString() === userId.toString()) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Workspace admins cannot leave. Transfer ownership or delete the workspace first.",
+      // Check if there are other admins in the workspace
+      const adminCount = await userModel.countDocuments({
+        "workspaces.workspaceId": workspaceId,
+        "workspaces.role": "ADMIN",
+        "workspaces.isActive": true
       });
+
+      if (adminCount <= 1) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Cannot leave workspace as the only admin. Transfer ownership to another member or delete the workspace first.",
+        });
+      }
     }
 
     await Promise.all([
@@ -463,6 +472,28 @@ export const deleteAccount = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+export const userSignOut = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    await userModel.updateOne({ _id: userId }, { refreshToken: "" });
+
+    res.clearCookie("accessToken", cookieOption);
+    res.clearCookie("refreshToken", cookieOption);
+
+    return res.status(200).json({
+      success: true,
+      message: "User signed out successfully",
+    });
+  } catch (error) {
+    console.error("Signout error:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Internal Server Error",

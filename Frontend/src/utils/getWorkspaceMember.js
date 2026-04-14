@@ -6,8 +6,6 @@ import {
 import Axios from "./axios";
 
 export const getWorkspaceMembers = async ({ currWorkspace, dispatch }) => {
-  // Do not mark "loaded" without a workspace id — otherwise the fetch never runs
-  // after currWorkspace is set (App effect sees isWorkspaceMemberLoaded already true).
   if (!currWorkspace?._id) {
     return;
   }

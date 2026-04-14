@@ -147,7 +147,6 @@ export const createTask = async (req, res) => {
       })
       .select("name email");
 
-    // Notify assignees
     for (const assigneeId of normalizedAssignees) {
       await createNotification({
         userId: assigneeId,
@@ -419,7 +418,6 @@ export const addSubtask = async (req, res) => {
       metadata: { subtaskTitle: title },
     });
 
-    // Notify all assignees about subtask
     if (updatedTask.assignees && updatedTask.assignees.length > 0) {
       for (const assigneeId of updatedTask.assignees) {
         if (assigneeId.toString() !== req.userId) {
@@ -501,7 +499,6 @@ export const addComment = async (req, res) => {
       metadata: { comment: message },
     });
 
-    // Notify all assignees about comment
     if (updatedTask.assignees && updatedTask.assignees.length > 0) {
       for (const assigneeId of updatedTask.assignees) {
         if (assigneeId.toString() !== req.userId) {

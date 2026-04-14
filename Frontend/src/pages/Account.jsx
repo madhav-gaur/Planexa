@@ -350,7 +350,7 @@ const Account = () => {
                                             </div>
                                             <div>
                                                 <p className='account-workspace-name'>{temp?.name || 'Workspace'}</p>
-                                                <span className={`member-tag ${ws.role?.toLowerCase()}`}>{ws.role}</span>
+                                                <span className={`member-tag ${ws.role?.toLowerCase()}`}>{ws.role.toLowerCase()}</span>
                                             </div>
                                         </div>
                                         {ws.role !== 'ADMIN' ? (

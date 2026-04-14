@@ -1,6 +1,6 @@
 import multer from "multer";
 import cloudinary from "./cloudinary.js";
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const storage = (folder) =>
   new CloudinaryStorage({
@@ -21,7 +21,9 @@ const attachmentStorage = new CloudinaryStorage({
 });
 
 export const uploadAvatar = multer({ storage: storage("avatars") });
-export const uploadWorkspaceLogo = multer({ storage: storage("workspace_logos") });
+export const uploadWorkspaceLogo = multer({
+  storage: storage("workspace_logos"),
+});
 export const uploadTaskAttachment = multer({
   storage: multer.memoryStorage(),
   limits: {

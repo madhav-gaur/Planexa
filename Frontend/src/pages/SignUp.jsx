@@ -75,10 +75,10 @@ const SignUp = () => {
         return;
       }
 
-      if (!response2.data.data.workspaces?.length) {
-        navigate("/create-workspace");
-        return;
-      }
+      // if (!response2.data.data.workspaces?.length) {
+      //   navigate("/create-workspace");
+      //   return;
+      // }
       dispatch(setIsUserLoaded(false))
       navigate("/");
 

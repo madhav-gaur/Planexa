@@ -33,6 +33,7 @@ const Settings = () => {
   const [savingDetails, setSavingDetails] = useState(false)
   const [savingLogo, setSavingLogo] = useState(false)
   const [savingRules, setSavingRules] = useState(false)
+  const [deletingWorkspace, setDeletingWorkspace] = useState(false)
 
   const currentUserRole = user?.workspaces?.find(
     (w) => w.workspaceId?.toString() === currWorkspace?._id?.toString(),
@@ -136,6 +137,36 @@ const Settings = () => {
     }
   }
 
+  const handleDeleteWorkspace = async () => {
+    if (!isAdmin || !currWorkspace?._id) return
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${currWorkspace.name}"? This action cannot be undone and will permanently delete all projects, tasks, and remove all members from this workspace.`
+    )
+
+    if (!confirmDelete) return
+
+    setDeletingWorkspace(true)
+    try {
+      const response = await Axios({
+        ...apiList.deleteWorkspace,
+        url: `${apiList.deleteWorkspace.url}/${currWorkspace._id}`,
+      })
+
+      if (response.data.success) {
+        toast.success('Workspace deleted successfully')
+        // Navigate to home or another workspace
+        window.location.href = '/'
+      }
+    } catch (error) {
+      console.error(error)
+      const msg = error.response?.data?.message || 'Could not delete workspace'
+      toast.error(msg)
+    } finally {
+      setDeletingWorkspace(false)
+    }
+  }
+
   if (!currWorkspace?._id) {
     return <Loading />
   }
@@ -164,7 +195,7 @@ const Settings = () => {
         </div>
       )}
 
-      <div className="account-wrapper">
+      <div className="account-wrapper" style={{flexDirection:'column'}}>
         <div className="account-content">
           <div className="settings-grid">
             <div className="account-section settings-card">
@@ -249,7 +280,7 @@ const Settings = () => {
                           border: 'var(--border)',
                           borderRadius: '7px',
                           width: '100%',
-                          minHeight:'8rem',
+                          minHeight: '8rem',
                           maxWidth: 'none',
                           resize: 'vertical',
                         }}
@@ -373,9 +404,39 @@ const Settings = () => {
                 </button>
               </form>
             </div>
-            {/* )} */}
           </div>
         </div>
+        {isAdmin && (
+          <div className="account-section settings-card danger-zone" style={{ width: '100%', maxWidth: 'none' }}>
+            <div className="account-section-head">
+              <h3 style={{ color: '#dc3545' }}>Danger Zone</h3>
+              <p>Irreversible actions for this workspace</p>
+            </div>
+
+            <div className="danger-zone-content">
+              <div className="danger-action">
+                <div>
+                  <h4>Delete Workspace</h4>
+                  <p>Once you delete this workspace, there is no going back. This will permanently delete the workspace, all projects, tasks, and remove all members.</p>
+                </div>
+                <button
+                  type="button"
+                  className="primary-button danger-button"
+                  onClick={handleDeleteWorkspace}
+                  disabled={deletingWorkspace}
+                >
+                  {deletingWorkspace ? (
+                    <>
+                      <ButtonLoading /> Deleting...
+                    </>
+                  ) : (
+                    'Delete Workspace'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
     </>

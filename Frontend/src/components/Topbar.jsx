@@ -2,13 +2,19 @@ import React, { useState, useEffect } from 'react'
 import logo from "../assets/Favicon.png"
 import { useNavigate } from 'react-router-dom'
 import { IoClose, IoMenu, IoSettingsOutline } from "react-icons/io5";
-import { useSelector } from 'react-redux';
-import { IoIosNotificationsOutline } from "react-icons/io";
+import { useSelector, useDispatch } from 'react-redux';
+// import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuMoon, LuSun } from "react-icons/lu";
 import { CiLogout } from 'react-icons/ci';
 import { fetchNotifications } from '../utils/fetchNotifications';
+import { apiList } from '../common/apiList';
+import Axios from '../utils/axios';
+import { toast } from 'react-toastify';
+import { setUserDetails, setIsUserLoaded } from '../store/user.slice';
+import { IoMdNotificationsOutline } from "react-icons/io";
 const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const user = useSelector(state => state.user.userDetails)
     const userName = user?.name?.split("")[0].toUpperCase()
     const [isUserCard, setIsUserCard] = useState(false)
@@ -17,6 +23,22 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
     const [notifications, setNotifications] = useState([])
     const [loading, setLoading] = useState(true)
     const unreadCount = notifications.filter(item => !item.isRead).length
+
+    const handleSignOut = async () => {
+        try {
+            await Axios({
+                ...apiList.signOut,
+            })
+            dispatch(setUserDetails(null))
+            dispatch(setIsUserLoaded(false))
+            localStorage.clear()
+            navigate('/sign-in')
+            toast.success('Signed out successfully')
+        } catch (error) {
+            console.error('Signout error:', error)
+            toast.error('Failed to sign out')
+        }
+    }
 
     useEffect(() => {
         if (!user) return
@@ -37,8 +59,8 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
                 </div>
                 <div className='topbar-right'>
                     <div className='topbar-right-item' onClick={() => setIsNotifyCard(prev => !prev)}>
-                        <div style={{ position: 'relative' }} >
-                            <IoIosNotificationsOutline />
+                        <div style={{ position: 'relative', marginTop:'2px' }} >
+                            <IoMdNotificationsOutline />
                             {unreadCount > 0 && (
                                 <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
                             )}
@@ -74,7 +96,10 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
                                     <IoSettingsOutline />
                                     <span>Manage Account</span>
                                 </div>
-                                <div style={{ color: 'var(--danger-red)', fontWeight: 600 }}>
+                                <div style={{ color: 'var(--danger-red)', fontWeight: 600 }} onClick={() => {
+                                    setIsUserCard(false)
+                                    handleSignOut()
+                                }}>
                                     <CiLogout />
                                     <span >Sign Out</span>
                                 </div>

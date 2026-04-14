@@ -9,6 +9,7 @@ import {
   updateAvatar,
   updateProfile,
   userSignIn,
+  userSignOut,
   userSignUp,
 } from "../controller/user.controller.js";
 import { upload } from "../config/multer.js";
@@ -18,6 +19,7 @@ export const userRouter = Router();
 
 userRouter.post("/sign-up", upload.none(), userSignUp);
 userRouter.post("/sign-in", upload.none(), userSignIn);
+userRouter.post("/sign-out", auth, userSignOut);
 userRouter.post("/forgot-password", upload.none(), forgotPassword);
 userRouter.post("/reset-password", upload.none(), resetPassword);
 userRouter.get("/get-user", auth, getUser);

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiList } from "../common/apiList";
+import { useNavigate } from "react-router-dom";
 
 const resolvedBaseURL =
   import.meta.env.VITE_API_URL?.replace(/\/$/, "") ||
@@ -31,13 +32,24 @@ Axios.interceptors.response.use(
         });
         return Axios(originalRequest);
       } catch (err) {
-        // logout
-        console.log(err)
+        console.log(err);
+        const navigate = useNavigate();
+        const status = error.response?.status;
+
+        if (status === 403) {
+          navigate("/forbidden");
+        } else if (status === 429) {
+          navigate("/too-many-requests");
+        } else if (status === 500) {
+          navigate("/error");
+        } else if (status === 503) {
+          navigate("/maintenance");
+        }
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default Axios;

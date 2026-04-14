@@ -42,12 +42,15 @@ const CreateWorkspaceModal = ({ close }) => {
             })
             if (response.data.success) {
                 toast.success("Workspace Created !!")
-                navigate("/")
                 setLoading(false)
                 dispatch(setIsWorkspaceLoaded(false))
+
                 if (location.pathname != "/create-workspace") {
                     close()
                 }
+                setTimeout(() => {
+                    navigate("/")
+                }, 100)
             }
             console.log(response)
         } catch (error) {

@@ -7,6 +7,7 @@ import { generateInviteLink } from "../utils/generateInviteLink.js";
 import { verifyInviteHash } from "../utils/verifyInviteLink.js";
 import { logActivity } from "../utils/logActivity.js";
 import { createNotification } from "../utils/createNotification.js";
+import { sendWorkspaceInviteEmail } from "../utils/sendWorkspaceInviteEmail.js";
 
 const WORKSPACE_ROLES = ["ADMIN", "CONTRIBUTOR", "VIEWER"];
 
@@ -153,6 +154,83 @@ export const getInviteLink = async (req, res) => {
 };
 // ?invite member
 
+export const sendInviteEmail = async (req, res) => {
+  try {
+    const { workspaceId, email, role } = req.body;
+    const userId = req.userId;
+
+    const workspace = await workspaceModel.findById(workspaceId).select(
+      "name settings members",
+    );
+
+    if (!workspace) {
+      return res.status(404).json({
+        success: false,
+        message: "Workspace not found",
+      });
+    }
+
+    if (!workspace.settings.allowGuestAccess) {
+      return res.status(400).json({
+        success: false,
+        message: "Guest access is disabled for this workspace",
+      });
+    }
+
+    if (workspace.members.length >= workspace.settings.maxMembers) {
+      return res.status(400).json({
+        success: false,
+        message: `Workspace member limit reached (${workspace.settings.maxMembers})`,
+      });
+    }
+
+    const existingMember = await userModel.findOne({
+      email: email,
+      "workspaces.workspaceId": workspaceId,
+    });
+
+    if (existingMember) {
+      return res.status(400).json({
+        success: false,
+        message: "User is already a member of this workspace",
+      });
+    }
+
+    const token = generateInviteLink(workspaceId, role);
+    const inviteLink = `http://${process.env.FRONTEND_URL}/invite/${token}`;
+
+    const inviter = await userModel.findById(userId).select("name");
+
+    await sendWorkspaceInviteEmail({
+      email,
+      workspaceName: workspace.name,
+      inviterName: inviter?.name || "A team member",
+      inviteLink,
+      role: role,
+    });
+
+    await logActivity({
+      actorId: req.userId,
+      action: "WORKSPACE_INVITE_SENT",
+      entityType: "WORKSPACE",
+      entityId: workspaceId,
+      workspaceId,
+      metadata: { targetEmail: email, role },
+    });
+
+    return res.json({
+      success: true,
+      message: "Invitation sent successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
 export const joinWorkspace = async (req, res) => {
   try {
     const userId = req.userId;
@@ -298,7 +376,6 @@ export const removeWorkspaceMember = async (req, res) => {
       metadata: { targetUserId: memberId },
     });
 
-    // Notify removed member
     const removedMember = await userModel.findById(memberId);
     if (removedMember && workspace) {
       await createNotification({
@@ -350,7 +427,6 @@ export const updateMemberRole = async (req, res) => {
       { $set: { "workspaces.$.role": roleToSet } },
     );
 
-    // Notify member about role change
     const memberUser = await userModel.findById(memberId);
     const workspaceInfo = await workspaceModel.findById(workspaceId);
     if (memberUser && workspaceInfo) {
@@ -597,7 +673,70 @@ export const updateWorkspaceSettings = async (req, res) => {
     });
   }
 };
-//
+
+export const deleteWorkspace = async (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    const userId = req.userId;
+
+    const workspace = await workspaceModel.findById(workspaceId);
+    if (!workspace) {
+      return res.status(404).json({
+        success: false,
+        message: "Workspace not found",
+      });
+    }
+
+    // Check if user is the admin
+    if (workspace.adminId.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Only workspace admin can delete the workspace",
+      });
+    }
+
+    // Delete all related data
+    // Delete projects and their tasks
+    const projects = await projectModel.find({ workspaceId });
+    for (const project of projects) {
+      await taskModel.deleteMany({ projectId: project._id });
+    }
+    await projectModel.deleteMany({ workspaceId });
+
+    // Delete all tasks in workspace
+    await taskModel.deleteMany({ workspaceId });
+
+    // Remove workspace from all members' workspaces array
+    await userModel.updateMany(
+      { "workspaces.workspaceId": workspaceId },
+      { $pull: { workspaces: { workspaceId: new mongoose.Types.ObjectId(workspaceId) } } }
+    );
+
+    // Delete the workspace
+    await workspaceModel.findByIdAndDelete(workspaceId);
+
+    await logActivity({
+      actorId: req.userId,
+      action: "WORKSPACE_DELETED",
+      entityType: "WORKSPACE",
+      entityId: workspaceId,
+      workspaceId: null, // No workspace context since it's deleted
+      metadata: { workspaceName: workspace.name },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Workspace deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
 // export const template = async (req, res) => {
 //   try {
 //     return res.status(200).json({

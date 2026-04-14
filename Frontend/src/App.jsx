@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { setIsUserLoaded, setIsUserLoading, setUserDetails } from "./store/user.slice";
 
 import HomeLander from "./pages/HomeLander";
@@ -21,7 +21,7 @@ import { apiList } from "./common/apiList";
 import { setCurrWorkspace, setIsWorkspaceLoaded, setIsWorkspaceLoading, setWorkspaces } from "./store/workspace.slice";
 import InvitePage from "./pages/InvitePage";
 import LoginProtect from "./pages/LoginProtect";
-import { ToastContainer, Zoom } from "react-toastify";
+import { toast, ToastContainer, Zoom } from "react-toastify";
 import { setIsProjectLoaded, setIsProjectLoading, setProjects } from "./store/project.slice";
 import ProjectDetail from "./pages/ProjectDetail";
 import TaskDetail from "./pages/TaskDetail";
@@ -29,6 +29,12 @@ import ProjectSettings from "./pages/ProjectSettings";
 import { setIsTaskLoading, setIsTaskLoaded, setTasks } from "./store/task.slice";
 import { getWorkspaceMembers } from "./utils/getWorkspaceMember";
 import Account from "./pages/Account";
+import NotFound from "./pages/NotFound";
+import Forbidden from "./pages/Forbidden";
+import InternalServerError from "./pages/InternalServerError";
+import TooManyRequests from "./pages/TooManyRequests";
+import Offline from "./pages/Offline";
+import ServiceUnavailable from "./pages/ServiceUnavailable";
 
 const CURR_WORKSPACE_STORAGE_KEY = "currWorkspaceId";
 
@@ -41,8 +47,24 @@ const App = () => {
   const { isProjectLoaded } = useSelector((state) => state.project);
   const { isTaskLoaded } = useSelector((state) => state.task);
   // const [isAuthChecked, se]
+  const navigate = useNavigate()
+  useEffect(() => {
+    const handleOnline = () => {
+      toast.success('Connection restored');
+    };
 
+    const handleOffline = () => {
+      navigate('/offline');
+    };
 
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -249,7 +271,14 @@ const App = () => {
         <Route path="/account" element={<DashboardLayout />}>
           <Route index element={<LoginProtect> <Account /> </LoginProtect>} />
         </Route>
-
+        <Route path="/forbidden" element={<Forbidden />} />
+        <Route path="/error" element={<InternalServerError />} />
+        <Route path="/too-many-requests" element={<TooManyRequests />} />
+        <Route path="/offline" element={<Offline />} />
+        <Route path="/maintenance" element={<ServiceUnavailable />} />
+        <Route path="*" element={<NotFound />} />
+        {/* 404 - Catch all unknown routes */}
+        <Route path="*" element={<NotFound />} />
       </Routes >
 
     </>

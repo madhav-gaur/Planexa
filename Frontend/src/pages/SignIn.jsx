@@ -61,10 +61,10 @@ const SignIn = () => {
         navigate(`/invite/${tempToken}`);
         return;
       }
-      if (response.data.data.workspaces.length == 0) {
-        navigate("/create-workspace")
-        return;
-      }
+      // if (response.data.data.workspaces.length == 0) {
+      //   navigate("/create-workspace")
+      //   return;
+      // }
       setLoading("Sign in successful");
       navigate("/");
     } catch (error) {
