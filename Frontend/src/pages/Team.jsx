@@ -11,7 +11,7 @@ import Axios from '../utils/axios'
 import { apiList } from '../common/apiList'
 import { toast } from 'react-toastify'
 import { setIsWorkspaceMemberLoaded } from '../store/workspace.slice'
-import { getWorkspaceMembers } from '../utils/getWorkspaceMember'
+import { useWorkspaceMember } from '../hooks/useWorkspaceMember'
 
 const Team = () => {
     const [isInviteModal, setIsInviteModal] = useState(false)
@@ -27,6 +27,8 @@ const Team = () => {
     const [view, setView] = useState('LIST')
     const [query, setQuery] = useState("")
     const dispatch = useDispatch()
+
+    useWorkspaceMember({ dispatch, currWorkspace })
 
     const filteredMembers = workspaceMember?.filter((member) => {
         const matchesSearch =
@@ -88,7 +90,6 @@ const Team = () => {
             console.log(response)
             if (response.data.success) {
                 toast.success("Role Updated")
-                getWorkspaceMembers({ dispatch, currWorkspace })
                 dispatch(setIsWorkspaceMemberLoaded(false))
                 setIsUpdateRole('')
                 setMemberMenu(null)

@@ -9,11 +9,11 @@ import { setIsTaskLoaded } from '../store/task.slice'
 import { IoArrowBack, IoClose } from 'react-icons/io5'
 import Comments from '../components/Comments'
 import ButtonLoading from '../components/ButtonLoading'
-import { getTasks } from '../utils/getTasks'
 import Loading from '../components/Loading'
 import { setIsProjectLoaded } from '../store/project.slice'
 import { FaRegFolderOpen } from 'react-icons/fa'
 import { MdOutlineEventAvailable } from 'react-icons/md'
+import { useTasks } from '../hooks/useTasks'
 
 const emptyForm = () => ({
     title: '',
@@ -74,6 +74,8 @@ const TaskDetail = () => {
         return `${temp[0]}-${temp[1]}-${temp[2].split('T')[0]}`
     }
 
+    useTasks({ currProject, dispatch })
+
     useEffect(() => {
         if (!currTask) return
         setData({
@@ -87,12 +89,6 @@ const TaskDetail = () => {
             labels: (currTask.labels ?? []).join(', '),
         })
     }, [currTask])
-
-    useEffect(() => {
-        if (currProject?._id && !isTaskLoaded) {
-            getTasks({ currProject, dispatch })
-        }
-    }, [currProject, dispatch, isTaskLoaded])
 
     const handleInput = (e) => {
         const { name, value } = e.target
@@ -291,7 +287,7 @@ const TaskDetail = () => {
     }
 
     return (
-        <div style={{display:'flex', alignItems:'center', flexDirection:'column'}}>
+        <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
             <div className='project-setting-wrapper'>
                 <div className='project-setting-container'>
                     <div className='app-form-container' onClick={(e) => e.stopPropagation()}>
@@ -444,7 +440,7 @@ const TaskDetail = () => {
                     </div>
                 </div>
                 <div className='project-secondary-settings'>
-                    <div className='app-form-container' style={{ padding: '1rem', maxHeight:'24rem' }}>
+                    <div className='app-form-container' style={{ padding: '1rem', maxHeight: '24rem' }}>
                         <div>
                             <h2>Attachments</h2>
                         </div>
@@ -536,7 +532,7 @@ const TaskDetail = () => {
                 </div>
 
             </div>
-            <div className='app-form-container' style={{ gap: 0, padding: "1rem", maxWidth:'1005px' }}>
+            <div className='app-form-container' style={{ gap: 0, padding: "1rem", maxWidth: '1005px' }}>
                 <div className='task-comment-wrapper'>
                     <div>
                         <h2>Comments</h2>

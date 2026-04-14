@@ -18,9 +18,9 @@ import { FaBug, FaRegFolderOpen } from "react-icons/fa";
 import Axios from '../utils/axios';
 import { LuGitCommitHorizontal } from "react-icons/lu";
 import { setIsProjectLoaded } from '../store/project.slice';
-import { getTasks } from '../utils/getTasks';
 import { apiList } from '../common/apiList';
 import { toast } from 'react-toastify';
+import { useTasks } from '../hooks/useTasks';
 const ProjectDetail = () => {
     const params = useParams()
     const [isCreateModal, setIsCreateModal] = useState(false)
@@ -60,17 +60,12 @@ const ProjectDetail = () => {
             setType("ALL")
         }
     }
+    useTasks({ currProject, dispatch })
+
     useEffect(() => {
         dispatch(setIsProjectLoaded(false))
         dispatch(setIsTaskLoaded(false))
     }, [dispatch])
-    useEffect(() => {
-        if (currProject?._id || !isTaskLoaded) {
-            if (!isTaskLoaded) {
-                getTasks({currProject, dispatch})
-            }
-        }
-    }, [isTaskLoaded, dispatch, currProject])
     const [completedCount, setCompletedCount] = useState(0);
     const [inProgressCount, setInProgressCount] = useState(0);
     useEffect(() => {

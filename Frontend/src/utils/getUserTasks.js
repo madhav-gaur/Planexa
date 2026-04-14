@@ -1,7 +1,7 @@
 import { apiList } from "../common/apiList";
 import Axios from "./axios";
 
-export const    getUserTasks = async ({ workspaceId, userId }) => {
+export const getUserTasks = async ({ workspaceId, userId }) => {
   try {
     const response = await Axios({
       ...apiList.getAllWorkspaceTasks,

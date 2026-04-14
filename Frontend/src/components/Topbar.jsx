@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import logo from "../assets/Favicon.png"
 import { useNavigate } from 'react-router-dom'
 import { IoClose, IoMenu, IoSettingsOutline } from "react-icons/io5";
@@ -6,12 +6,13 @@ import { useSelector, useDispatch } from 'react-redux';
 // import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuMoon, LuSun } from "react-icons/lu";
 import { CiLogout } from 'react-icons/ci';
-import { fetchNotifications } from '../utils/fetchNotifications';
 import { apiList } from '../common/apiList';
 import Axios from '../utils/axios';
 import { toast } from 'react-toastify';
 import { setUserDetails, setIsUserLoaded } from '../store/user.slice';
-import { IoMdNotificationsOutline } from "react-icons/io";
+import { IoMdNotificationsOutline } from "react-icons/io"
+import { useNotification } from "../hooks/useNotification";
+;
 const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -23,6 +24,9 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
     const [notifications, setNotifications] = useState([])
     const [loading, setLoading] = useState(true)
     const unreadCount = notifications.filter(item => !item.isRead).length
+
+      useNotification({ pageNum: 1, setLoading, setHasMore: () => { }, setNotifications })
+    
 
     const handleSignOut = async () => {
         try {
@@ -39,11 +43,6 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
             toast.error('Failed to sign out')
         }
     }
-
-    useEffect(() => {
-        if (!user) return
-        fetchNotifications({ pageNum: 1, setLoading, setHasMore: () => { }, setNotifications })
-    }, [user])
 
     return (
         <div className='topbar-wrapper'>

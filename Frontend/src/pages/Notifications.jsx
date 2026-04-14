@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Axios from '../utils/axios'
 import { apiList } from '../common/apiList'
 import { toast } from 'react-toastify'
 import Loading from '../components/Loading'
 import { formatDistanceToNow } from 'date-fns'
 import './styles/Notifications.css'
-import { fetchNotifications } from '../utils/fetchNotifications'
+import { useNotification } from '../hooks/useNotification'
 
 const Notifications = () => {
     const [notifications, setNotifications] = useState([])
@@ -13,9 +13,7 @@ const Notifications = () => {
     const [page, setPage] = useState(1)
     const [hasMore, setHasMore] = useState(true)
 
-    useEffect(() => {
-        fetchNotifications({ pageNum: 1, setLoading, setHasMore, setNotifications })
-    }, [])
+    useNotification({ pageNum: page, setLoading, setHasMore, setNotifications })
 
     const markAsRead = async (notificationId) => {
         try {
@@ -56,7 +54,6 @@ const Notifications = () => {
     const loadMore = () => {
         const nextPage = page + 1
         setPage(nextPage)
-        fetchNotifications({ pageNum: nextPage, setLoading, setHasMore, setNotifications })
     }
 
     if (loading) return <Loading />

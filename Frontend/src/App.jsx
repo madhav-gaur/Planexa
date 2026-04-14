@@ -1,212 +1,32 @@
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { setIsUserLoaded, setIsUserLoading, setUserDetails } from "./store/user.slice";
+import { ToastContainer, Zoom } from "react-toastify";
 
-import HomeLander from "./pages/HomeLander";
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
-import ResetPassword from "./pages/ResetPassword";
-import CreateWorkspace from "./pages/CreateWorkspace";
-import Loading from "./components/Loading";
-import DashboardContent from "./pages/DashboardContent";
-import DashboardLayout from "../Layout/DashboardLayout";
-import Projects from "./pages/Projects";
-import Team from "./pages/Team";
-import Settings from "./pages/Settings";
-import Notifications from "./pages/Notifications";
-import Activity from "./pages/Activity";
-import Axios from "./utils/axios";
-import { apiList } from "./common/apiList";
-import { setCurrWorkspace, setIsWorkspaceLoaded, setIsWorkspaceLoading, setWorkspaces } from "./store/workspace.slice";
-import InvitePage from "./pages/InvitePage";
-import LoginProtect from "./pages/LoginProtect";
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import { setIsProjectLoaded, setIsProjectLoading, setProjects } from "./store/project.slice";
-import ProjectDetail from "./pages/ProjectDetail";
-import TaskDetail from "./pages/TaskDetail";
-import ProjectSettings from "./pages/ProjectSettings";
-import { setIsTaskLoading, setIsTaskLoaded, setTasks } from "./store/task.slice";
-import { getWorkspaceMembers } from "./utils/getWorkspaceMember";
-import Account from "./pages/Account";
-import NotFound from "./pages/NotFound";
-import Forbidden from "./pages/Forbidden";
-import InternalServerError from "./pages/InternalServerError";
-import TooManyRequests from "./pages/TooManyRequests";
-import Offline from "./pages/Offline";
-import ServiceUnavailable from "./pages/ServiceUnavailable";
 
-const CURR_WORKSPACE_STORAGE_KEY = "currWorkspaceId";
+// ? Hooks
+
+import { useUser } from "./hooks/useUser";
+import { useAllWorkspaceTasks } from "./hooks/useAllWorkspaceTasks";
+import { useProject } from "./hooks/useProject";
+import { useWorkspace } from "./hooks/useWorkspace";
+import { useNetworkStatus } from "./hooks/useNetworkStatus";
+import { useWorkspaceMember } from "./hooks/useWorkspaceMember";
+import AppRoutes from "./Routes/AppRoutes";
+
 
 const App = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.userDetails);
   const { currWorkspace } = useSelector(state => state.workspace)
-  const { isUserLoaded, } = useSelector((state) => state.user);
-  const { isWorkspaceLoaded, isWorkspaceMemberLoaded } = useSelector((state) => state.workspace);
-  const { isProjectLoaded } = useSelector((state) => state.project);
-  const { isTaskLoaded } = useSelector((state) => state.task);
-  // const [isAuthChecked, se]
-  const navigate = useNavigate()
-  useEffect(() => {
-    const handleOnline = () => {
-      toast.success('Connection restored');
-    };
-
-    const handleOffline = () => {
-      navigate('/offline');
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        dispatch(setIsUserLoading(true))
-        const response = await Axios({
-          ...apiList.getUser,
-        })
-        if (response) {
-          dispatch(setIsUserLoading(false))
-        }
-        if (response.data.success) {
-          let data = response.data.data
-          dispatch(setUserDetails(data))
-          dispatch(setIsWorkspaceLoaded(true))
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        dispatch(setIsUserLoaded(true))
-        dispatch(setIsUserLoading(false))
-      }
-    }
-    if (!isUserLoaded) {
-      fetchUser()
-    }
-  }, [isUserLoaded, dispatch])
-
-  useEffect(() => {
-    const getWorkspaces = async () => {
-      try {
-        dispatch(setIsWorkspaceLoading(true))
-        const response = await Axios({
-          ...apiList.getWorkspaces,
-        })
-        if (response) {
-          dispatch(setIsWorkspaceLoading(false))
-        }
-        if (response.data.success) {
-          let data = response.data.data
-          dispatch(setWorkspaces(data))
-          const savedWorkspaceId = localStorage.getItem(CURR_WORKSPACE_STORAGE_KEY)
-          const selectedWorkspace =
-            data.find((item) => item._id === savedWorkspaceId) || data[0] || {}
-          dispatch(setCurrWorkspace(selectedWorkspace))
-          dispatch(setIsWorkspaceLoaded(true))
-          if (isWorkspaceLoaded) {
-            dispatch(setIsWorkspaceLoading(false))
-          }
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        dispatch(setIsWorkspaceLoaded(true))
-        dispatch(setIsWorkspaceLoading(false))
-      }
-    }
-    if (!isWorkspaceLoaded) {
-      getWorkspaces()
-    }
-  }, [isWorkspaceLoaded, dispatch])
-
-  useEffect(() => {
-    if (currWorkspace?._id) {
-      localStorage.setItem(CURR_WORKSPACE_STORAGE_KEY, currWorkspace._id)
-    }
-  }, [currWorkspace?._id])
 
 
-  useEffect(() => {
-    if (!currWorkspace?._id) return;
-    if (!isWorkspaceMemberLoaded) {
-      getWorkspaceMembers({ dispatch, currWorkspace });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currWorkspace?._id, dispatch, isWorkspaceMemberLoaded])
-
-  useEffect(() => {
-    if (!currWorkspace._id) return
-    const getProjects = async () => {
-      try {
-        dispatch(setIsProjectLoading(true))
-        const response = await Axios({
-          ...apiList.getProjects,
-          data: {
-            workspaceId: currWorkspace?._id
-          }
-        })
-        console.log(response)
-        if (response.data.success) {
-          dispatch(setProjects(response.data.data))
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        dispatch(setIsProjectLoading(false))
-        dispatch(setIsProjectLoaded(true))
-      }
-    }
-    if (!isProjectLoaded) {
-      getProjects()
-    }
+  useUser();
+  useWorkspace();
+  useProject();
+  useAllWorkspaceTasks()
+  useNetworkStatus();
+  useWorkspaceMember({ currWorkspace, dispatch })
+  
 
 
-  }, [currWorkspace?._id, dispatch, isProjectLoaded])
-
-  useEffect(() => {
-    if (!currWorkspace._id) return
-    const getAllWorkspaceTasks = async () => {
-      try {
-        dispatch(setIsTaskLoading(true))
-        const response = await Axios({
-          ...apiList.getAllWorkspaceTasks,
-          data: {
-            workspaceId: currWorkspace?._id
-          }
-        })
-        console.log(response)
-        if (response.data.success) {
-          dispatch(setTasks(response.data.data))
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        dispatch(setIsTaskLoading(false))
-        dispatch(setIsTaskLoaded(true))
-      }
-    }
-    if (!isTaskLoaded) {
-      getAllWorkspaceTasks()
-    }
-
-
-  }, [currWorkspace?._id, dispatch, isTaskLoaded])
-
-
-
-
-  const AuthProtect = ({ children }) => {
-    const user = useSelector((state) => state.user.userDetails);
-    if (!user || !user._id) return <Navigate to="/sign-in" />;
-    return children;
-  };
 
   return (
     <>
@@ -222,65 +42,7 @@ const App = () => {
         pauseOnHover
         theme={localStorage.getItem('theme') == 'light' ? 'dark' : 'light'}
         transition={Zoom} />
-
-      <Routes>
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/create-workspace" element={
-          <AuthProtect>
-            <CreateWorkspace />
-          </AuthProtect>
-        } />
-
-        <Route path="/invite/:inviteToken" element={<InvitePage />} />
-
-
-        <Route path="/" element={user?._id ? <LoginProtect>
-          <DashboardLayout />
-        </LoginProtect> : <HomeLander />} >
-
-          <Route index element={<DashboardContent />} />
-        </Route>
-        <Route path="/projects" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <Projects /> </LoginProtect>} />
-        </Route>
-        <Route path="/projects/:projectId" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <ProjectDetail />  </LoginProtect>} />
-        </Route>
-        <Route path="/projects/:projectId/settings" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <ProjectSettings /> </LoginProtect>} />
-        </Route>
-        <Route path="/projects/:projectId/tasks/:taskId" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <TaskDetail /> </LoginProtect>} />
-        </Route>
-
-        <Route path="/team" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <Team /> </LoginProtect>} />
-        </Route>
-
-        <Route path="/settings" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <Settings /> </LoginProtect>} />
-        </Route>
-        <Route path="/notifications" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <Notifications /> </LoginProtect>} />
-        </Route>
-        <Route path="/activity" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <Activity /> </LoginProtect>} />
-        </Route>
-        <Route path="/account" element={<DashboardLayout />}>
-          <Route index element={<LoginProtect> <Account /> </LoginProtect>} />
-        </Route>
-        <Route path="/forbidden" element={<Forbidden />} />
-        <Route path="/error" element={<InternalServerError />} />
-        <Route path="/too-many-requests" element={<TooManyRequests />} />
-        <Route path="/offline" element={<Offline />} />
-        <Route path="/maintenance" element={<ServiceUnavailable />} />
-        <Route path="*" element={<NotFound />} />
-        {/* 404 - Catch all unknown routes */}
-        <Route path="*" element={<NotFound />} />
-      </Routes >
-
+      <AppRoutes />
     </>
   );
 
