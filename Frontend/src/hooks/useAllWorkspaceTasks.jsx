@@ -20,7 +20,6 @@ export const useAllWorkspaceTasks = () => {
                         workspaceId: currWorkspace?._id
                     }
                 })
-                console.log(response)
                 if (response.data.success) {
                     dispatch(setTasks(response.data.data))
                 }

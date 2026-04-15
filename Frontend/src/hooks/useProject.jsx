@@ -12,7 +12,7 @@ export const useProject = () => {
     const { currWorkspace } = useSelector(state => state.workspace)
 
     useEffect(() => {
-        if (!currWorkspace._id) return
+    if (!currWorkspace._id) return
         const getProjects = async () => {
             try {
                 dispatch(setIsProjectLoading(true))
@@ -22,7 +22,6 @@ export const useProject = () => {
                         workspaceId: currWorkspace?._id
                     }
                 })
-                console.log(response)
                 if (response.data.success) {
                     dispatch(setProjects(response.data.data))
                 }

@@ -94,13 +94,13 @@ const CreateProjectModal = ({ close }) => {
                     members: data.members,
                 }
             })
-            console.log(response)
+
             if (response.data.success) {
                 close()
                 toast.success("Project Created !!")
                 dispatch(setIsProjectLoaded(false))
             }
-            console.log(response)
+
         } catch (error) {
             console.error(error)
         } finally {

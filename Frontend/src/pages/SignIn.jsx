@@ -50,7 +50,7 @@ const SignIn = () => {
           password: data.password,
         },
       });
-      console.log(response)
+
       dispatch(setIsUserLoaded(false))
       if (!response.data.success) {
         setError(response.data.message);
@@ -69,7 +69,7 @@ const SignIn = () => {
       navigate("/");
     } catch (error) {
       console.error(error);
-    }finally{
+    } finally {
       setLoading('Sign in')
     }
   };

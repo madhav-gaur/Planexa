@@ -57,7 +57,6 @@ const ProjectSettings = () => {
     )?.role;
 
 
-    console.log(currProject)
 
     const [data, setData] = useState(null)
     useEffect(() => {
@@ -118,13 +117,11 @@ const ProjectSettings = () => {
                     labels: labelDB
                 }
             })
-            console.log(response)
             if (response.data.success) {
                 close()
                 toast.success("Details Updates")
                 dispatch(setIsProjectLoaded(false))
             }
-            console.log(response)
         } catch (error) {
             console.error(error)
         } finally {
@@ -139,14 +136,12 @@ const ProjectSettings = () => {
                     memberId, projectId
                 }
             })
-            console.log(response)
             if (response.data.success) {
                 close()
                 toast.success("Member Removed")
                 dispatch(setIsProjectLoaded(false))
                 setIsAlertBox("");
             }
-            console.log(response)
         } catch (error) {
             console.error(error)
         } finally {
@@ -161,7 +156,6 @@ const ProjectSettings = () => {
                     projectId
                 }
             })
-            console.log(response)
             if (response.data.success) {
                 close()
                 toast.success("Project Deleted")
@@ -169,7 +163,6 @@ const ProjectSettings = () => {
                 setIsAlertBox("");
                 navigate("/projects")
             }
-            console.log(response)
         } catch (error) {
             console.error(error)
         } finally {

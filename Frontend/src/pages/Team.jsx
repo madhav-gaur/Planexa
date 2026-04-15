@@ -64,14 +64,14 @@ const Team = () => {
                     memberId, workspaceId: currWorkspace._id
                 }
             })
-            console.log(response)
+
             if (response.data.success) {
                 toast.success("Member Removed")
                 dispatch(setIsWorkspaceMemberLoaded(false))
                 setIsDeleteMember(null);
                 setMemberMenu(null)
             }
-            console.log(response)
+
         } catch (error) {
             console.error(error)
         }
@@ -87,7 +87,7 @@ const Team = () => {
                     workspaceId: currWorkspace._id
                 }
             })
-            console.log(response)
+
             if (response.data.success) {
                 toast.success("Role Updated")
                 dispatch(setIsWorkspaceMemberLoaded(false))
@@ -95,7 +95,7 @@ const Team = () => {
                 setMemberMenu(null)
                 setSelectedRole('')
             }
-            console.log(response)
+
         } catch (error) {
             console.error(error)
         }

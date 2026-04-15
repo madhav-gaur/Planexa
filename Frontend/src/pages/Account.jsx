@@ -121,7 +121,7 @@ const Account = () => {
                     confirmPassword,
                 },
             });
-            console.log(response);
+            ;
 
             if (response.data.success) {
                 toast.success(response.data.message);

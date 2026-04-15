@@ -72,14 +72,14 @@ const CreateTaskModal = ({ close, currProject }) => {
                     labels: data.labels.split(',').map(item => item.trim()).filter(Boolean),
                 }
             })
-            console.log(response)
+
             if (response.data.success) {
                 close()
                 toast.success("Task Created !!")
                 dispatch(setIsProjectLoaded(false))
                 dispatch(setIsTaskLoaded(false))
             }
-            console.log(response)
+
         } catch (error) {
             console.error(error)
         } finally {

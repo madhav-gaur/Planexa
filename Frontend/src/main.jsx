@@ -7,9 +7,11 @@ import './App.css'
 import App from './App.jsx'
 import { store } from './store/store.js'
 import { Provider } from 'react-redux';
+import OfflineRouteGuard from './components/OfflineRouteGuard.jsx';
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
+    <OfflineRouteGuard />
     <Provider store={store}>
       <App />
     </Provider>

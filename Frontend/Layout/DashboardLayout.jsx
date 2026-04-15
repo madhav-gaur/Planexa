@@ -5,6 +5,7 @@ import './DashboardLayout.css'
 import { useSelector } from "react-redux";
 import Loading from "../src/components/Loading";
 import { useEffect, useState } from "react";
+import OfflineBar from "../src/components/OfflineBar";
 const DashboardLayout = () => {
     const { isWorkspaceLoading, } = useSelector(state => state.workspace)
     const [isSidebar, setIsSidebar] = useState(false);
@@ -31,7 +32,7 @@ const DashboardLayout = () => {
     }, [darkMode]);
 
     return (
-        <div className={`dashboard-wrapper ${darkMode? "dark": ""}`}>
+        <div className={`dashboard-wrapper ${darkMode ? "dark" : ""}`}>
             <Sidebar
                 isSidebar={isSidebar}
                 setIsSidebar={setIsSidebar}
@@ -43,7 +44,6 @@ const DashboardLayout = () => {
 
             <div className="dashboard-main">
                 <Topbar setIsSidebar={setIsSidebar} isSidebar={isSidebar} darkMode={darkMode} setDarkMode={setDarkMode} />
-
                 <div className="dashboard-content-wrapper"
                     onClick={() => setIsSidebar(false)}
                     style={{ backdropFilter: `${isSidebar ? "blur(4px)" : ""}` }}>
@@ -55,6 +55,7 @@ const DashboardLayout = () => {
                         onClick={() => setIsSidebar(false)}
                     />
                 )}
+                <OfflineBar />
             </div>
         </div>
     );

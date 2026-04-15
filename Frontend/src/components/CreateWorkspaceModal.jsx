@@ -52,7 +52,7 @@ const CreateWorkspaceModal = ({ close }) => {
                     navigate("/")
                 }, 100)
             }
-            console.log(response)
+
         } catch (error) {
             console.error(error)
         }
