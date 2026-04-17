@@ -39,7 +39,7 @@ const HomeLander = () => {
                     </div>
                     <div>
                         <button className='primary-button' onClick={() => navigate("/sign-in")}>Try for Free</button>
-                        <button ><a href="#features">See Features</a></button>
+                        <button><a href="#features">See Features</a></button>
                     </div>
                 </div>
                 <div>

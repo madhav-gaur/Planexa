@@ -9,7 +9,7 @@ import { CiLogout } from 'react-icons/ci';
 import { apiList } from '../common/apiList';
 import Axios from '../utils/axios';
 import { toast } from 'react-toastify';
-import { setUserDetails, setIsUserLoaded, setIsAuthenticated } from '../store/user.slice';
+import { setUserDetails, setIsUserLoaded } from '../store/user.slice';
 import { IoMdNotificationsOutline } from "react-icons/io"
 import { useNotification } from "../hooks/useNotification";
 import { setIsWorkspaceLoaded } from '../store/workspace.slice';
@@ -36,11 +36,10 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
             dispatch(setUserDetails(null));
             dispatch(setIsUserLoaded(true));
             dispatch(setIsWorkspaceLoaded(false));
-            dispatch(setIsAuthenticated(false));
             localStorage.setItem("theme", "light");
             localStorage.clear();
-
             navigate("/sign-in", { replace: true });
+            location.reload()
             toast.success("Signed out successfully");
         } catch (error) {
             console.error(error);

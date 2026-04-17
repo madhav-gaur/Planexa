@@ -25,14 +25,10 @@ Axios.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await Axios({
-          ...apiList.refreshToken,
-          withCredentials: true,
-        });
+        await Axios({ ...apiList.refreshToken, withCredentials: true });
         return Axios(originalRequest);
-      } catch (err) {
-        console.log(err);
-        const status = error.response?.status;
+      } catch (refreshError) {
+        const status = refreshError.response?.status;
 
         if (status === 403) {
           window.location.href = "/forbidden";
@@ -42,9 +38,9 @@ Axios.interceptors.response.use(
           window.location.href = "/error";
         } else if (status === 503) {
           window.location.href = "/maintenance";
-        } else {
-          window.location.href = "/sign-in";
         }
+
+        return Promise.reject(refreshError);
       }
     }
 

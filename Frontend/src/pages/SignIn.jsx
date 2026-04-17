@@ -7,7 +7,7 @@ import Axios from '../utils/axios';
 import { apiList } from '../common/apiList';
 import ButtonLoading from '../components/ButtonLoading';
 import { useDispatch } from 'react-redux';
-import { setIsAuthenticated, setIsUserLoaded } from '../store/user.slice';
+import { setIsUserLoaded } from '../store/user.slice';
 import { toast } from 'react-toastify';
 import { IoMdHome } from 'react-icons/io';
 const SignIn = () => {
@@ -56,9 +56,6 @@ const SignIn = () => {
         return;
       }
       if (response.data.success) {
-
-        dispatch(setIsAuthenticated(true));
-        localStorage.setItem("isAuthenticated", "true");
 
         dispatch(setIsUserLoaded(false))
       }

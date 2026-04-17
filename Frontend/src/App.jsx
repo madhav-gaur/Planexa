@@ -8,13 +8,8 @@ import AppRoutes from "./Routes/AppRoutes";
 
 
 const App = () => {
-  // const user = useSelector((state) => state.user.userDetails);
-  // if (user) {
-
     useUser();
     useWorkspace();
-
-  // }
   return (
     <>
       <ToastContainer
