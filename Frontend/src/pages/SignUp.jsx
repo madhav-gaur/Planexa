@@ -9,6 +9,7 @@ import { apiList } from '../common/apiList';
 import { useDispatch } from 'react-redux';
 import { setIsUserLoaded } from '../store/user.slice';
 import { toast } from 'react-toastify';
+import { IoMdHome } from 'react-icons/io';
 const SignUp = () => {
   const [loading, setLoading] = useState("Create Account")
   const [data, setData] = useState({
@@ -93,6 +94,7 @@ const SignUp = () => {
         <div className='app-form-head'>
           <h2>Create an Account</h2>
           <p>Enter Following Details to Create Account</p>
+          <span onClick={() => navigate('/')}><IoMdHome /></span>
         </div>
         <form className='app-form'>
           <div className='app-form-item'>

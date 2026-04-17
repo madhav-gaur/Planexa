@@ -21,6 +21,9 @@ import { setIsProjectLoaded } from '../store/project.slice';
 import { apiList } from '../common/apiList';
 import { toast } from 'react-toastify';
 import { useTasks } from '../hooks/useTasks';
+import { useProject } from '../hooks/useProject';
+import '../pages/styles/Projects.css'
+
 const ProjectDetail = () => {
     const params = useParams()
     const [isCreateModal, setIsCreateModal] = useState(false)
@@ -60,7 +63,6 @@ const ProjectDetail = () => {
             setType("ALL")
         }
     }
-    useTasks({ currProject, dispatch })
 
     useEffect(() => {
         dispatch(setIsProjectLoaded(false))
@@ -116,6 +118,8 @@ const ProjectDetail = () => {
             setUpdatingTaskId('')
         }
     }
+    useProject()
+    useTasks({ currProject, dispatch, isTaskLoaded })
     return (
         <>
             <div className='dashboard-head'>

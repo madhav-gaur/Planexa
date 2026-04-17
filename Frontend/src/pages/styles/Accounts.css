@@ -190,7 +190,12 @@
     width: fit-content;
   }
 }
-
+@media (max-width:768px) {
+  .account-danger-card{
+    align-items: end;
+    flex-direction: column;
+  }
+}
 .account-danger-title {
   font-size: 14px;
   font-weight: 500;
@@ -204,21 +209,6 @@
   max-width: 380px;
 }
 
-.ghost-button {
-  background: none;
-  border: var(--border);
-  border-radius: 7px;
-  padding: 6px 14px;
-  font-size: 13px;
-  cursor: pointer;
-  color: var(--text-light);
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: var(--surface-hover-light);
-    color: var(--text-normal);
-  }
-}
 
 .account-workspace-name {
   color: var(--text-normal);

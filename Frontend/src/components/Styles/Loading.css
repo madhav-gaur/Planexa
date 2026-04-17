@@ -1,7 +1,7 @@
 .loader-wrapper {
-
     display: flex;
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -11,11 +11,12 @@
     justify-content: center;
     background-color: var(--surface);
     gap: 1rem;
-
+    p{
+        color: var(--text-normal);
+    }
 }
 
 .loader {
-
     border-top: 2px solid var(--text-normal);
     border-bottom: 2px solid var(--text-normal);
     border-radius: 3.40282e38px;

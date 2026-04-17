@@ -206,9 +206,9 @@ const Account = () => {
                             <div className='account-avatar-container'>
                                 <div className='account-avatar'>
                                     {preview
-                                        ? <img src={preview} alt='preview' />
+                                        ? <img src={preview} alt='preview' loading='lazy' />
                                         : image
-                                            ? <img src={user.avatar} alt='avatar' />
+                                            ? <img src={user.avatar} alt='avatar' loading='lazy' />
                                             : <p>{user?.name?.charAt(0).toUpperCase()}</p>
                                     }
                                 </div>

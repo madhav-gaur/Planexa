@@ -7,6 +7,7 @@ import Loading from '../components/Loading'
 import { toast } from 'react-toastify'
 import './styles/Activity.css'
 import './styles/Notifications.css'
+import { FiActivity } from 'react-icons/fi'
 
 const Activity = () => {
     const { currWorkspace } = useSelector(state => state.workspace)
@@ -83,8 +84,9 @@ const Activity = () => {
             </div>
             <div className="activity-container">
                 {activities.length === 0 ? (
-                    <div className="no-notifications">
-                        <p>No activity yet</p>
+                    <div className="empty-model">
+                        <span><FiActivity /></span>
+                        <h3>No activity yet</h3>
                     </div>
                 ) : (
                     <>

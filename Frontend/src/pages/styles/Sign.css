@@ -148,12 +148,6 @@
   }
 }
 
-.app-form-item input:focus,
-.app-form-item select:focus {
-  outline: auto;
-  outline-color: var(--primary-blue);
-}
-
 .app-form-item input:focus + label,
 .app-form-item input:not(:placeholder-shown) + label {
   top: 0;

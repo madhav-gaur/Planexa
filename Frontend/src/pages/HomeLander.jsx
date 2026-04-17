@@ -23,7 +23,7 @@ const HomeLander = () => {
         <div className='home-lander-wrapper'>
             <header>
                 <div>
-                    <img src={Favicon} alt="Planexa Logo" />
+                    <img src={Favicon} alt="Planexa Logo" loading='lazy' />
                     <h1 onClick={() => navigate("/")}>Planexa</h1>
                 </div>
                 <div>
@@ -43,7 +43,7 @@ const HomeLander = () => {
                     </div>
                 </div>
                 <div>
-                    <img src={LanderPage} alt="" />
+                    <img src={LanderPage} alt="" loading='lazy' />
                 </div>
 
             </section>

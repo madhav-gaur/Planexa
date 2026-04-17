@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import './styles/Sign.css'
+import '../pages/styles/Sign.css'
 import { IoEyeOutline } from "react-icons/io5";
 import { IoEyeOffOutline } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
@@ -7,8 +7,9 @@ import Axios from '../utils/axios';
 import { apiList } from '../common/apiList';
 import ButtonLoading from '../components/ButtonLoading';
 import { useDispatch } from 'react-redux';
-import { setIsUserLoaded } from '../store/user.slice';
+import { setIsAuthenticated, setIsUserLoaded } from '../store/user.slice';
 import { toast } from 'react-toastify';
+import { IoMdHome } from 'react-icons/io';
 const SignIn = () => {
   const [data, setData] = useState({
     email: "",
@@ -50,6 +51,8 @@ const SignIn = () => {
           password: data.password,
         },
       });
+      dispatch(setIsAuthenticated(true));
+      localStorage.setItem("isAuthenticated", "true");
 
       dispatch(setIsUserLoaded(false))
       if (!response.data.success) {
@@ -103,6 +106,7 @@ const SignIn = () => {
         <div className='app-form-head'>
           <h2>Sign in</h2>
           <p>Enter Following Details to Sign in</p>
+          <span onClick={()=>navigate('/')}><IoMdHome /></span>
         </div>
         <form className='app-form' onSubmit={handleSubmit}>
           <div className='app-form-item'>

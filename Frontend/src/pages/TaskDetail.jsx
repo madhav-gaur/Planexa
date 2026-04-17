@@ -50,8 +50,8 @@ const TaskDetail = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const params = useParams()
-    const { tasks, isTaskLoaded, isTaskLoading } = useSelector(state => state.task)
-    const { projects, isProjectLoaded } = useSelector(state => state.project)
+    const { tasks, isTaskLoaded } = useSelector(state => state.task)
+    const { projects} = useSelector(state => state.project)
     const { workspaceMember, currWorkspace } = useSelector(state => state.workspace)
     const currTask = tasks?.find(item => item._id == params.taskId)
     const currProject = projects?.find(item => item._id == params.projectId)
@@ -74,7 +74,7 @@ const TaskDetail = () => {
         return `${temp[0]}-${temp[1]}-${temp[2].split('T')[0]}`
     }
 
-    useTasks({ currProject, dispatch })
+    useTasks({ currProject, dispatch, isTaskLoaded })
 
     useEffect(() => {
         if (!currTask) return
@@ -258,9 +258,9 @@ const TaskDetail = () => {
         }
     }
 
-    if (!isProjectLoaded) {
-        return <Loading />
-    }
+    // if (!isProjectLoaded) {
+    //     return <Loading />
+    // }
 
     if (!currProject) {
         return (
@@ -271,10 +271,10 @@ const TaskDetail = () => {
         )
     }
 
-    const waitingForTask = !currTask && (!isTaskLoaded || isTaskLoading)
-    if (waitingForTask) {
-        return <Loading />
-    }
+    // const waitingForTask = !currTask && (!isTaskLoaded || isTaskLoading)
+    // if (waitingForTask) {
+    //     return <Loading />
+    // }
 
     if (!currTask) {
         return (

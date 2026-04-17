@@ -4,47 +4,7 @@
     flex-direction: column;
 }
 
-.dashboard-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
-.dashboard-head-left {
-    h2 {
-        font-size: 1.6rem;
-        margin-bottom: 10px;
-    }
-
-    p {
-        font-size: 14px;
-        color: var(--text-light);
-    }
-}
-
-.dashboard-head-right {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
-
-    div {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-        justify-content: center;
-        border: var(--border);
-        width: 2rem;
-        height: 2rem;
-        border-radius: 7px;
-        font-size: 1.2rem;
-
-        &:hover {
-            background-color: var(--surface-hover-light2);
-        }
-    }
-}
 
 .dashboard-stats-1 {
     display: grid;
@@ -150,7 +110,7 @@
 
 .dashboard-panel {
     border: var(--border);
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 1.2rem;
     background: var(--surface);
     display: flex;
@@ -260,7 +220,7 @@
 
 .dashboard-deadline-item {
     border: var(--border);
-    border-radius: 10px;
+    border-radius: 7px;
     padding: 1rem;
     background: var(--surface-hover-light);
     display: flex;
@@ -293,7 +253,7 @@
 
 .dashboard-activity-item {
     border: var(--border);
-    border-radius: 10px;
+    border-radius: 7px;
     padding: 1rem;
     display: flex;
     justify-content: space-between;
@@ -320,7 +280,7 @@
 
 .dashboard-empty-state {
     border: var(--border);
-    border-radius: 10px;
+    border-radius: 7px;
     padding: 1.1rem;
     color: var(--text-light);
     text-align: center;

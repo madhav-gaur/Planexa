@@ -9,7 +9,9 @@ import { setIsWorkspaceLoaded } from "../store/workspace.slice";
 
 export const useUser = () => {
     const dispatch = useDispatch();
-    const { isUserLoaded, } = useSelector((state) => state.user);
+    const { isUserLoaded, isAuthenticated } = useSelector((state) => state.user);
+    console.log(isAuthenticated);
+    
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -32,9 +34,9 @@ export const useUser = () => {
                 dispatch(setIsUserLoading(false))
             }
         }
-        if (!isUserLoaded) {
+        if (!isUserLoaded && isAuthenticated ) {
             fetchUser()
         }
-    }, [isUserLoaded, dispatch])
+    }, [isUserLoaded, dispatch, isAuthenticated])
 
 }

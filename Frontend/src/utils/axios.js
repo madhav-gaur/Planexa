@@ -1,6 +1,5 @@
 import axios from "axios";
 import { apiList } from "../common/apiList";
-import { useNavigate } from "react-router-dom";
 
 const resolvedBaseURL =
   import.meta.env.VITE_API_URL?.replace(/\/$/, "") ||
@@ -33,17 +32,18 @@ Axios.interceptors.response.use(
         return Axios(originalRequest);
       } catch (err) {
         console.log(err);
-        const navigate = useNavigate();
         const status = error.response?.status;
 
         if (status === 403) {
-          navigate("/forbidden");
+          window.location.href = "/forbidden";
         } else if (status === 429) {
-          navigate("/too-many-requests");
+          window.location.href = "/too-many-requests";
         } else if (status === 500) {
-          navigate("/error");
+          window.location.href = "/error";
         } else if (status === 503) {
-          navigate("/maintenance");
+          window.location.href = "/maintenance";
+        } else {
+          window.location.href = "/sign-in";
         }
       }
     }

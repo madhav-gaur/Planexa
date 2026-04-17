@@ -30,9 +30,11 @@ const DashboardLayout = () => {
             localStorage.setItem("theme", "light");
         }
     }, [darkMode]);
-
+    useEffect(() => {
+        document.documentElement.classList.toggle("dark", darkMode);
+    }, [darkMode]);
     return (
-        <div className={`dashboard-wrapper ${darkMode ? "dark" : ""}`}>
+        <div className={`dashboard-wrapper`}>
             <Sidebar
                 isSidebar={isSidebar}
                 setIsSidebar={setIsSidebar}

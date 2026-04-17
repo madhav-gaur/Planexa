@@ -10,26 +10,27 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { IoArrowBack } from "react-icons/io5";
 import ButtonLoading from '../components/ButtonLoading'
 import "../pages/styles/ProjectSetting.css"
-import { CiCircleRemove } from 'react-icons/ci'
 import AlertDialog from '../components/AlertDialog';
 import Loading from '../components/Loading';
+import { useWorkspaceMember } from '../hooks/useWorkspaceMember';
 
 const ProjectSettings = () => {
     const { currWorkspace } = useSelector(state => state.workspace)
     const [loading, setLoading] = useState(false)
     const [isAlertBox, setIsAlertBox] = useState({});
     const [isAlertBoxDel, setIsAlertBoxDel] = useState("");
-
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const params = useParams()
     const { projects } = useSelector(state => state.project)
-    const user = useSelector(state => state.user.userDetails)
+    const user = useSelector(state => state.user?.userDetails)
 
     useEffect(() => {
         dispatch(setIsProjectLoaded(false))
     }, [dispatch])
+
+    // useProject()
 
     const currProject = projects?.find(item => item._id == params.projectId)
     const transformDate = (date) => {
@@ -118,7 +119,6 @@ const ProjectSettings = () => {
                 }
             })
             if (response.data.success) {
-                close()
                 toast.success("Details Updates")
                 dispatch(setIsProjectLoaded(false))
             }
@@ -170,6 +170,7 @@ const ProjectSettings = () => {
         }
     }
     const { workspaceMember } = useSelector(state => state.workspace)
+    useWorkspaceMember({currWorkspace, dispatch})
     if (!currProject || !data) return <Loading />;
     return (
         (
@@ -334,12 +335,12 @@ const ProjectSettings = () => {
                             {
                                 currProject.members.map((memberId) => {
                                     const member = workspaceMember?.find(u => u._id === memberId);
-                                    const currWorkspaceDetails = member.workspaces.find(item => item.workspaceId == currWorkspace._id) || {};
+                                    const currWorkspaceDetails = member?.workspaces.find(item => item.workspaceId == currWorkspace._id) || {};
                                     const role = currWorkspaceDetails.role
 
-                                    return <div key={member._id} className='project-member-list-item'>
+                                    return <div key={member?._id} className='project-member-list-item'>
                                         <div>
-                                            <h3>{member.name}</h3>
+                                            <h3>{member?.name}</h3>
                                             <span>{role}</span>
                                         </div>
                                         <div onClick={() => {
@@ -355,7 +356,7 @@ const ProjectSettings = () => {
                                                 toast.error("Only admin can remove members");
                                                 return;
                                             }
-                                            if (user._id == member._id) {
+                                            if (user?._id == member._id) {
                                                 toast.error("You can't remove yourself");
                                                 return;
                                             }

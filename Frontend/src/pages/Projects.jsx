@@ -6,12 +6,15 @@ import { formatDate } from '../utils/formatDate'
 import "./styles/Projects.css"
 import { CiCalendarDate } from "react-icons/ci";
 import { useNavigate } from 'react-router-dom'
-import { IoClose, IoSettingsOutline } from 'react-icons/io5'
+import { IoClose } from 'react-icons/io5'
 import { FaRegFolderOpen } from "react-icons/fa";
-import Loading from '../components/Loading'
 import { CiSearch } from "react-icons/ci";
 import { setIsProjectLoaded } from '../store/project.slice'
 import { setIsTaskLoaded } from '../store/task.slice'
+import "../pages/styles/Team.css";
+import { useProject } from '../hooks/useProject'
+
+
 const Projects = () => {
     const [isCreateModal, setIsCreateModal] = useState(false)
     const { projects, isProjectLoading } = useSelector(state => state.project)
@@ -45,6 +48,7 @@ const Projects = () => {
             setPriority("ALL")
         }
     }
+    useProject()
     return (
         <>
             <div className='dashboard-head'>

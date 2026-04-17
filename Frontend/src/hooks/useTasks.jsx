@@ -7,7 +7,7 @@ import {
 } from "../store/task.slice";
 import Axios from "../utils/axios";
 
-export const useTasks = ({ currProject, dispatch }) => {
+export const useTasks = ({ currProject, isTaskLoaded, dispatch }) => {
     useEffect(() => {
         const getTasks = async () => {
             try {
@@ -30,6 +30,7 @@ export const useTasks = ({ currProject, dispatch }) => {
                 dispatch(setIsTaskLoading(false));
             }
         };
-        getTasks()
-    }, [currProject?._id, dispatch])
+        if(!isTaskLoaded)
+            getTasks()
+    }, [currProject?._id, dispatch, isTaskLoaded])
 }

@@ -208,7 +208,7 @@ const Settings = () => {
                 <div className="account-avatar-container workspace-logo-block">
                   <div className="workspace-settings-logo">
                     {logoPreview ? (
-                      <img src={logoPreview} alt="" />
+                      <img src={logoPreview} alt="" loading='lazy' />
                     ) : (
                       <span>{workLetter}</span>
                     )}

@@ -16,12 +16,13 @@
   min-width: 15rem;
   width: 100%;
   align-items: stretch;
+
+
   .app-form-container {
     max-width: none;
     max-height: 800px;
     overflow: auto;
   }
-
   .primary-button {
     margin-top: 1rem;
   }
@@ -33,7 +34,7 @@
 
 .app-form-container .app-form-setting-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 1rem;
   margin-bottom: 1rem;
 
@@ -58,6 +59,15 @@
     font-size: 1.6rem;
     word-wrap: break-word;
   }
+}
+@media (max-width:425px) {
+.app-form-container .app-form-setting-head {
+  flex-direction: column;
+  gap: 0px;
+  div:first-child{
+    background-color: var(--surface-hover-light2);
+  }
+}
 }
 
 .project-secondary-settings {

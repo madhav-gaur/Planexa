@@ -5,6 +5,7 @@ const initialVal = {
   userDetails: null,
   isUserLoading: false,
   isUserLoaded: false,
+  isAuthenticated: localStorage.getItem("isAuthenticated") === "true",
 };
 
 const userSlice = createSlice({
@@ -20,10 +21,17 @@ const userSlice = createSlice({
     setIsUserLoaded: (state, action) => {
       state.isUserLoaded = action.payload;
     },
+    setIsAuthenticated: (state, action) => {
+      state.isAuthenticated = action.payload;
+    },
   },
 });
 
-export const { setUserDetails, setIsUserLoading, setIsUserLoaded } =
-  userSlice.actions;
+export const {
+  setUserDetails,
+  setIsUserLoading,
+  setIsUserLoaded,
+  setIsAuthenticated,
+} = userSlice.actions;
 
 export default userSlice.reducer;

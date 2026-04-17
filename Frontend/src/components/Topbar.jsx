@@ -9,9 +9,10 @@ import { CiLogout } from 'react-icons/ci';
 import { apiList } from '../common/apiList';
 import Axios from '../utils/axios';
 import { toast } from 'react-toastify';
-import { setUserDetails, setIsUserLoaded } from '../store/user.slice';
+import { setUserDetails, setIsUserLoaded, setIsAuthenticated } from '../store/user.slice';
 import { IoMdNotificationsOutline } from "react-icons/io"
 import { useNotification } from "../hooks/useNotification";
+import { setIsWorkspaceLoaded } from '../store/workspace.slice';
 ;
 const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
     const navigate = useNavigate()
@@ -25,24 +26,28 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
     const [loading, setLoading] = useState(true)
     const unreadCount = notifications.filter(item => !item.isRead).length
 
-      useNotification({ pageNum: 1, setLoading, setHasMore: () => { }, setNotifications })
-    
+    useNotification({ pageNum: 1, setLoading, setHasMore: () => { }, setNotifications })
+
 
     const handleSignOut = async () => {
         try {
-            await Axios({
-                ...apiList.signOut,
-            })
-            dispatch(setUserDetails(null))
-            dispatch(setIsUserLoaded(false))
-            localStorage.clear()
-            navigate('/sign-in')
-            toast.success('Signed out successfully')
+            await Axios({ ...apiList.signOut });
+
+            dispatch(setUserDetails(null));
+            dispatch(setIsUserLoaded(true));
+            dispatch(setIsWorkspaceLoaded(false));
+            dispatch(setIsAuthenticated(false));
+
+            localStorage.clear();
+
+            navigate("/sign-in", { replace: true });
+            toast.success("Signed out successfully");
         } catch (error) {
-            console.error('Signout error:', error)
-            toast.error('Failed to sign out')
+            console.error(error);
+            
+            toast.error("Failed to sign out");
         }
-    }
+    };
 
     return (
         <div className='topbar-wrapper'>
@@ -53,12 +58,12 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
                     }}>
                         <IoMenu />
                     </div>
-                    <img src={logo} alt="Planexa Logo" />
+                    <img src={logo} alt="Planexa Logo" loading='lazy' />
                     <h1 onClick={() => navigate("/")}>Planexa</h1>
                 </div>
                 <div className='topbar-right'>
                     <div className='topbar-right-item' onClick={() => setIsNotifyCard(prev => !prev)}>
-                        <div style={{ position: 'relative', marginTop:'2px' }} >
+                        <div style={{ position: 'relative', marginTop: '2px' }} >
                             <IoMdNotificationsOutline />
                             {unreadCount > 0 && (
                                 <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
@@ -73,7 +78,7 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
                         {isUserCard
                             ? <IoClose size={20} />
                             : user?.avatar
-                                ? <img src={user.avatar} alt="avatar" className='topbar-avatar' />
+                                ? <img src={user.avatar} loading='lazy' alt="avatar" className='topbar-avatar' />
                                 : <p>{userName}</p>
                         }
                     </div>

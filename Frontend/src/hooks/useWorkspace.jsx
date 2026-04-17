@@ -10,7 +10,8 @@ export const useWorkspace = () => {
     const dispatch = useDispatch();
     const { isWorkspaceLoaded } = useSelector((state) => state.workspace);
     const CURR_WORKSPACE_STORAGE_KEY = "currWorkspaceId";
-  const { currWorkspace } = useSelector(state => state.workspace)
+    const { currWorkspace } = useSelector(state => state.workspace)
+    const {isAuthenticated } = useSelector((state) => state.user);
 
     useEffect(() => {
         const getWorkspaces = async () => {
@@ -44,7 +45,7 @@ export const useWorkspace = () => {
         if (currWorkspace?._id) {
             localStorage.setItem(CURR_WORKSPACE_STORAGE_KEY, currWorkspace._id)
         }
-        if (!isWorkspaceLoaded) {
+        if (!isWorkspaceLoaded && isAuthenticated) {
             getWorkspaces()
         }
     }, [isWorkspaceLoaded, dispatch, currWorkspace])

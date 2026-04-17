@@ -7,6 +7,7 @@ import ButtonLoading from './ButtonLoading'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { setIsProjectLoaded } from '../store/project.slice'
+import { useWorkspaceMember } from '../hooks/useWorkspaceMember'
 
 const CreateProjectModal = ({ close }) => {
     const { currWorkspace } = useSelector(state => state.workspace)
@@ -107,6 +108,7 @@ const CreateProjectModal = ({ close }) => {
             setLoading(false)
         }
     }
+    useWorkspaceMember({currWorkspace, dispatch})
     return (
         <div className='app-form-container' onClick={(e) => e.stopPropagation()}>
             <div className='app-form-head'>

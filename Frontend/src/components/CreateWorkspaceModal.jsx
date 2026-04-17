@@ -8,6 +8,8 @@ import ButtonLoading from './ButtonLoading'
 import { useDispatch } from 'react-redux'
 import { setIsWorkspaceLoaded } from '../store/workspace.slice'
 import { toast } from 'react-toastify'
+import '../pages/styles/ProjectSetting.css'
+import '../pages/styles/Sign.css'
 
 const CreateWorkspaceModal = ({ close }) => {
 

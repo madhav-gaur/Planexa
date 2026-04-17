@@ -8,34 +8,30 @@ import { setIsProjectLoaded, setIsProjectLoading, setProjects } from "../store/p
 
 export const useProject = () => {
     const dispatch = useDispatch();
-    const { isProjectLoaded } = useSelector((state) => state.project);
-    const { currWorkspace } = useSelector(state => state.workspace)
+    const { isProjectLoaded } = useSelector(state => state.project);
+    const { currWorkspace } = useSelector(state => state.workspace);
 
     useEffect(() => {
-    if (!currWorkspace._id) return
+        if (!currWorkspace._id || isProjectLoaded) return;
+
         const getProjects = async () => {
+            dispatch(setIsProjectLoading(true));
+
             try {
-                dispatch(setIsProjectLoading(true))
                 const response = await Axios({
                     ...apiList.getProjects,
-                    data: {
-                        workspaceId: currWorkspace?._id
-                    }
-                })
+                    data: { workspaceId: currWorkspace._id }
+                }); 
+
                 if (response.data.success) {
-                    dispatch(setProjects(response.data.data))
+                    dispatch(setProjects(response.data.data));
                 }
-            } catch (error) {
-                console.error(error)
             } finally {
-                dispatch(setIsProjectLoading(false))
-                dispatch(setIsProjectLoaded(true))
+                dispatch(setIsProjectLoading(false));
+                dispatch(setIsProjectLoaded(true));
             }
-        }
-        if (!isProjectLoaded) {
-            getProjects()
-        }
+        };
 
-
-    }, [currWorkspace?._id, dispatch, isProjectLoaded])
-}
+        getProjects();
+    }, [isProjectLoaded, currWorkspace._id, dispatch]);
+};

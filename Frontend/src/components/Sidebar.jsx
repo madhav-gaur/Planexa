@@ -19,6 +19,8 @@ import { toast } from 'react-toastify';
 import { getUserTasks } from '../utils/getUserTasks';
 import { apiList } from '../common/apiList';
 import Axios from '../utils/axios';
+import { useWorkspace } from '../hooks/useWorkspace';
+
 const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarCollapsed, isSidebarHovering, setIsSidebarHovering, }) => {
 
     const dispatch = useDispatch()
@@ -34,7 +36,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
     const [userTasks, setUserTasks] = useState([])
     const [isTasksLoading, setIsTasksLoading] = useState(false)
     const workLogo = currWorkspace?.name?.split("")[0].toUpperCase()
-
+    useWorkspace()
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth < 1100);
@@ -119,7 +121,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                         <div className='workspace-nav-name'>
                             {currWorkspace?.logo == "" ?
                                 <span>{workLogo}</span>
-                                : <img src={currWorkspace?.logo} alt="" />}
+                                : <img src={currWorkspace?.logo} alt="" loading='lazy' />}
                             {isExpanded && <div>
                                 <p>{currWorkspace?.name?.slice(0, 14)}{currWorkspace?.name?.length > 14 ? "..." : ""}</p>
                                 <b>{workspaces.length} Workspace</b>
@@ -149,7 +151,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                                     <div className='workspace-nav-name'>
                                                         {item?.logo == "" ?
                                                             <span>{item?.name?.split("")[0].toUpperCase()}</span>
-                                                            : <img src={item?.logo} alt="" />}
+                                                            : <img src={item?.logo} loading='lazy' />}
                                                         <div>
                                                             <p style={{ fontSize: "14px" }}>{item?.name?.slice(0, 16)}{item?.name?.length > 16 ? "..." : ""}</p>
                                                             <b>{item?.members.length} members</b>
@@ -197,6 +199,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                 `${isActive ? 'nav-item active' : 'nav-item'
                                 }`
                             }
+                            aria-label='Projects'
                             to="/projects">
                             <FaRegFolderOpen />
                             <p>Projects</p>
@@ -206,6 +209,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                 `${isActive ? 'nav-item active' : 'nav-item'
                                 }`
                             }
+                            aria-label='Team'
                             to="/team">
                             <LuUsers />
                             <p>Team</p>
@@ -215,6 +219,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                 `${isActive ? 'nav-item active' : 'nav-item'
                                 }`
                             }
+                            aria-label='Activity'
                             to="/activity">
                             <IoPulseOutline />
                             <p>Activity</p>
@@ -224,6 +229,7 @@ const Sidebar = ({ isSidebar, setIsSidebar, isSidebarCollapsed, setIsSidebarColl
                                 `${isActive ? 'nav-item active' : 'nav-item'
                                 }`
                             }
+                            aria-label='Settings'
                             to="/settings">
                             <IoSettingsOutline />
                             <p>Settings</p>

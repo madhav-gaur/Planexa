@@ -139,8 +139,7 @@
   position: relative;
 
   .nav-item:focus {
-    outline: auto;
-    outline-color: var(--primary-blue);
+    outline: none;
   }
 
   a.active:hover {
@@ -256,11 +255,6 @@ nav:has(a.nav-item:nth-of-type(5).active)::before {
       transition: all 0.1s;
     }
 
-    &:focus {
-      outline: auto;
-      outline-color: var(--primary-blue);
-    }
-
     &:hover {
       background-color: var(--surface-hover-light2);
     }
@@ -331,7 +325,7 @@ nav:has(a.nav-item:nth-of-type(5).active)::before {
   align-items: center;
   justify-content: space-between;
   padding: 21px 1rem;
-  z-index: 10;
+  z-index: 100;
 
   .topbar-left {
     display: flex;

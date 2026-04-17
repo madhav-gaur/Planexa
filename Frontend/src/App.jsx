@@ -1,27 +1,20 @@
-import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, Zoom } from "react-toastify";
-
-
 // ? Hooks
 
 import { useUser } from "./hooks/useUser";
-import { useAllWorkspaceTasks } from "./hooks/useAllWorkspaceTasks";
-import { useProject } from "./hooks/useProject";
 import { useWorkspace } from "./hooks/useWorkspace"
-import { useWorkspaceMember } from "./hooks/useWorkspaceMember";
 import AppRoutes from "./Routes/AppRoutes";
+// import { useSelector } from "react-redux";
 
 
 const App = () => {
-  const dispatch = useDispatch();
-  const { currWorkspace } = useSelector(state => state.workspace)
+  // const user = useSelector((state) => state.user.userDetails);
+  // if (user) {
 
-  useUser();
-  useWorkspace();
-  useProject();
-  useAllWorkspaceTasks()
-  useWorkspaceMember({ currWorkspace, dispatch })
+    useUser();
+    useWorkspace();
 
+  // }
   return (
     <>
       <ToastContainer

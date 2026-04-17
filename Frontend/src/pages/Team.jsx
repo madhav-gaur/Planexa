@@ -12,6 +12,9 @@ import { apiList } from '../common/apiList'
 import { toast } from 'react-toastify'
 import { setIsWorkspaceMemberLoaded } from '../store/workspace.slice'
 import { useWorkspaceMember } from '../hooks/useWorkspaceMember'
+import { FaUsersSlash } from 'react-icons/fa'
+import '../pages/styles/Projects.css'
+
 
 const Team = () => {
     const [isInviteModal, setIsInviteModal] = useState(false)
@@ -233,8 +236,12 @@ const Team = () => {
                                             </select></AlertDialog>}
                                 </div>
                             })
+                            
                         }
-                        {!filteredMembers[0] && <div style={{ display: "flex", justifyContent: "center", color: "var(--text-light)" }}>No members found</div>}
+                        {!filteredMembers[0] && <div className='empty-model'>
+                            <span><FaUsersSlash /></span>
+                            <h3>No Members found</h3>
+                        </div>}
                     </div>
                 </div>
 

@@ -101,13 +101,14 @@
   font-weight: 500;
   color: var(--text-normal);
 }
-
-.settings-number-row input {
-  padding: 12px 14px;
+.settings-number-row{
+  margin-top: 1rem;
+  input{
+    padding: 12px 14px;
   border: var(--border);
   border-radius: 10px;
   max-width: 220px;
-  margin-top: 0.5rem;
+  }
 }
 
 .ghost-button.disabled {
@@ -129,8 +130,9 @@
 
 .danger-action {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  align-items: flex-end;
   gap: 1rem;
   padding: 1rem;
   border: 1px solid #dc3545;

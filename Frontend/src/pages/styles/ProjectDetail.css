@@ -3,7 +3,7 @@
     flex-direction: column;
     margin-top: 2rem;
     border: var(--border);
-    border-radius: 6px;
+    border-radius: 7px;
     width: 100%;
 }
 
@@ -52,7 +52,7 @@
     .task-list-item-priority {
         font-size: 12px;
         padding: 2px 15px;
-        border-radius: 4px;
+        border-radius: 7px;
         font-weight: 500;
         border: var(--border);
     }
