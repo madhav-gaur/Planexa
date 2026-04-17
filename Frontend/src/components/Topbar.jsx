@@ -37,14 +37,14 @@ const Topbar = ({ setIsSidebar, isSidebar, setDarkMode, darkMode }) => {
             dispatch(setIsUserLoaded(true));
             dispatch(setIsWorkspaceLoaded(false));
             dispatch(setIsAuthenticated(false));
-
+            localStorage.setItem("theme", "light");
             localStorage.clear();
 
             navigate("/sign-in", { replace: true });
             toast.success("Signed out successfully");
         } catch (error) {
             console.error(error);
-            
+
             toast.error("Failed to sign out");
         }
     };

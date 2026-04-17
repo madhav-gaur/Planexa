@@ -51,13 +51,16 @@ const SignIn = () => {
           password: data.password,
         },
       });
-      dispatch(setIsAuthenticated(true));
-      localStorage.setItem("isAuthenticated", "true");
-
-      dispatch(setIsUserLoaded(false))
       if (!response.data.success) {
         setError(response.data.message);
         return;
+      }
+      if (response.data.success) {
+
+        dispatch(setIsAuthenticated(true));
+        localStorage.setItem("isAuthenticated", "true");
+
+        dispatch(setIsUserLoaded(false))
       }
       toast.success("Sign in Successfull")
       if (tempToken) {
@@ -106,7 +109,7 @@ const SignIn = () => {
         <div className='app-form-head'>
           <h2>Sign in</h2>
           <p>Enter Following Details to Sign in</p>
-          <span onClick={()=>navigate('/')}><IoMdHome /></span>
+          <span onClick={() => navigate('/')}><IoMdHome /></span>
         </div>
         <form className='app-form' onSubmit={handleSubmit}>
           <div className='app-form-item'>

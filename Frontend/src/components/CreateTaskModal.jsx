@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { setIsProjectLoaded } from '../store/project.slice'
 import { setIsTaskLoaded } from '../store/task.slice'
+import { useWorkspaceMember } from '../hooks/useWorkspaceMember'
 
 const CreateTaskModal = ({ close, currProject }) => {
     const [loading, setLoading] = useState(false)
@@ -22,7 +23,6 @@ const CreateTaskModal = ({ close, currProject }) => {
         assignees: [],
         labels: "",
     })
-    // console.log(data)
     const { workspaceMember, currWorkspace } = useSelector(state => state.workspace)
     const autoAssignEnabled = currWorkspace?.settings?.taskAutoAssign
     const handleInput = (e) => {
@@ -86,6 +86,7 @@ const CreateTaskModal = ({ close, currProject }) => {
             setLoading(false)
         }
     }
+    useWorkspaceMember({currWorkspace, dispatch})
     return (
         <div className='app-form-container' onClick={(e) => e.stopPropagation()}>
             <div className='app-form-head'>

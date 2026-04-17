@@ -12,11 +12,13 @@ import Axios from '../utils/axios';
 import { apiList } from '../common/apiList';
 import { toast } from 'react-toastify';
 import { formatDistanceToNow } from 'date-fns';
+import { useProject } from '../hooks/useProject';
+import { useWorkspace } from '../hooks/useWorkspace';
 
 const calcTotal = (obj = {}) => Object.values(obj).reduce((sum, val) => sum + val, 0)
 const percentage = (value, total) => total ? Math.round((value / total) * 100) : 0
-
 const MetricList = ({ items, total, tone = 'blue' }) => {
+
     return (
         <div className="dashboard-metric-list">
             {items.map((item) => (
@@ -39,6 +41,8 @@ const MetricList = ({ items, total, tone = 'blue' }) => {
 }
 
 const DashboardContent = () => {
+    useWorkspace()
+    useProject()
     const [isCreateModal, setIsCreateModal] = useState(false)
     const user = useSelector(state => state.user.userDetails)
     const { currWorkspace } = useSelector(state => state.workspace)

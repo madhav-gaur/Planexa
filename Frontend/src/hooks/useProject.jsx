@@ -12,7 +12,8 @@ export const useProject = () => {
     const { currWorkspace } = useSelector(state => state.workspace);
 
     useEffect(() => {
-        if (!currWorkspace._id || isProjectLoaded) return;
+        if (!currWorkspace._id )return;
+        if (isProjectLoaded )return;
 
         const getProjects = async () => {
             dispatch(setIsProjectLoading(true));
@@ -21,7 +22,7 @@ export const useProject = () => {
                 const response = await Axios({
                     ...apiList.getProjects,
                     data: { workspaceId: currWorkspace._id }
-                }); 
+                });
 
                 if (response.data.success) {
                     dispatch(setProjects(response.data.data));
@@ -31,7 +32,6 @@ export const useProject = () => {
                 dispatch(setIsProjectLoaded(true));
             }
         };
-
-        getProjects();
+        if (!isProjectLoaded) getProjects();
     }, [isProjectLoaded, currWorkspace._id, dispatch]);
 };
