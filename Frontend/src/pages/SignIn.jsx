@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { setIsUserLoaded } from '../store/user.slice';
 import { toast } from 'react-toastify';
 import { IoMdHome } from 'react-icons/io';
+import { setIsWorkspaceLoaded } from '../store/workspace.slice';
 const SignIn = () => {
   const [data, setData] = useState({
     email: "",
@@ -56,8 +57,8 @@ const SignIn = () => {
         return;
       }
       if (response.data.success) {
-
         dispatch(setIsUserLoaded(false))
+        dispatch(setIsWorkspaceLoaded(false)); 
       }
       toast.success("Sign in Successfull")
       if (tempToken) {

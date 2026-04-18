@@ -13,6 +13,7 @@ import "../pages/styles/ProjectSetting.css"
 import AlertDialog from '../components/AlertDialog';
 import Loading from '../components/Loading';
 import { useWorkspaceMember } from '../hooks/useWorkspaceMember';
+import { useProject } from '../hooks/useProject';
 
 const ProjectSettings = () => {
     const { currWorkspace } = useSelector(state => state.workspace)
@@ -30,7 +31,7 @@ const ProjectSettings = () => {
         dispatch(setIsProjectLoaded(false))
     }, [dispatch])
 
-    // useProject()
+    useProject()
 
     const currProject = projects?.find(item => item._id == params.projectId)
     const transformDate = (date) => {

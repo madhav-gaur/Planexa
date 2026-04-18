@@ -14,6 +14,9 @@ import { setIsProjectLoaded } from '../store/project.slice'
 import { FaRegFolderOpen } from 'react-icons/fa'
 import { MdOutlineEventAvailable } from 'react-icons/md'
 import { useTasks } from '../hooks/useTasks'
+import { useProject } from '../hooks/useProject'
+import '../pages/styles/Projects.css'
+import { TbFoldersOff } from 'react-icons/tb'
 
 const emptyForm = () => ({
     title: '',
@@ -51,11 +54,12 @@ const TaskDetail = () => {
     const dispatch = useDispatch()
     const params = useParams()
     const { tasks, isTaskLoaded } = useSelector(state => state.task)
-    const { projects} = useSelector(state => state.project)
+    const { projects } = useSelector(state => state.project)
     const { workspaceMember, currWorkspace } = useSelector(state => state.workspace)
     const currTask = tasks?.find(item => item._id == params.taskId)
     const currProject = projects?.find(item => item._id == params.projectId)
-
+    console.log(projects)
+    console.log(currProject)
     const [loading, setLoading] = useState(false)
     const [uploadingAttachment, setUploadingAttachment] = useState(false)
     const [attachmentFile, setAttachmentFile] = useState(null)
@@ -73,7 +77,7 @@ const TaskDetail = () => {
         const temp = date.split('-')
         return `${temp[0]}-${temp[1]}-${temp[2].split('T')[0]}`
     }
-
+    useProject()
     useTasks({ currProject, dispatch, isTaskLoaded })
 
     useEffect(() => {
@@ -264,9 +268,11 @@ const TaskDetail = () => {
 
     if (!currProject) {
         return (
-            <div className='project-setting-wrapper'>
-                <p style={{ padding: '2rem', color: 'var(--text-light)' }}>Project not found.</p>
-                <button type="button" className="primary-button" style={{ marginLeft: '2rem' }} onClick={() => navigate('/projects')}>Back to projects</button>
+            <div className='empty-model' style={{ top: '50%' }}>
+                <span><TbFoldersOff /></span>
+                <h3>Project not found.</h3>
+                <p>Couldn't find this Project</p>
+                <button type="button" className="primary-button" onClick={() => navigate('/projects')}>Back to projects</button>
             </div>
         )
     }

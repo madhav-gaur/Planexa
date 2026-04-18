@@ -5,48 +5,39 @@ import { apiList } from "../common/apiList";
 
 import React from 'react'
 import { setCurrWorkspace, setIsWorkspaceLoaded, setIsWorkspaceLoading, setWorkspaces } from "../store/workspace.slice";
-
 export const useWorkspace = () => {
     const dispatch = useDispatch();
     const { isWorkspaceLoaded } = useSelector((state) => state.workspace);
     const CURR_WORKSPACE_STORAGE_KEY = "currWorkspaceId";
-    const { currWorkspace } = useSelector(state => state.workspace)
 
     useEffect(() => {
+        if (isWorkspaceLoaded) return;
+
         const getWorkspaces = async () => {
             try {
-                dispatch(setIsWorkspaceLoading(true))
-                const response = await Axios({
-                    ...apiList.getWorkspaces,
-                })
-                if (response) {
-                    dispatch(setIsWorkspaceLoading(false))
-                }
+                dispatch(setIsWorkspaceLoading(true));
+                const response = await Axios({ ...apiList.getWorkspaces });
+
                 if (response.data.success) {
-                    let data = response.data.data
-                    dispatch(setWorkspaces(data))
-                    const savedWorkspaceId = localStorage.getItem(CURR_WORKSPACE_STORAGE_KEY)
-                    const selectedWorkspace =
-                        data.find((item) => item._id === savedWorkspaceId) || data[0] || {}
-                    dispatch(setCurrWorkspace(selectedWorkspace))
-                    dispatch(setIsWorkspaceLoaded(true))
-                    if (isWorkspaceLoaded) {
-                        dispatch(setIsWorkspaceLoading(false))
+                    const data = response.data.data;
+                    dispatch(setWorkspaces(data));
+
+                    const savedId = localStorage.getItem(CURR_WORKSPACE_STORAGE_KEY);
+                    const selected = data.find(w => w._id === savedId) || data[0] || {};
+                    dispatch(setCurrWorkspace(selected));
+
+                    if (selected._id) {
+                        localStorage.setItem(CURR_WORKSPACE_STORAGE_KEY, selected._id);
                     }
                 }
             } catch (error) {
-                console.error(error)
+                console.error(error);
             } finally {
-                dispatch(setIsWorkspaceLoaded(true))
-                dispatch(setIsWorkspaceLoading(false))
+                dispatch(setIsWorkspaceLoaded(true));
+                dispatch(setIsWorkspaceLoading(false));
             }
-        }
-        if (currWorkspace?._id) {
-            localStorage.setItem(CURR_WORKSPACE_STORAGE_KEY, currWorkspace._id)
-        }
-        if (!isWorkspaceLoaded) {
-            getWorkspaces()
-        }
-    }, [isWorkspaceLoaded, dispatch, currWorkspace])
+        };
 
-}
+        getWorkspaces();
+    }, [isWorkspaceLoaded, dispatch]);
+};

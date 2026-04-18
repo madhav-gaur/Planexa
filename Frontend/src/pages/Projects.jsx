@@ -14,7 +14,6 @@ import { setIsTaskLoaded } from '../store/task.slice'
 import "../pages/styles/Team.css";
 import { useProject } from '../hooks/useProject'
 
-
 const Projects = () => {
     const [isCreateModal, setIsCreateModal] = useState(false)
     const { projects, isProjectLoading } = useSelector(state => state.project)
@@ -148,8 +147,7 @@ const Projects = () => {
                         })
                     }
                 </div>
-            </div>
-            {
+                {
                 !projects[0] && !isProjectLoading && <div className='empty-model'>
                     <span><FaRegFolderOpen /></span>
                     <h3>No Projects Found</h3>
@@ -157,6 +155,8 @@ const Projects = () => {
                     <button className='primary-button' onClick={() => setIsCreateModal(true)}>+ Create Project</button>
                 </div>
             }
+            </div>
+            
             {
                 projects[0] && !filteredProjects[0] && !isProjectLoading && <div className='empty-model'>
                     <span><FaRegFolderOpen /></span>
