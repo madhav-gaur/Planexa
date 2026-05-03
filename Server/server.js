@@ -16,23 +16,28 @@ import { activityRouter } from "./routes/activity.route.js";
 import { reportRouter } from "./routes/report.route.js";
 
 const app = express();
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://planexa-web.vercel.app",
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed for this origin: " + origin));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const allowedOrigins = ["http://localhost:5173", "https://planexa-web.vercel.app"];
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS not allowed for this origin: " + origin));
-      }
-    },
-    credentials: true,
-  }),
-);
-
 app.use(cookieParser());
 app.use(morgan("combined"));
 app.use(
