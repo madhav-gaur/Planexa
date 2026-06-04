@@ -34,11 +34,13 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-app.use(helmet({
-  crossOriginResourcePolicy: false,
-  crossOriginOpenerPolicy: false,
-}));
+app.options("/{*splat}", cors(corsOptions));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+    crossOriginOpenerPolicy: false,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -67,3 +69,6 @@ connectDB()
     console.error("DB connection failed:", err);
     process.exit(1);
   });
+app.all("/{*splat}", (req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
