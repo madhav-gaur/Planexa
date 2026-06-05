@@ -262,3 +262,27 @@ button:disabled {
         }
     }
 }
+
+.Toastify__toast-theme--light {
+  color: black !important;
+}
+
+.Toastify__toast {
+  min-height: 3.1rem !important;
+  width: fit-content !important;
+  min-width: 220px !important;
+  max-width: 320px !important;
+
+  padding: 12px 24px !important;
+
+  border-radius: 20rem !important;
+
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.Toastify__toast-body {
+  margin: 0 !important;
+  padding: 0 !important;
+}

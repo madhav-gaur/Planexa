@@ -42,6 +42,7 @@ const Settings = () => {
 
   useEffect(() => {
     if (!currWorkspace?._id) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(currWorkspace.name || '')
     setDescription(currWorkspace.description || '')
     setLogoPreview(currWorkspace.logo || null)
@@ -112,6 +113,27 @@ const Settings = () => {
 
   const handleSettingsChange = (key, value) => {
     setSettings((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const renderSettingsToggle = (key, label) => {
+    const id = `settings-${key}`
+
+    return (
+      <div className="settings-toggle checkbox-wrapper-7" key={key}>
+        <label className="settings-toggle-label" htmlFor={id}>
+          {label}
+        </label>
+        <input
+          className="tgl tgl-ios"
+          id={id}
+          type="checkbox"
+          checked={settings[key]}
+          disabled={!isAdmin}
+          onChange={(e) => handleSettingsChange(key, e.target.checked)}
+        />
+        <label className="tgl-btn" htmlFor={id} />
+      </div>
+    )
   }
 
   const handleSaveRules = async (e) => {
@@ -195,7 +217,7 @@ const Settings = () => {
         </div>
       )}
 
-      <div className="account-wrapper" style={{flexDirection:'column'}}>
+      <div className="account-wrapper" style={{ flexDirection: 'column' }}>
         <div className="account-content">
           <div className="settings-grid">
             <div className="account-section settings-card">
@@ -308,51 +330,11 @@ const Settings = () => {
               </div>
 
               <form className="settings-rules-form" onSubmit={handleSaveRules}>
-                <label className="settings-toggle">
-                  <input
-                    type="checkbox"
-                    checked={settings.allowGuestAccess}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleSettingsChange('allowGuestAccess', e.target.checked)}
-                  />
-                  <span>Allow guest access</span>
-                </label>
-                <label className="settings-toggle">
-                  <input
-                    type="checkbox"
-                    checked={settings.taskAutoAssign}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleSettingsChange('taskAutoAssign', e.target.checked)}
-                  />
-                  <span>Task auto-assign</span>
-                </label>
-                <label className="settings-toggle">
-                  <input
-                    type="checkbox"
-                    checked={settings.allowFileUploads}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleSettingsChange('allowFileUploads', e.target.checked)}
-                  />
-                  <span>Allow file uploads</span>
-                </label>
-                <label className="settings-toggle">
-                  <input
-                    type="checkbox"
-                    checked={settings.allowSubtasks}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleSettingsChange('allowSubtasks', e.target.checked)}
-                  />
-                  <span>Allow subtasks</span>
-                </label>
-                <label className="settings-toggle">
-                  <input
-                    type="checkbox"
-                    checked={settings.allowComments}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleSettingsChange('allowComments', e.target.checked)}
-                  />
-                  <span>Allow comments</span>
-                </label>
+                {renderSettingsToggle('allowGuestAccess', 'Allow guest access')}
+                {renderSettingsToggle('taskAutoAssign', 'Task auto-assign')}
+                {renderSettingsToggle('allowFileUploads', 'Allow file uploads')}
+                {renderSettingsToggle('allowSubtasks', 'Allow subtasks')}
+                {renderSettingsToggle('allowComments', 'Allow comments')}
 
                 <div style={{ display: 'flex', flexDirection: 'row', width: '100%', gap: '1rem' }}>
 

@@ -24,14 +24,10 @@ const DashboardLayout = () => {
     });
 
     useEffect(() => {
-        if (darkMode) {
-            localStorage.setItem("theme", "dark");
-        } else {
-            localStorage.setItem("theme", "light");
-        }
-    }, [darkMode]);
-    useEffect(() => {
+        const theme = darkMode ? "dark" : "light";
+        localStorage.setItem("theme", theme);
         document.documentElement.classList.toggle("dark", darkMode);
+        window.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
     }, [darkMode]);
     return (
         <div className={`dashboard-wrapper`}>
